@@ -1,0 +1,260 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")  // Referencing the environment variable
+}
+
+enum MemberRole {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+model Profile {
+  id String @id @default(uuid()) @map("_id")
+  userId String @unique
+  name String
+  imageUrl String?  
+  email String  
+
+   
+   //answers Answer[] // Relation to Answer
+  //quizAttempts QuizAttempt[] // a relation to QuizAttempt
+
+
+  role MemberRole @default(STUDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model Course{
+  id String @id @default(uuid()) @map("_id")
+  userId String
+  title String  
+  description String?  
+  imageUrl    String?
+  price       Float?
+  isPublished Boolean @default(false) 
+  categoryId String?
+  category Category? @relation(fields: [categoryId], references: [id])
+
+  chapters Chapter[]
+  attachments Attachment[]
+  purchases Purchase[]
+
+  quizzes Quiz[] // Add this line
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId])
+  @@fulltext([title])
+}
+
+model Category{
+  id String @id @default(uuid()) @map("_id")
+  name String
+  description String?
+
+  courses Course[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model Attachment{
+  id String @id @default(uuid()) @map("_id")
+  name String
+  url String 
+ 
+   courseId String
+   Course Course @relation(fields: [courseId], references: [id], onDelete:Cascade)
+
+   createdAt DateTime @default(now())
+   updatedAt DateTime @updatedAt
+ 
+   @@index([courseId])
+
+   }
+
+
+model Chapter{
+  id String @id @default(uuid()) @map("_id")
+  title String
+  description String?  
+  videoUrl String? 
+  position Int
+  isPublished Boolean @default(false)
+  isFree Boolean @default(false)
+  muxData muxData?
+
+  courseId String
+  Course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  userProgress UserProgress[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+@@index([courseId])
+}
+
+
+model  muxData {
+  id String @id @default(uuid()) @map("_id")
+  assetId String
+  playbackId String
+   
+  chapterId String  @unique
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete:Cascade)          
+}
+ 
+
+
+model UserProgress{
+  id String @id @default(uuid()) @map("_id")
+  userId String
+
+  chapterId String
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete:Cascade)
+
+  isCompleted Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([chapterId])
+  @@unique([userId,chapterId])
+}
+
+
+model Purchase{
+  id String @id @default(uuid()) @map("_id")
+  userId String
+  courseId String
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  
+  @@unique([userId,courseId])
+  @@index([courseId])
+}
+
+
+
+model StripeCustomer {
+  id                String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String     @unique
+  stripeCustomerId String     @unique
+
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+}
+
+model Logging {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  url       String
+  method    String
+  body      String?
+  response  String?
+  statusCode Int?
+  errorMessage String?
+  createdAt DateTime @default(now())
+}
+
+
+
+
+
+
+ 
+
+ 
+
+
+model Quiz {
+  id        String     @id @default(uuid()) @map("_id")
+  title     String
+  courseId  String
+  course    Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  questions Question[] // Relation to Question model
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+ // results   QuizResult[] @relation("QuizResults") 
+}
+
+model Question {
+  id            String   @id @default(uuid()) @map("_id")
+  quizId        String
+  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  questionText  String   
+  options       Option[] @relation("QuestionOptions") // Relation to options
+  correctAnswer String   // Correct answer
+}
+
+model Option {
+  id         String   @id @default(uuid()) @map("_id")
+  text       String   // Option text
+
+  question   Question @relation("QuestionOptions", fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+}
+
+
+model QuizAttempt {
+  id           String    @id @default(uuid()) @map("_id")
+  quizId        String
+  studentId     String
+  score         Int
+  totalQuestions Int
+  answers       String   // Storing answers as JSON string
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Add relation if necessary
+ // quiz           Quiz     @relation(fields: [quizId], references: [id])
+
+}
+
+model QuizResult {
+  id           String   @id @default(uuid()) @map("_id")
+  quizId       String
+  studentId    String
+  score        Int
+  total        Int
+  createdAt    DateTime @default(now())
+
+  //quiz         Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+
+// model Answer {
+//   id String @id @default(uuid()) @map("_id")
+//   text String
+//   isCorrect Boolean
+
+//   questionId String
+//   question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+
+
+
