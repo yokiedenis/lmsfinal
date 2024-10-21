@@ -98,12 +98,13 @@ export const CourseSidebar = async ({
 
       {/* Display locked message if not all chapters are completed */}
       {!allChaptersCompleted && (
-        <div className="p-4 bg-yellow-700 border-l-4 border-yellow-500 text-white rounded-lg">
-    <span className="w-full text-center p-3">
-            Complete all chapters to unlock the final quiz
-          </span>
-        </div>
-      )}
+  <div className="p-6 bg-gradient-to-r from-indigo-500 to-purple-600 border-l-4 border-purple-400 text-white rounded-lg shadow-lg animate__animated animate__pulse">
+    <span className="w-full text-center">
+      <h2 className="text-3xl font-extrabold mb-2">🚀 Unlock the Final Quiz!</h2>
+      <p className="text-lg">Complete all chapters to gain access.</p>
+    </span>
+  </div>
+     )}
     </div>
   );
 };

@@ -1,7 +1,8 @@
-import { NextResponse, NextRequest } from "next/server"; // Import NextRequest
-import prisma from "@/lib/prisma"; // Import your Prisma client instance
-import { z } from "zod"; // Import Zod for validation
-import { getAuth } from "@clerk/nextjs/server"; // Import Clerk's getAuth function
+// Import necessary modules
+import { NextResponse, NextRequest } from "next/server"; 
+import prisma from "@/lib/prisma"; 
+import { z } from "zod"; 
+import { getAuth } from "@clerk/nextjs/server"; 
 
 // Zod schema for validating the answer submission
 const answerSchema = z.object({
@@ -17,7 +18,7 @@ const answerSchema = z.object({
 
 // API route handler for submitting quiz answers
 export async function POST(request: NextRequest, { params }: { params: { courseId: string; quizId: string } }) {
-  const { quizId } = params; // Extract quizId from parameters
+  const { quizId } = params;
 
   // Parse the request body
   const body = await request.json();
@@ -26,17 +27,17 @@ export async function POST(request: NextRequest, { params }: { params: { courseI
   const result = answerSchema.safeParse(body);
 
   if (!result.success) {
-    console.error("Validation errors:", result.error.errors); // Log validation errors
+    console.error("Validation errors:", result.error.errors);
     return NextResponse.json(
       { message: "Validation failed", errors: result.error.errors },
       { status: 400 }
     );
   }
 
-  const { answers } = result.data; // Destructure validated data
+  const { answers } = result.data;
 
   // Get user authentication details from the request
-  const { userId } = getAuth(request); // Get the authenticated user ID
+  const { userId } = getAuth(request); 
 
   // Check if the user is authenticated
   if (!userId) {
@@ -53,26 +54,39 @@ export async function POST(request: NextRequest, { params }: { params: { courseI
       select: { id: true, correctAnswer: true },
     });
 
+    console.log("quizQuestions:", quizQuestions);
+    console.log("submitted answers:", answers);
+
     // Calculate score
     let score = 0;
     const totalQuestions = quizQuestions.length;
 
-    // Iterate through answers to calculate the score
-    answers.forEach(answer => {
-      const question = quizQuestions.find(q => q.id === answer.questionId);
-      if (question && question.correctAnswer === answer.answer) {
-        score++;
-      }
-    });
+    // Create a mapping of correct answers for quick lookup
+    const correctAnswersMap = Object.fromEntries(
+      quizQuestions.map(question => [question.id, question.correctAnswer])
+    );
 
+    // Iterate through answers to calculate the score
+answers.forEach(answer => {
+  const submittedAnswer = answer.answer.split('.')[0].trim(); // Extract the letter and trim any whitespace
+
+  const correctAnswer = correctAnswersMap[answer.questionId];
+
+  console.log(`Checking: Question ID: ${answer.questionId}, Submitted Answer: ${submittedAnswer}, Correct Answer: ${correctAnswer}`);
+
+  // Compare the submitted answer with the correct answer
+  if (correctAnswer && correctAnswer === submittedAnswer) {
+    score++;
+  }
+});
     // Save the quiz attempt with the userId included
     const quizAttempt = await prisma.quizAttempt.create({
       data: {
         quizId,
-        studentId: userId, // Use the authenticated user's ID
+        studentId: userId,
         score,
         totalQuestions,
-        answers: JSON.stringify(answers), // Save answers as JSON string
+        answers: JSON.stringify(answers),
       },
     });
 
@@ -87,8 +101,6 @@ export async function POST(request: NextRequest, { params }: { params: { courseI
     );
   } catch (error) {
     console.error("Failed to submit answers:", error);
-
-    // Type assertion to handle the unknown error type
     const errorMessage = (error instanceof Error) ? error.message : "Failed to submit answers";
 
     return NextResponse.json(

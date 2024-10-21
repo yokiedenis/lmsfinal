@@ -8,7 +8,14 @@ import { CoursesList } from "@/components/courses-list";
 import { InfoCard } from "./_components/info-card";
 import { BannerCard } from "./_components/banner-card";
 
+import StudentAIHelper from '@/components/studentaihelper'; 
+
 export default async function Dashboard() {
+
+  const modules = ['Module 1', 'Module 2', 'Module 3']; // Replace with your actual modules
+  const courses = ['Course 1', 'Course 2', 'Course 3']; // Replace with your actual courses
+  
+
   const { userId } = auth();
 
   if (!userId) {
@@ -48,6 +55,9 @@ export default async function Dashboard() {
       <CoursesList
         items={[...coursesInProgress, ...completedCourses]}
       />
+
+      {/* <StudentAIHelper modules={modules} courses={courses}  /> */}
+
     </div>
   )
 }

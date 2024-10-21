@@ -205,12 +205,13 @@ model Question {
   questionText  String   
   options       Option[] @relation("QuestionOptions") // Relation to options
   correctAnswer String   // Correct answer
+ 
 }
 
 model Option {
   id         String   @id @default(uuid()) @map("_id")
   text       String   // Option text
-
+   
   question   Question @relation("QuestionOptions", fields: [questionId], references: [id], onDelete: Cascade)
   questionId String
 }

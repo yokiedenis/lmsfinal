@@ -38,7 +38,7 @@ const formSchema = z.object({
     .number({
       invalid_type_error: "Price must be a number",
     })
-    .nonnegative("Price cannot be negative"), // Accepts 0 but not negative values
+    .min(0, "Price cannot be negative"), // Accepts 0 and prevents negative values
 });
 
 export const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
@@ -59,6 +59,7 @@ export const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
   const { isSubmitting, isValid } = form.formState;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log("Submitted values:", values); // Check submitted values
     try {
       await axios.patch(`/api/courses/${courseId}`, values);
       toast.success("Course updated successfully");
@@ -74,17 +75,11 @@ export const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
       <div className="font-medium flex items-center justify-between">
         Course Price
         <Button onClick={toggleEdit} variant="ghost">
-          {isEditing ? <>Cancel</> : <>
-            <Pencil className="h-4 w-4 mr-2" />
-            Edit Price
-          </>}
+          {isEditing ? <>Cancel</> : <><Pencil className="h-4 w-4 mr-2" /> Edit Price</>}
         </Button>
       </div>
       {!isEditing && (
-        <p className={cn(
-          "text-sm mt-2",
-          initialData.price === 0 ? "text-slate-500 italic" : ""
-        )}>
+        <p className={cn("text-sm mt-2", initialData.price === 0 ? "text-slate-500 italic" : "")}>
           {initialData.price === 0 ? "Free" : formatPrice(initialData.price!)}
         </p>
       )}
@@ -104,6 +99,7 @@ export const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
                       disabled={isSubmitting}
                       placeholder="Set a price for your course (0 for Free)"
                       {...field}
+                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)} // Parse input value
                     />
                   </FormControl>
                   <FormMessage />
@@ -111,10 +107,7 @@ export const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
               )}
             />
             <div className="flex items-center gap-x-2">
-              <Button
-                disabled={!isValid || isSubmitting}
-                type="submit"
-              >
+              <Button disabled={!isValid || isSubmitting} type="submit">
                 Save
               </Button>
             </div>

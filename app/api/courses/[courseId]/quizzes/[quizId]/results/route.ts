@@ -1,13 +1,14 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma"; // Import your Prisma client instance
+import { NextResponse, NextRequest } from "next/server";
+import prisma from "@/lib/prisma";
+import { getAuth } from "@clerk/nextjs/server";
 
-export async function GET(request: Request, { params }: { params: { courseId: string; quizId: string } }) {
-  const { courseId, quizId } = params; // Extract courseId and quizId from parameters
+export async function GET(request: NextRequest, { params }: { params: { courseId: string; quizId: string } }) {
+  const { courseId, quizId } = params;
 
-  const studentId = request.headers.get("student-id"); // Get studentId from headers
+  const { userId } = getAuth(request);
 
-  if (!studentId) {
-    return NextResponse.json({ message: "Student ID is required" }, { status: 400 });
+  if (!userId) {
+    return NextResponse.json({ message: "User not authenticated" }, { status: 401 });
   }
 
   try {
@@ -15,7 +16,7 @@ export async function GET(request: Request, { params }: { params: { courseId: st
     const quizAttempt = await prisma.quizAttempt.findFirst({
       where: {
         quizId,
-        studentId,
+        studentId: userId,
       },
       select: {
         score: true,
@@ -27,6 +28,7 @@ export async function GET(request: Request, { params }: { params: { courseId: st
       return NextResponse.json({ message: "No results found for this student" }, { status: 404 });
     }
 
+    // Return the quiz attempt results
     return NextResponse.json(quizAttempt, { status: 200 });
   } catch (error) {
     console.error("Failed to fetch quiz results:", error);
