@@ -1,13 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-
 import { db } from "@/lib/db";
-
 import { getProgress } from "@/actions/get-progress";
-
 import { CourseSidebar } from "./_components/course-sidebar";
 import { CourseNavbar } from "./_components/course-navbar";
-//import getSafeProfile from "@/actions/get-safe-profile";
 
 const CourseLayout = async ({
   children,
@@ -18,12 +14,8 @@ const CourseLayout = async ({
 }) => {
   const { userId } = auth();
   if (!userId) {
-    return redirect("/")
+    return redirect("/");
   }
-  // const safeProfile = await getSafeProfile();
-  // if (!safeProfile) {
-  //   return redirect("/");
-  // }
 
   const course = await db.course.findUnique({
     where: {
@@ -57,17 +49,15 @@ const CourseLayout = async ({
   const progressCount: number = await getProgress(userId, course.id);
 
   // Extract quizId
-  const quizId = course.quizzes?.[0]?.id; // Adjust based on your data structure
-
+  const quizId = course.quizzes?.[0]?.id; // Get the first quizId or set a default value
 
   return (
-
     <div className="h-full">
       <div className="h-[80px] md:pl-80 fixed inset-y-0 w-full z-50">
         <CourseNavbar
           course={course}
           progressCount={progressCount}
-        //  currentProfile={safeProfile}
+          quizId={quizId} // Pass quizId to CourseNavbar
         />
       </div>
       <div className="hidden md:flex h-full w-80 flex-col fixed inset-y-0 z-50">
@@ -81,8 +71,7 @@ const CourseLayout = async ({
         {children}
       </main>
     </div>
-
-  )
+  );
 }
 
-export default CourseLayout
+export default CourseLayout;
