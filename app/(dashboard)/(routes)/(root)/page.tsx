@@ -10,6 +10,8 @@ import { BannerCard } from "./_components/banner-card";
 
 import StudentAIHelper from '@/components/studentaihelper'; 
 
+import Chat from "@/components/chat";
+
 export default async function Dashboard() {
 
   const modules = ['Module 1', 'Module 2', 'Module 3']; // Replace with your actual modules
@@ -32,11 +34,9 @@ export default async function Dashboard() {
       <div className="grid grid-cols-1 gap-4">
         <BannerCard
             icon={InfoIcon}
-            label="Welcome to the dashboard"
-            description={`This is where you can see your progress 
-            and continue your courses. This is a demonstration LMS and as such, all courses are free and Stripe is in test
-             mode. To enroll in a course, enter dummy data in the Stripe form. Contact me from
-             folio.kendev.co to obtain admin access`}
+            label="Welcome to the Dashboard"
+            description={`This is where you can see your progress and continue your courses. This is a LMS and as such, some courses are free, and Stripe is in test mode. To enroll in a course, enter dummy data in the Stripe form.
+               Admin access is only limited to Edu skill team`}
         />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -55,8 +55,9 @@ export default async function Dashboard() {
       <CoursesList
         items={[...coursesInProgress, ...completedCourses]}
       />
-
-      {/* <StudentAIHelper modules={modules} courses={courses}  /> */}
+     
+     
+      
 
     </div>
   )

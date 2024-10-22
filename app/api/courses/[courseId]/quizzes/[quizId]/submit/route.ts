@@ -1,4 +1,3 @@
-// Import necessary modules
 import { NextResponse, NextRequest } from "next/server"; 
 import prisma from "@/lib/prisma"; 
 import { z } from "zod"; 
@@ -67,28 +66,50 @@ export async function POST(request: NextRequest, { params }: { params: { courseI
     );
 
     // Iterate through answers to calculate the score
-answers.forEach(answer => {
-  const submittedAnswer = answer.answer.split('.')[0].trim(); // Extract the letter and trim any whitespace
+    answers.forEach(answer => {
+      const submittedAnswer = answer.answer.split('.')[0].trim(); // Extract the letter and trim any whitespace
+      const correctAnswer = correctAnswersMap[answer.questionId];
 
-  const correctAnswer = correctAnswersMap[answer.questionId];
+      console.log(`Checking: Question ID: ${answer.questionId}, Submitted Answer: ${submittedAnswer}, Correct Answer: ${correctAnswer}`);
 
-  console.log(`Checking: Question ID: ${answer.questionId}, Submitted Answer: ${submittedAnswer}, Correct Answer: ${correctAnswer}`);
+      // Compare the submitted answer with the correct answer
+      if (correctAnswer && correctAnswer === submittedAnswer) {
+        score++;
+      }
+    });
 
-  // Compare the submitted answer with the correct answer
-  if (correctAnswer && correctAnswer === submittedAnswer) {
-    score++;
-  }
-});
-    // Save the quiz attempt with the userId included
-    const quizAttempt = await prisma.quizAttempt.create({
-      data: {
+    // Check if the user has already submitted the quiz before
+    const existingAttempt = await prisma.quizAttempt.findFirst({
+      where: {
         quizId,
         studentId: userId,
-        score,
-        totalQuestions,
-        answers: JSON.stringify(answers),
       },
     });
+
+    let quizAttempt;
+
+    if (existingAttempt) {
+      // If an attempt exists, update it
+      quizAttempt = await prisma.quizAttempt.update({
+        where: { id: existingAttempt.id },
+        data: {
+          score,
+          totalQuestions,
+          answers: JSON.stringify(answers), // Store the new answers
+        },
+      });
+    } else {
+      // If no previous attempt exists, create a new one
+      quizAttempt = await prisma.quizAttempt.create({
+        data: {
+          quizId,
+          studentId: userId,
+          score,
+          totalQuestions,
+          answers: JSON.stringify(answers),
+        },
+      });
+    }
 
     // Return the results with status 201 (Created)
     return NextResponse.json(

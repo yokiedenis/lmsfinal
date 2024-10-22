@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import ResultPopup from "@/components/resultpopup"; // Import your ResultPopup
 import Confetti from "react-confetti"; // Import the confetti library
+import { Banner } from "@/components/banner";
 
 interface QuizOption {
   id: string;
@@ -190,8 +191,11 @@ export const StudentQuizForm = ({ quizId, courseId }: StudentQuizFormProps) => {
 
       {/* Optional Revisit message - Placed inside the quiz section */}
       {showRevisitMessage && (
-        <div className="mb-4 p-2 bg-red-100 text-red-600 rounded-md">
-          You might want to revisit the materials before trying again.
+        <div>
+          <Banner
+              variant= "warning"
+              label = "You might want to revisit the course materials/videos before trying again"
+          />
           <Button onClick={handleRetryQuiz} className="mt-2">
             Repeat Quiz
           </Button>

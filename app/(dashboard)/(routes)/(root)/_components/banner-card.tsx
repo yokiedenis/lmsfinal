@@ -16,18 +16,20 @@ export const BannerCard = ({
   label,
 }: BannerCardProps) => {
   return (
-    <div className="border rounded-md flex items-center gap-x-2 p-3">
+    <div className="border rounded-md flex items-center gap-x-2 p-3"
+    style={{ backgroundColor: '#61005f' }}
+    >
       <IconBadge
         variant={variant}
         icon={Icon}
       />
       <div>
-        <p className="font-medium">
+        <p className="font-medium" style={{ color: '#fbe800' }}>
           {label}
         </p>
-        <p className="text-gray-700 dark:text-gray-200 text-sm">
-          { description }
-        </p>
+        <p className="text-sm" style={{ color: '#ffff' }}>
+            {description}
+         </p>
       </div>
     </div>
   )
