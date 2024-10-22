@@ -49,7 +49,17 @@ export const CourseSidebar = async ({
   return (
     <div className="h-full border-r flex flex-col overflow-y-auto shadow-sm">
       <div className="p-8 flex flex-col border-b">
-        <h1 className="font-semibold">{course.title}</h1>
+      <h1
+  className="font-semibold"
+  style={{
+    color: 'yellow', // White text color
+    backgroundColor: '#6A0DAD', // Rich purple background
+    padding: '12px 20px', // Add padding for spacing
+    borderRadius: '8px' // Rounded corners for a modern look
+  }}
+>
+  {course.title}
+</h1>
         {purchase && (
           <div className="mt-10">
             <CourseProgress variant="success" value={progressCount} />
