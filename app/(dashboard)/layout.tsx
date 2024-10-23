@@ -1,6 +1,6 @@
 import { Sidebar } from "./_components/sidebar";
 import NavBar from "./_components/navbar";
-import Chat from "@/components/chat";
+import Chat from "@/components/chatbot";
 
  
 
