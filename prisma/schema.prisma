@@ -257,5 +257,15 @@ model QuizResult {
 // }
 
 
+model SupportQuery {
+  id         String   @id @default(uuid()) @map("_id")
+  studentId  String
+  email      String
+  subject    String
+  message    String
+  createdAt  DateTime @default(now())
+ }
+
+
 
 

@@ -1,0 +1,113 @@
+/* supportcenter.module.css */
+
+/* Ensure the entire viewport is utilized */
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw; /* Full viewport width */
+  height: 100vh; /* Full viewport height */
+  padding: 0; /* Remove padding */
+  box-sizing: border-box; /* Include padding in width/height */
+  background-color: #f9f9ff; /* Change as needed for background */
+}
+
+.supportCenter {
+  background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent to see the background */
+  padding: 2rem; /* Add padding for content */
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  flex-grow: 1; /* Allow the support center to grow */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Align items to the top */
+  overflow-y: auto; /* Enable scrolling if content overflows */
+}
+
+.title {
+  font-size: 2rem; /* Increase title size */
+  font-weight: bold;
+  color: #003366; /* Your purple color */
+  text-align: left; /* Align left for better fit */
+  margin-bottom: 1.5rem; /* Space below the title */
+}
+
+/* FAQ Section */
+.section {
+  margin-bottom: 2rem; /* Space below each section */
+}
+
+.sectionTitle {
+  font-size: 1.5rem; /* Increase section title size */
+  color: goldenrod; /* Your purple color */
+  font-weight: 600;
+  margin-bottom: 1rem; /* Space below the section title */
+}
+
+.faq details {
+  background-color: #f0f0ff;
+  padding: 0.8rem; /* Inner padding for details */
+  margin-bottom: 0.8rem; /* Space below each FAQ */
+  border-radius: 4px;
+}
+
+.faq summary {
+  font-weight: 500;
+  color: #4c0080; /* Your purple color */
+}
+
+.faq p {
+  margin-top: 0.5rem; /* Space above the answer */
+  color: #333; /* Dark color for better readability */
+}
+
+/* Form Section */
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem; /* Space below each form group */
+}
+
+.label {
+  font-size: 1rem; /* Slightly larger label */
+  color: #4c0080; /* Your purple color */
+  font-weight: 500;
+  margin-bottom: 0.4rem; /* Space below label */
+}
+
+.input, .textarea {
+  width: 100%; /* Full width for inputs */
+  padding: 0.8rem; /* Inner padding for inputs */
+  font-size: 1rem; /* Font size for inputs */
+  border: 1px solid #ccc; /* Border color */
+  border-radius: 4px; /* Rounded corners */
+  margin-top: 0.2rem; /* Space above input */
+}
+
+.input:focus, .textarea:focus {
+  border-color: #4c0080; /* Highlight border on focus */
+  outline: none; /* Remove default outline */
+  box-shadow: 0 0 4px rgba(76, 0, 128, 0.3); /* Shadow effect */
+}
+
+.textarea {
+  resize: vertical; /* Allow vertical resizing */
+  min-height: 120px; /* Minimum height for textarea */
+}
+
+.submitButton {
+  padding: 0.8rem 1.2rem; /* Inner padding for button */
+  font-size: 1rem; /* Font size for button */
+  font-weight: bold; /* Bold font for button */
+  background-color: #4c0080; /* Your purple color */
+  color: #fff; /* White text on button */
+  border: none; /* No border */
+  border-radius: 4px; /* Rounded corners for button */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+.submitButton:hover {
+  background-color: #370060; /* Darker purple on hover */
+}

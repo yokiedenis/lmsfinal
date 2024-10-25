@@ -1,6 +1,6 @@
 "use client";
 
-import { Layout, Compass, List, BarChart, Users } from "lucide-react";
+import { Layout, Compass, List, BarChart, Users,CircleHelp,MessageCircle } from "lucide-react";
 import SidebarItem from "./sidebar-item";
 import { usePathname } from "next/navigation";
 
@@ -14,6 +14,11 @@ const STUDENTRoutes = [
         icon: Compass,
         label: "Browse",
         href: "/search",
+    },
+    {
+        icon: CircleHelp,
+        label: "Student Helper",
+        href: "/help",
     }
 ]
 
@@ -32,7 +37,13 @@ const teacherRoutes = [
         icon: Users,
         label: "Manage Users",
         href: "/teacher/users",
-    }
+    },
+    {
+        icon: MessageCircle,
+        label: "Student Feedback",
+        href: "/teacher/feedback",
+    },
+     
 ]
 
 

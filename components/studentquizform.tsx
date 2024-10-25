@@ -6,8 +6,8 @@ import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
-import ResultPopup from "@/components/resultpopup"; // Import your ResultPopup
-import Confetti from "react-confetti"; // Import the confetti library
+import ResultPopup from "@/components/resultpopup";
+import Confetti from "react-confetti";
 import { Banner } from "@/components/banner";
 
 interface QuizOption {
@@ -34,11 +34,34 @@ export const StudentQuizForm = ({ quizId, courseId }: StudentQuizFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<{ score: number; totalQuestions: number } | null>(null);
   const [isResultPopupVisible, setIsResultPopupVisible] = useState(false);
-  const [showFireworks, setShowFireworks] = useState(false); // State for fireworks
-  const [showRevisitMessage, setShowRevisitMessage] = useState(false); // State for revisit message
-  const [showCongratsBanner, setShowCongratsBanner] = useState(false); // State for congratulations banner
+  const [showFireworks, setShowFireworks] = useState(false);
+  const [showRevisitMessage, setShowRevisitMessage] = useState(false);
+  const [showCongratsBanner, setShowCongratsBanner] = useState(false);
+
+  // Timer state
+  const [timer, setTimer] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(true);
 
   const { userId } = useAuth();
+
+  useEffect(() => {
+    // Start timer on component load
+    const timerInterval = setInterval(() => {
+      if (isTimerRunning) {
+        setTimer((prev) => prev + 1);
+      }
+    }, 1000);
+
+    // Clean up interval on component unmount
+    return () => clearInterval(timerInterval);
+  }, [isTimerRunning]);
+
+  // Timer display formatter
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60).toString().padStart(2, "0");
+    const secs = (seconds % 60).toString().padStart(2, "0");
+    return `${mins}:${secs}`;
+  };
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -78,29 +101,24 @@ export const StudentQuizForm = ({ quizId, courseId }: StudentQuizFormProps) => {
         },
       });
 
-      console.log("Quiz Results Response:", response.data); // Debug log
       setResult(response.data);
       setIsResultPopupVisible(true);
 
       const scorePercentage = (response.data.score / response.data.totalQuestions) * 100;
-      console.log("Score Percentage:", scorePercentage); // Debug log
 
-      // Determine if we should show the congratulations banner or revisit message
       if (scorePercentage < 60) {
         setShowRevisitMessage(true);
         setShowCongratsBanner(false);
         setShowFireworks(false);
       } else {
-        setShowCongratsBanner(true); // Show the congratulations banner
+        setShowCongratsBanner(true);
         setShowFireworks(true);
         setShowRevisitMessage(false);
 
-        // Automatically hide the congratulations banner after 15 seconds
         setTimeout(() => {
           setShowCongratsBanner(false);
-        }, 15000); // 15 seconds
+        }, 15000);
 
-        // Hide fireworks after 2 minutes
         setTimeout(() => setShowFireworks(false), 120000);
       }
     } catch (error) {
@@ -112,6 +130,7 @@ export const StudentQuizForm = ({ quizId, courseId }: StudentQuizFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setIsTimerRunning(false); // Stop the timer on submit
 
     try {
       const answersToSubmit = Object.entries(answers).map(([questionId, answerId]) => {
@@ -134,9 +153,8 @@ export const StudentQuizForm = ({ quizId, courseId }: StudentQuizFormProps) => {
         { headers: { "user-id": userId } }
       );
 
-      console.log("Submit Response:", response.data); // Debug log
       if (response.data) {
-        await fetchResults(); // Fetch results after submitting
+        await fetchResults();
         toast.success("Quiz submitted successfully!");
       }
     } catch (error) {
@@ -152,19 +170,19 @@ export const StudentQuizForm = ({ quizId, courseId }: StudentQuizFormProps) => {
   };
 
   const handleRetryQuiz = async () => {
-    // Reset answers and results before retrying
     setAnswers({});
-    setResult(null); // Reset result state
+    setResult(null);
     setIsResultPopupVisible(false);
     setShowRevisitMessage(false);
-    setShowCongratsBanner(false); // Hide congratulations banner on retry
+    setShowCongratsBanner(false);
     setShowFireworks(false);
+    setTimer(0); // Reset timer
+    setIsTimerRunning(true);
 
     try {
-      // Ensure to fetch the new quiz state after retry
       const response = await axios.get(`/api/courses/${courseId}/quizzes/${quizId}`);
       if (response.data && response.data.questions) {
-        setQuiz(response.data.questions); // Refetch the quiz
+        setQuiz(response.data.questions);
       } else {
         toast.error("No questions found for this quiz.");
       }
@@ -180,21 +198,23 @@ export const StudentQuizForm = ({ quizId, courseId }: StudentQuizFormProps) => {
 
   return (
     <div className="mt-6 p-4 border bg-slate-100 rounded-md shadow-lg">
+      <div className="timer text-center text-xl font-bold text-blue-600 mb-4 animate-pulse">
+        Time Elapsed: {formatTime(timer)}
+      </div>
+
       <h2 className="font-bold text-lg mb-4">Attempt Quiz</h2>
 
-      {/* Show "CONGRATULATIONS" banner with animation when score is 60% or above */}
       {showCongratsBanner && (
         <div className="congrats-banner bg-green-100 text-green-700 p-2 rounded-md shadow-md mb-4">
           CONGRATULATIONS!
         </div>
       )}
 
-      {/* Optional Revisit message - Placed inside the quiz section */}
       {showRevisitMessage && (
         <div>
           <Banner
-              variant= "warning"
-              label = "You might want to revisit the course materials/videos before trying again"
+            variant="warning"
+            label="You might want to revisit the course materials/videos before trying again"
           />
           <Button onClick={handleRetryQuiz} className="mt-2">
             Repeat Quiz
@@ -232,16 +252,16 @@ export const StudentQuizForm = ({ quizId, courseId }: StudentQuizFormProps) => {
         </Button>
       </form>
 
-      {/* Render ResultPopup if results are available and popup is visible */}
-      {isResultPopupVisible && result && (
+      {isResultPopupVisible && (
         <ResultPopup
-          score={result.score}
-          totalQuestions={result.totalQuestions}
+          score={result?.score || 0}
+          totalQuestions={result?.totalQuestions || 0}
           onClose={handleClosePopup}
+          // courseId={courseId}
+          // quizId={quizId}
         />
       )}
 
-      {/* Optional Fireworks effect */}
       {showFireworks && <Confetti />}
     </div>
   );

@@ -35,7 +35,7 @@ export default async function Dashboard() {
       <div className="grid grid-cols-1 gap-4">
         <BannerCard
             icon={InfoIcon}
-            label="Welcome to the Dashboard"
+            label="Welcome to the Eduskill Student Dashboard"
             description={`This is where you can see your progress and continue your courses. This is a LMS and as such, some courses are free, and Stripe is in test mode. To enroll in a course, enter dummy data in the Stripe form.
                Admin access is only limited to Edu skill team`}
         />

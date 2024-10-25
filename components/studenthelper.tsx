@@ -25,10 +25,10 @@ const StudentHelper: React.FC = () => {
     if (userInput.trim()) {
       const userMessage: Message = { sender: 'user', text: userInput };
       setMessages((prevMessages) => [...prevMessages, userMessage]);
-
+  
       try {
-        const response = await axios.post<{ reply: string }>('/chat', { userMessage: userInput });
-
+        const response = await axios.post<{ reply: string }>('/chat', { userMessage: userInput }); // Updated endpoint
+  
         const botMessage: Message = { sender: 'bot', text: response.data.reply };
         setMessages((prevMessages) => [...prevMessages, botMessage]);
       } catch (error) {
@@ -36,11 +36,12 @@ const StudentHelper: React.FC = () => {
         const botError: Message = { sender: 'bot', text: 'Sorry, I am having trouble responding right now.' };
         setMessages((prevMessages) => [...prevMessages, botError]);
       }
-
+  
       // Clear the input field
       setUserInput('');
     }
   };
+  
 
   return (
     <div>

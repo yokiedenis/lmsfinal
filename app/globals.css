@@ -114,19 +114,68 @@
 }
 
 .student-helper-container {
-  padding: 1.5rem; /* Increase padding for a more spacious layout */
+  padding: 2rem; /* Increase padding for a more spacious layout */
   background-color: #ffffff; /* Use a clean white background for contrast */
   border-radius: 12px; /* Slightly larger border radius for softer corners */
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Deeper shadow for a more pronounced effect */
-  max-width: 400px; /* Set a max width for better alignment */
+  max-width: 480px; /* Increased max width for better alignment */
   margin: 1rem auto; /* Center container and add vertical spacing */
   border: 1px solid #ddd; /* Add a subtle border for definition */
 }
 
-.toggle-btn {
+.chatbot-toggle-btn {
   background-color: #f39c12; /* Maintain the vibrant primary color */
   color: white;
-  padding: 12px 24px; /* Slightly larger padding for the button */
+  padding: 14px 28px; /* Slightly larger padding for the button */
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s; /* Add a transform for a hover effect */
+  font-size: 18px; /* Increase font size for better readability */
+  font-weight: bold; /* Make the button text bold */
+  display: block; /* Ensure it takes full width */
+  margin: 0 auto; /* Center the button */
+}
+
+.chatbot-container {
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  height: 500px; /* Set a fixed height for the chat container */
+  overflow-y: auto; /* Enable vertical scrolling if content overflows */
+  border: 1px solid #ddd; /* Add a border around the chat area */
+  border-radius: 8px; /* Round the corners of the chat area */
+  background-color: #f9f9f9; /* Match background with the container */
+  padding: 1rem; /* Add padding for content inside */
+}
+
+.chatbot-header h2 {
+  font-size: 24px; /* Increase font size for the header */
+  color: #333; /* Darker text color for better contrast */
+  margin: 0; /* Remove default margin */
+}
+
+.chatbot-body {
+  flex-grow: 1; /* Allow body to expand and fill available space */
+  padding: 0.5rem; /* Add some padding */
+}
+
+.chatbot-footer {
+  display: flex; /* Flexbox for input and button alignment */
+  margin-top: 1rem; /* Spacing above the footer */
+}
+
+.chatbot-input {
+  flex-grow: 1; /* Allow input to take remaining space */
+  padding: 10px; /* Padding for input field */
+  border: 1px solid #ddd; /* Border for input */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 16px; /* Increase font size for input */
+  margin-right: 10px; /* Spacing between input and button */
+}
+
+.send-btn {
+  background-color: #3498db; /* Color for the send button */
+  color: white;
+  padding: 12px 20px; /* Padding for the button */
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s; /* Add a transform for a hover effect */
@@ -134,16 +183,8 @@
   font-weight: bold; /* Make the button text bold */
 }
 
-.toggle-btn:hover {
-  background-color: #e67e22; /* Maintain hover color */
-  transform: scale(1.05); /* Slightly increase button size on hover */
-}
-
-.helper-content {
-  margin-top: 1.5rem; /* Increase spacing between button and content */
-  font-family: 'Arial', sans-serif; /* Change font for better readability */
-  color: #333; /* Darker text color for better contrast */
-  line-height: 1.5; /* Increase line height for better readability */
+.send-btn:hover {
+  background-color: #2980b9; /* Darker shade on hover */
 }
 
 /* Add styles for messages */
@@ -169,22 +210,12 @@
   word-wrap: break-word; /* Allow text to wrap */
 }
 
-/* Chat container styles */
-.chatbot-container {
-  display: flex;
-  flex-direction: column; /* Stack elements vertically */
-  height: 500px; /* Set a fixed height for the chat container */
-  overflow-y: auto; /* Enable vertical scrolling if content overflows */
-  border: 1px solid #ddd; /* Add a border around the chat area */
-  border-radius: 8px; /* Round the corners of the chat area */
-  background-color: #f9f9f9; /* Match background with the container */
-}
-
-
-
-
 
 
 
 
 @import "~@uploadthing/react/styles.css"
+
+
+
+

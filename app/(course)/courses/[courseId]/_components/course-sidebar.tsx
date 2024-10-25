@@ -9,6 +9,8 @@ import { CourseSidebarItem } from "./course-sidebar-item";
 import QuizButton  from './quiz-button';
 import Link from 'next/link';
 
+import { motion } from "framer-motion";
+
 interface CourseSidebarProps {
   course: Course & {
     chapters: (Chapter & {

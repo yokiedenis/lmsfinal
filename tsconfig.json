@@ -42,7 +42,7 @@
     "./*",
     "app",
     "types"
-  ],
+, "express-server/express-dialogflow"  ],
   "exclude": [
     "node_modules"
   ]

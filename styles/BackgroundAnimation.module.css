@@ -1,0 +1,17 @@
+/* styles/BackgroundAnimation.module.css */
+@keyframes moveBackground {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 0%; }
+}
+
+.animatedBackground {
+    height: 100vh; /* Full viewport height */
+    width: 100%; /* Full width */
+    background: linear-gradient(270deg, #CCCCFF, #9400D3);
+    background-size: 400% 400%; /* For smooth gradient animation */
+    animation: moveBackground 15s ease infinite; /* Adjust duration as needed */
+    display: flex; /* Center content */
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    padding: 40px; /* Padding around the content */
+}
