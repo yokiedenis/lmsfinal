@@ -8,9 +8,9 @@ import { CoursesList } from "@/components/courses-list";
 import { InfoCard } from "./_components/info-card";
 import { BannerCard } from "./_components/banner-card";
 
-import StudentHelper from '@/components/studenthelper'; 
+//import StudentHelper from '@/components/studenthelper'; 
 
-import Chatbot from "@/components/chatbot";
+//import Chatbot from "@/components/chatbot";
 //import ChatbotModal from '@/components/chatbot';
 
 export default async function Dashboard() {
@@ -57,7 +57,7 @@ export default async function Dashboard() {
         items={[...coursesInProgress, ...completedCourses]}
       />
 
-      <StudentHelper/>
+      {/* <StudentHelper/> */}
        
       
      
