@@ -31,7 +31,7 @@ const FeedbackPage = () => {
   const fetchSupportQueries = async () => {
     setLoading(true); // Start loading
     try {
-      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "https://production-eduskill.vercel.app"}/api/support-queries`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "https://eduskill-final.vercel.app/"}/api/support-queries`;
       const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
