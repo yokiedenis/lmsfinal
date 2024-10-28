@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import type { NextRequest } from "next/server";
 
-export async function GET(request) {
+export async function GET(request: NextRequest) {
   const { userId } = auth();
   console.log("Authenticated User ID:", userId);
 
   if (!userId) {
-    return new NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
@@ -28,14 +29,14 @@ export async function GET(request) {
     });
 
     console.log("Fetched Support Queries:", supportQueries);
-    return new NextResponse.json(supportQueries, {
+    return NextResponse.json(supportQueries, {
       headers: {
         "Access-Control-Allow-Origin": "https://eduskill-final.vercel.app",
       },
     });
   } catch (error) {
     console.error("Error fetching support queries:", error);
-    return new NextResponse.json(
+    return NextResponse.json(
       { error: "Failed to fetch support queries" },
       { status: 500, headers: { "Access-Control-Allow-Origin": "https://eduskill-final.vercel.app" } }
     );
