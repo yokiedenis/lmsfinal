@@ -103,7 +103,7 @@ const CreatePage = () => {
                         <div className="flex items-center gap-x-2" >
                             <Link href="/teacher/courses">
                                 <Button 
-                                    variant="ghost"
+                                    variant="destructive"
                                     type="button"
                                 >
                                     Cancel
@@ -112,7 +112,7 @@ const CreatePage = () => {
                             <Button
                                 type="submit"
                                 disabled={!isValid || isSubmitting}
-                                variant = "ghost"
+                                variant = "success"
                             >
                                 Continue
                             </Button>
