@@ -1,3 +1,5 @@
+// app/(dashboard)/(routes)/teacher/feedback/page.tsx
+
 "use client";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs"; // Import useAuth hook
@@ -31,7 +33,7 @@ const FeedbackPage = () => {
   const fetchSupportQueries = async () => {
     setLoading(true); // Start loading
     try {
-      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "https://eduskill-final.vercel.app/"}/api/support-queries`;
+const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "https://eduskill-final.vercel.app/"}/api/support-queries`;
       const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
@@ -54,7 +56,7 @@ const FeedbackPage = () => {
 
   return (
     <div className={`p-6 ${styles.container}`}>
-      <h1 className="text-fuchsia-700 text-2xl font-semibold mb-4">Support Queries</h1>
+      <h1 className="text-purple-600 text-2xl font-semibold mb-4">Support Queries</h1>
       {loading && (
         <motion.div
           initial={{ opacity: 0 }}
