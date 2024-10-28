@@ -1,3 +1,5 @@
+/* supportquerytable.module.css */
+
 .tableContainer {
   margin: 20px;
   overflow-x: auto;
@@ -6,16 +8,45 @@
 .table {
   width: 100%;
   border-collapse: collapse;
+  font-family: "Roboto", sans-serif;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-.table th,
+.table th {
+  background-color: #4f46e5; /* Deep purple */
+  color: #fff;
+  padding: 12px 8px;
+  text-align: left;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+}
+
+.table th::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: #ff8c00; /* Accent color */
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.table th:hover::after {
+  transform: scaleX(1);
+}
+
 .table td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 12px;
+  font-size: 14px;
 }
 
-.table thead tr {
-  background-color: #f4f4f4;
+.table tbody tr {
+  transition: background-color 0.3s ease;
 }
 
 .table tbody tr:nth-child(even) {
@@ -24,4 +55,26 @@
 
 .table tbody tr:hover {
   background-color: #f1f1f1;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 4px solid rgba(75, 85, 99, 0.3);
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
