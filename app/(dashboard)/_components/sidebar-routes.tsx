@@ -19,6 +19,11 @@ const STUDENTRoutes = [
         icon: CircleHelp,
         label: "Student Helper",
         href: "/help",
+    },
+    {
+        icon: BarChart,
+        label: "Student Analytics",
+        href: "/analytics",
     }
 ]
 
@@ -33,11 +38,11 @@ const teacherRoutes = [
         label: "Analytics",
         href: "/teacher/analytics",
     },
-    {
-        icon: Users,
-        label: "Manage Users",
-        href: "/teacher/users",
-    },
+    // {
+    //     icon: Users,
+    //     label: "Manage Users",
+    //     href: "/teacher/users",
+    // },
     {
         icon: MessageCircle,
         label: "Student Feedback",

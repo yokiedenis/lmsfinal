@@ -210,6 +210,36 @@
   word-wrap: break-word; /* Allow text to wrap */
 }
 
+/* styles/globals.css or your global styles file */
+
+/* styles/globals.css or your global styles file */
+.fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50; /* Ensure the navbar is above all other content */
+}
+
+.mt-16 {
+  margin-top: 4rem; /* Adjust based on your navbar height */
+}
+
+/* Additional global styles if necessary */
+
+.z-50 {
+  z-index: 50; /* Ensure the navbar is above all other content */
+}
+
+.pt-16 {
+  padding-top: 4rem; /* Adjust based on your navbar height */
+}
+
+.shadow {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Add any other global styles as needed */
 
 
 

@@ -197,7 +197,7 @@ export const StudentQuizForm = ({ quizId, courseId }: StudentQuizFormProps) => {
   }
 
   return (
-    <div className="mt-6 p-4 border bg-slate-100 rounded-md shadow-lg">
+    <div className="mt-5 p-4 border bg-slate-100 rounded-md shadow-lg">
       <div className="timer text-center text-xl font-bold text-blue-600 mb-4 animate-pulse">
         Time Elapsed: {formatTime(timer)}
       </div>

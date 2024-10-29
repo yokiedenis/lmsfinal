@@ -1,27 +1,113 @@
-.tableContainer {
-  margin: 20px;
-  overflow-x: auto;
+/* supportquerytable.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+  background-color: #e5ddd5; /* WhatsApp-like background */
+  padding: 16px;
+  box-sizing: border-box;
 }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
+.notification {
+  position: fixed; /* Change this to fixed for full screen positioning */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center the notification */
+  color: #ffff;
+  padding: 15px 30px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000; /* Make sure it is above other content */
+  transition: opacity 0.3s ease;
+  background-color: #075e54;
 }
 
-.table th,
-.table td {
-  border: 1px solid #ddd;
-  padding: 8px;
+
+
+.chatHeader {
+  font-size: 20px;
+  color: #ffff;
+  font-weight: bold;
+  padding: 10px 0;
+  text-align: center;
+  background-color: #800080;
 }
 
-.table thead tr {
-  background-color: #f4f4f4;
+.chatMessages {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
+/* Style for messages */
+.message {
+  max-width: 70%;
+  padding: 10px 15px;
+  border-radius: 15px;
+  font-size: 14px;
+  line-height: 1.4;
+  word-wrap: break-word;
 }
 
-.table tbody tr:hover {
-  background-color: #f1f1f1;
+.student {
+  align-self: flex-start;
+  background-color: #ffffff;
+  color: #000000;
+  border-radius: 15px 15px 15px 0;
+}
+
+.teacher {
+  align-self: flex-end;
+  background-color: #dcf8c6; /* WhatsApp green bubble */
+  color: #000000;
+  border-radius: 15px 15px 0 15px;
+}
+
+.responseInputContainer {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #ffffff;
+  border-top: 1px solid #ddd;
+}
+
+.responseInput {
+  flex-grow: 1;
+  border: none;
+  padding: 10px;
+  border-radius: 20px;
+  background-color: #f0f0f0;
+  margin-right: 8px;
+  font-size: 14px;
+  outline: none;
+}
+
+.sendButton {
+  padding: 8px 15px;
+  background-color: #075e54;
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+}
+
+.sendButton:hover {
+  background-color: #128c7e;
+}
+
+/* Hide scrollbars for the chat messages */
+.chatMessages::-webkit-scrollbar {
+  display: none;
+}
+
+.chatMessages {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

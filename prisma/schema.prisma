@@ -221,6 +221,8 @@ model QuizAttempt {
   id           String    @id @default(uuid()) @map("_id")
   quizId        String
   studentId     String
+  student       User     @relation(fields: [studentId], references: [id])
+
   score         Int
   totalQuestions Int
   answers       String   // Storing answers as JSON string
@@ -231,6 +233,15 @@ model QuizAttempt {
  // quiz           Quiz     @relation(fields: [quizId], references: [id])
 
 }
+
+ model User {
+  id           String       @id @default(uuid()) @map("_id")
+  name         String
+  email        String       @unique
+  quizAttempts QuizAttempt[] // Relation back to QuizAttempt
+}
+
+
 
 model QuizResult {
   id           String   @id @default(uuid()) @map("_id")
@@ -266,6 +277,13 @@ model SupportQuery {
   createdAt  DateTime @default(now())
  }
 
-
+model Message {
+  id        String    @id @default(uuid()) @map("_id")
+  userId    String   // The ID of the student or teacher
+  userType  String   // "student" or "teacher"
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
 

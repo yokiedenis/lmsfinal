@@ -55,24 +55,41 @@ const SupportQueryTable = ({ data }: SupportQueryTableProps) => {
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th key={header.id}>
+                <motion.th
+                  key={header.id}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: header.index * 0.1 }}
+                >
                   {header.isPlaceholder
                     ? null
                     : typeof header.column.columnDef.header === "function"
                     ? header.column.columnDef.header(header.getContext())
                     : header.column.columnDef.header}
-                </th>
+                </motion.th>
               ))}
             </tr>
           ))}
         </thead>
         <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id}>
+          {table.getRowModel().rows.map((row, rowIndex) => (
+            <motion.tr
+              key={row.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: rowIndex * 0.05 }}
+            >
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id}>{cell.getValue() as string}</td>
+                <motion.td
+                  key={cell.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {cell.getValue() as string}
+                </motion.td>
               ))}
-            </tr>
+            </motion.tr>
           ))}
         </tbody>
       </table>

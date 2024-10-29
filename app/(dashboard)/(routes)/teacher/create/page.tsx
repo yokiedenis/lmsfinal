@@ -63,7 +63,7 @@ const CreatePage = () => {
     return (
         <div className="max-w-5xl mx-auto flex md:items-center md:justify-center h-full p-6">
             <div>
-                <h1  className="text-2xl">
+                <h1  className="text-2xl text-purple-800 font-bold">
                 Name your new course
                 </h1>
 
@@ -81,7 +81,7 @@ const CreatePage = () => {
                             name="title"
                             render={({field }) => (
                                 <FormItem>
-                                    <FormLabel>
+                                    <FormLabel className="text-purple-500">
                                         Course Title
                                     </FormLabel>
                                     <FormControl>
@@ -103,7 +103,7 @@ const CreatePage = () => {
                         <div className="flex items-center gap-x-2" >
                             <Link href="/teacher/courses">
                                 <Button 
-                                    variant="ghost"
+                                    variant="destructive"
                                     type="button"
                                 >
                                     Cancel
@@ -112,7 +112,7 @@ const CreatePage = () => {
                             <Button
                                 type="submit"
                                 disabled={!isValid || isSubmitting}
-                                variant = "ghost"
+                                variant = "success"
                             >
                                 Continue
                             </Button>
