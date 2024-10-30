@@ -1,120 +1,111 @@
 "use client"; // Ensure this is included for client-side rendering
 
-import { useEffect, useState, KeyboardEvent } from "react";
-import { useAuth } from "@clerk/nextjs"; // Import useAuth hook
-import SupportQueryTable from "@/components/supportquerytable"; // Ensure this path is correct
 import styles from "@/app/(dashboard)/(routes)/teacher/feedback/supportquerytable.module.css";
+
+import React, { useEffect, useState, KeyboardEvent } from 'react';
+import { useUser } from '@clerk/nextjs';
+//import styles from '@/styles/ChatInterface.module.css';
 
 type Message = {
     userId: string;
-    userType: "student" | "teacher";
+    userType: 'student' | 'teacher';
+    userName: string;
     content: string;
+    timestamp: string;
 };
 
-const FeedbackPage: React.FC = () => {
-    const { userId, isLoaded, isSignedIn } = useAuth();
+const ChatInterface: React.FC = () => {
+    const { user } = useUser();
     const [messages, setMessages] = useState<Message[]>([]);
-    const [response, setResponse] = useState("");
+    const [input, setInput] = useState('');
     const [notification, setNotification] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [data, setData] = useState<any[]>([]); // Adjust as needed
+
+    // Load messages from localStorage on component mount
+    useEffect(() => {
+        const savedMessages = localStorage.getItem('messages');
+        if (savedMessages) {
+            setMessages(JSON.parse(savedMessages));
+        }
+        fetchMessages();
+
+        const interval = setInterval(fetchMessages, 5000);
+        return () => clearInterval(interval);
+    }, []);
 
     const fetchMessages = async () => {
-        const response = await fetch("/api/messages/");
-        const data: any[] = await response.json();
-
-        // Validate messages to ensure they conform to the Message type
-        const validMessages: Message[] = data.filter(msg =>
-            typeof msg.userId === "string" &&
-            (msg.userType === "student" || msg.userType === "teacher") &&
-            typeof msg.content === "string"
-        ) as Message[];
-
-        // Store valid messages in localStorage and update state
-        localStorage.setItem("messages", JSON.stringify(validMessages));
-        setMessages(validMessages);
+        try {
+            const response = await fetch('/api/messages');
+            const data: Message[] = await response.json();
+            setMessages(data);
+            localStorage.setItem('messages', JSON.stringify(data)); // Save to localStorage
+        } catch (error) {
+            console.error("Error fetching messages:", error);
+        }
     };
 
-    useEffect(() => {
-        if (isLoaded && isSignedIn) {
-            const storedMessages = localStorage.getItem("messages");
-            if (storedMessages) {
-                setMessages(JSON.parse(storedMessages));
-            }
-            fetchMessages();
-            const interval = setInterval(fetchMessages, 2000); // Poll every 2 seconds
-            return () => clearInterval(interval);
-        }
-    }, [isLoaded, isSignedIn]);
-
-    const handleSendResponse = async () => {
-        if (response.trim() && typeof userId === 'string') {
+    const handleSend = async () => {
+        if (input.trim() && user) {
             const newMessage: Message = {
-                userId,
-                userType: "teacher",
-                content: response,
+                userId: user.id,
+                userType: 'student',
+                userName: user.firstName || user.username || 'Unknown User',
+                content: input,
+                timestamp: new Date().toISOString(),
             };
 
-            // Send the new message to the API
-            await fetch("/api/messages/", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(newMessage),
-            });
+            try {
+                await fetch('/api/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newMessage),
+                });
 
-            // Update local storage and state
-            const updatedMessages = [...messages, newMessage];
-            localStorage.setItem("messages", JSON.stringify(updatedMessages));
-            setMessages(updatedMessages);
-            setResponse(""); // Clear input
-            setNotification("New message sent!"); // Notify user
+                setMessages((prevMessages) => {
+                    const updatedMessages = [...prevMessages, newMessage];
+                    localStorage.setItem('messages', JSON.stringify(updatedMessages)); // Save to localStorage
+                    return updatedMessages;
+                });
+                setInput('');
+                setNotification("Message sent!");
+            } catch (error) {
+                console.error("Error sending message:", error);
+            }
         }
     };
 
     const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === "Enter") {
+        if (event.key === 'Enter') {
             event.preventDefault();
-            handleSendResponse();
+            handleSend();
         }
     };
 
-    useEffect(() => {
-        if (notification) {
-            const timer = setTimeout(() => {
-                setNotification(null);
-            }, 4000); // Clear notification after 4 seconds
-            return () => clearTimeout(timer);
-        }
-    }, [notification]);
-
     return (
         <div className={styles.container}>
-            <div className={styles.chatHeader}>Eduskill Teacher Feedback</div>
+            <div className={styles.chatHeader}>Eduskill Teacher Support</div>
             <div className={styles.chatMessages}>
-                {messages.map((msg, index) => (
-                    <div
-                        key={index}
-                        className={`${styles.message} ${
-                            msg.userType === "student" ? styles.student : styles.teacher
-                        }`}
-                    >
-                        {msg.content}
+                {messages.map((message, index) => (
+                    <div key={index} className={`${styles.messageContainer}`}>
+                        <div className={styles.messageHeader}>
+                            <strong>{message.userName}</strong>
+                            <span className={styles.timestamp}>{new Date(message.timestamp).toLocaleTimeString()}</span>
+                        </div>
+                        <div className={`${styles.message} ${message.userType === 'student' ? styles.student : styles.teacher}`}>
+                            {message.content}
+                        </div>
                     </div>
                 ))}
             </div>
             <div className={styles.responseInputContainer}>
                 <input
                     type="text"
-                    value={response}
-                    onChange={(e) => setResponse(e.target.value)}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     className={styles.responseInput}
                     placeholder="Type a message..."
-                    onKeyDown={handleKeyDown}
                 />
-                <button onClick={handleSendResponse} className={styles.sendButton}>
-                    Send
-                </button>
+                <button onClick={handleSend} className={styles.sendButton}>Send</button>
             </div>
             {notification && (
                 <div className={styles.notification}>
@@ -125,4 +116,4 @@ const FeedbackPage: React.FC = () => {
     );
 };
 
-export default FeedbackPage;
+export default ChatInterface;
