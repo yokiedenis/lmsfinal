@@ -1,185 +1,106 @@
-/* supportquerytable.module.css */
-
-<<<<<<< HEAD
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   height: 100vh;
-  background-color: #e5ddd5; /* WhatsApp-like background */
-  padding: 16px;
-  box-sizing: border-box;
+  background-color: #e5ddd5;
+  font-family: Arial, sans-serif;
 }
-
-.notification {
-  position: fixed; /* Change this to fixed for full screen positioning */
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); /* Center the notification */
-  color: #ffff;
-  padding: 15px 30px;
-  border-radius: 5px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  z-index: 1000; /* Make sure it is above other content */
-  transition: opacity 0.3s ease;
-  background-color: #075e54;
-}
-
-
 
 .chatHeader {
-  font-size: 20px;
-  color: #ffff;
+  background-color: #075e54;
+  color: white;
+  padding: 15px;
+  font-size: 1.2em;
   font-weight: bold;
-  padding: 10px 0;
   text-align: center;
-  background-color: #800080;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .chatMessages {
   flex-grow: 1;
+  padding: 10px 15px;
   overflow-y: auto;
-  padding: 10px;
+  background-color: #efeae2;
+}
+
+.messageContainer {
+  margin-bottom: 15px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-=======
-.tableContainer {
-  margin: 20px;
-  overflow-x: auto;
 }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: "Roboto", sans-serif;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+.messageHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85em;
+  color: #555;
+  margin-bottom: 2px;
 }
 
-.table th {
-  background-color: #4f46e5; /* Deep purple */
-  color: #fff;
-  padding: 12px 8px;
-  text-align: left;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  position: relative;
-}
-
-.table th::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  height: 3px;
-  width: 100%;
-  background: #ff8c00; /* Accent color */
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-}
-
-.table th:hover::after {
-  transform: scaleX(1);
-}
-
-.table td {
-  border: 1px solid #ddd;
-  padding: 12px;
-  font-size: 14px;
-}
-
-.table tbody tr {
-  transition: background-color 0.3s ease;
->>>>>>> f54a93268d3954541143f33b20574b0ea648b0ba
-}
-
-/* Style for messages */
 .message {
-  max-width: 70%;
+  max-width: 60%;
   padding: 10px 15px;
-  border-radius: 15px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 0.95em;
   line-height: 1.4;
   word-wrap: break-word;
 }
 
 .student {
+  background-color: #dcf8c6;
+  color: #333;
   align-self: flex-start;
-  background-color: #ffffff;
-  color: #000000;
-  border-radius: 15px 15px 15px 0;
+  border-top-right-radius: 8px;
+  border-top-left-radius: 0px;
 }
 
 .teacher {
+  background-color: #34b7f1;
   align-self: flex-end;
-  background-color: #dcf8c6; /* WhatsApp green bubble */
-  color: #000000;
-  border-radius: 15px 15px 0 15px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 0px;
+}
+
+.timestamp {
+  font-size: 0.75em;
+  color: gray;
+  margin-left: 10px;
 }
 
 .responseInputContainer {
   display: flex;
   align-items: center;
-  padding: 10px;
-  background-color: #ffffff;
+  padding: 10px 15px;
+  background-color: #f0f0f0;
   border-top: 1px solid #ddd;
 }
 
 .responseInput {
   flex-grow: 1;
-  border: none;
-  padding: 10px;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
   border-radius: 20px;
-  background-color: #f0f0f0;
-  margin-right: 8px;
-  font-size: 14px;
   outline: none;
+  font-size: 1em;
 }
 
 .sendButton {
-  padding: 8px 15px;
   background-color: #075e54;
-  color: #ffffff;
+  color: white;
   border: none;
+  padding: 10px 15px;
   border-radius: 50%;
-  font-size: 14px;
+  margin-left: 10px;
   cursor: pointer;
-  outline: none;
 }
 
 .sendButton:hover {
-  background-color: #128c7e;
+  background-color: #0a7266;
 }
 
-/* Hide scrollbars for the chat messages */
-.chatMessages::-webkit-scrollbar {
-  display: none;
-}
-
-.chatMessages {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
-.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-.spinner {
-  width: 24px;
-  height: 24px;
-  border: 4px solid rgba(75, 85, 99, 0.3);
-  border-top-color: #4f46e5;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.notification {
+  color: #34b7f1;
+  text-align: center;
+  margin-top: 5px;
+  font-size: 0.9em;
 }

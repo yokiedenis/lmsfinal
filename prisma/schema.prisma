@@ -282,6 +282,7 @@ model Message {
   userId    String   // The ID of the student or teacher
   userType  String   // "student" or "teacher"
   content   String
+  userName  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
