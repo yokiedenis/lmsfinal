@@ -1,78 +1,70 @@
 import React, { useEffect, useState, KeyboardEvent } from 'react';
+import { useUser } from '@clerk/nextjs';
 import styles from '@/styles/ChatInterface.module.css';
 
 type Message = {
     userId: string;
     userType: 'student' | 'teacher';
+    userName: string;
     content: string;
+    timestamp: string;
 };
 
 const ChatInterface: React.FC = () => {
+    const { user } = useUser();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
-    const [loading, setLoading] = useState(false);
     const [notification, setNotification] = useState<string | null>(null);
-    const [lastSentByUser, setLastSentByUser] = useState(false);
+
+    // Load messages from localStorage on component mount
+    useEffect(() => {
+        const savedMessages = localStorage.getItem('messages');
+        if (savedMessages) {
+            setMessages(JSON.parse(savedMessages));
+        }
+        fetchMessages();
+
+        const interval = setInterval(fetchMessages, 5000);
+        return () => clearInterval(interval);
+    }, []);
 
     const fetchMessages = async () => {
         try {
             const response = await fetch('/api/messages');
-            if (response.ok) {
-                const data: Message[] = await response.json();
-                
-                // Check if there are new messages
-                if (data.length > messages.length && !lastSentByUser) {
-                    setNotification("New message received!");
-                }
-
-                setMessages(data);
-            } else {
-                console.error("Failed to fetch messages:", response.statusText);
-            }
+            const data: Message[] = await response.json();
+            setMessages(data);
+            localStorage.setItem('messages', JSON.stringify(data)); // Save to localStorage
         } catch (error) {
             console.error("Error fetching messages:", error);
         }
     };
 
-    useEffect(() => {
-        fetchMessages();
-        const interval = setInterval(fetchMessages, 2000); // Poll every 2 seconds
-        return () => clearInterval(interval);
-    }, []);
-
-    useEffect(() => {
-        if (notification) {
-            const timer = setTimeout(() => {
-                setNotification(null);
-            }, 4000); // Clear notification after 4 seconds
-            return () => clearTimeout(timer);
-        }
-    }, [notification]);
-
     const handleSend = async () => {
-        if (input.trim()) {
-            setLoading(true);
-            try {
-                const newMessage: Message = {
-                    userId: 'studentId', // Replace this with actual student ID
-                    userType: 'student',
-                    content: input
-                };
+        if (input.trim() && user) {
+            const newMessage: Message = {
+                userId: user.id,
+                userType: 'student',
+                userName: user.firstName || user.username || 'Unknown User',
+                content: input,
+                timestamp: new Date().toISOString(),
+            };
 
+            try {
                 await fetch('/api/messages', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newMessage),
                 });
 
+                setMessages((prevMessages) => {
+                    const updatedMessages = [...prevMessages, newMessage];
+                    localStorage.setItem('messages', JSON.stringify(updatedMessages)); // Save to localStorage
+                    return updatedMessages;
+                });
                 setInput('');
-                setLastSentByUser(true);
                 setNotification("Message sent!");
-                fetchMessages(); // Optionally fetch new messages right after sending
             } catch (error) {
                 console.error("Error sending message:", error);
-            } finally {
-                setLoading(false);
             }
         }
     };
@@ -86,21 +78,19 @@ const ChatInterface: React.FC = () => {
 
     return (
         <div className={styles.container}>
-            <div className={styles.chatHeader}><h2>Eduskill Student Support</h2></div>
+            <div className={styles.chatHeader}>Eduskill Student Support</div>
             <div className={styles.chatMessages}>
                 {messages.map((message, index) => (
-                    <div
-                        key={index}
-                        className={`${styles.message} ${message.userType === 'student' ? styles.student : styles.teacher}`}
-                    >
-                        {message.content}
+                    <div key={index} className={`${styles.messageContainer}`}>
+                        <div className={styles.messageHeader}>
+                            <strong>{message.userName}</strong>
+                            <span className={styles.timestamp}>{new Date(message.timestamp).toLocaleTimeString()}</span>
+                        </div>
+                        <div className={`${styles.message} ${message.userType === 'student' ? styles.student : styles.teacher}`}>
+                            {message.content}
+                        </div>
                     </div>
                 ))}
-                {loading && (
-                    <div className={`${styles.message} ${styles.teacher}`}>
-                        Waiting for feedback...
-                    </div>
-                )}
             </div>
             <div className={styles.responseInputContainer}>
                 <input
