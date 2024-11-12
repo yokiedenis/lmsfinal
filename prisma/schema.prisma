@@ -320,6 +320,23 @@ model Learner {
 }
 
 
+model Learner {
+  id                       String   @id @default(uuid()) @map("_id")
+  name                     String
+  imageUrl                 String?  // Optional field for profile images
+  statistics               Float
+  lessonStatus             String
+  quizScore                String
+  assignmentStatus         String
+  webinarStatus            String
+  feedbackAssignmentStatus String
+  feedbackWebinarStatus    String
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+}
+
+
+
 
 
 
