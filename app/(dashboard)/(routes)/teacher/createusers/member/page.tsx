@@ -1,3 +1,5 @@
+// app/(dashboard)/(routes)/teacher/createusers/member/page.tsx
+
 "use client";
 import * as z from "zod";
 import axios from "axios";
@@ -8,32 +10,28 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { MemberRole, Profile } from "@prisma/client";
-
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Combobox } from "@/components/ui/combobox";
 
+// Define props interface for the component
 interface MemberRoleFormProps {
-  initialData: Profile;  // Contains the Profile data
+  initialData: Profile; // Contains the Profile data
 }
 
+// Define form schema using zod
 const formSchema = z.object({
   role: z.string().min(1),
 });
 
+// Map MemberRole to options for the combobox
 const options = Object.values(MemberRole).map((role) => ({
   label: role,
   value: role,
 }));
 
+// Main form component
 const MemberRoleForm = ({ initialData }: MemberRoleFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const toggleEdit = () => setIsEditing((current) => !current);
@@ -81,40 +79,27 @@ const MemberRoleForm = ({ initialData }: MemberRoleFormProps) => {
         </Button>
       </div>
       {!isEditing && (
-        <p className={cn(
-          "text-sm mt-2",
-          !initialData?.role && "text-slate-500 italic"
-        )}>
+        <p className={cn("text-sm mt-2", !initialData?.role && "text-slate-500 italic")}>
           {selectedOption?.label || "No role"}
         </p>
       )}
       {isEditing && (
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 mt-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
             <FormField
               control={form.control}
               name="role"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Combobox
-                      options={options}
-                      disabled={isSubmitting}
-                      {...field}
-                    />
+                    <Combobox options={options} disabled={isSubmitting} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <div className="flex items-center gap-x-2">
-              <Button
-                disabled={!isValid || isSubmitting}
-                type="submit"
-              >
+              <Button disabled={!isValid || isSubmitting} type="submit">
                 Save
               </Button>
             </div>
@@ -123,6 +108,7 @@ const MemberRoleForm = ({ initialData }: MemberRoleFormProps) => {
       )}
     </div>
   );
-}
+};
 
+// Export the component as default
 export default MemberRoleForm;
