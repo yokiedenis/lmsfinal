@@ -1,83 +1,78 @@
-// components/Leaderboard.tsx
-"use client";
+"use client"; // Ensures client-side rendering for this component
+
 import React, { useEffect, useState } from 'react';
-import { PrismaClient } from '@prisma/client';
-import { Trophy, ArrowUp } from 'lucide-react';
 
-const prisma = new PrismaClient();
-
-interface LeaderboardEntry {
-  rank: number;
+type Learner = {
+  id: string;
   name: string;
-  score: number;
-}
+  imageUrl: string | null;
+  statistics: number;
+  lessonStatus: string;
+  quizScore: string;
+  assignmentStatus: string;
+  webinarStatus: string;
+  feedbackAssignmentStatus: string;
+  feedbackWebinarStatus: string;
+};
 
-const Leaderboard = () => {
-  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+const AnalyticsPage: React.FC = () => {
+  const [learners, setLearners] = useState<Learner[]>([]);
 
   useEffect(() => {
-    async function fetchLeaderboardData() {
+    async function fetchLearners() {
       try {
-        const data = await getLeaderboardData();
-        setLeaderboardData(data);
+        const response = await fetch('/api/learners');
+        if (!response.ok) {
+          throw new Error('Failed to fetch learners');
+        }
+        const data: Learner[] = await response.json();
+        setLearners(data);
       } catch (error) {
-        console.error("Error fetching leaderboard data:", error);
+        console.error('Error fetching learners:', error);
       }
     }
 
-    fetchLeaderboardData();
+    fetchLearners();
   }, []);
 
   return (
-    <div className="w-full px-4 sm:px-8 py-6 bg-gray-900 text-white rounded-lg shadow-lg">
-      <h1 className="text-3xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-red-500 mb-6">
-        Leaderboard
-      </h1>
-      <div className="space-y-4">
-        {leaderboardData.map((student) => (
-          <div
-            key={student.rank}
-            className="flex items-center justify-between bg-gray-800 rounded-md p-4 shadow-md hover:scale-105 transform transition duration-300 ease-out"
-          >
-            <div className="flex items-center space-x-4">
-              <div className="rank flex items-center space-x-2">
-                <Trophy color={student.rank === 1 ? '#FFD700' : '#BBB'} size={24} />
-                <span className="text-lg font-semibold">{student.rank}</span>
-              </div>
-              <div className="name text-xl font-medium text-white">{student.name}</div>
-            </div>
-            <div className="score flex items-center space-x-2">
-              <ArrowUp color="#28A745" size={24} />
-              <span className="text-lg font-semibold">{student.score}</span>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="analytics-container">
+      <h1>Students LeaderBoard</h1>
+      <table className="analytics-table">
+        <thead>
+          <tr>
+            <th>Learner's Name</th>
+            <th>Statistics</th>
+            <th>Lesson</th>
+            <th>Quiz</th>
+            <th>Assignment</th>
+            <th>Webinar</th>
+            <th>Feedback - Assignment</th>
+            <th>Feedback - Webinar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {learners.map((learner) => (
+            <tr key={learner.id}>
+              <td>
+                <div className="learner-info">
+                  <img src={learner.imageUrl || '/avatar.png'} alt={learner.name} />
+                  <span>{learner.name}</span>
+                </div>
+              </td>
+              <td>{`${learner.statistics}%`}</td>
+              <td className={`status ${learner.lessonStatus.replace(/\s+/g, '-').toLowerCase()}`}>{learner.lessonStatus}</td>
+              <td className={`status ${learner.quizScore.toLowerCase()}`}>{learner.quizScore}</td>
+              <td className={`status ${learner.assignmentStatus.toLowerCase()}`}>{learner.assignmentStatus}</td>
+              <td className={`status ${learner.webinarStatus.toLowerCase()}`}>{learner.webinarStatus}</td>
+              <td className={`status ${learner.feedbackAssignmentStatus.toLowerCase()}`}>{learner.feedbackAssignmentStatus}</td>
+              <td className={`status ${learner.feedbackWebinarStatus.toLowerCase()}`}>{learner.feedbackWebinarStatus}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
 
-// Fetch leaderboard data from database
-async function getLeaderboardData(): Promise<LeaderboardEntry[]> {
-  const usersWithScores = await prisma.user.findMany({
-    include: {
-      quizAttempts: true, // Include related quiz attempt scores for each user
-    },
-  });
-
-  // Calculate total score for each user
-  const leaderboardData = usersWithScores.map(user => ({
-    name: user.name,
-    score: user.quizAttempts.reduce((total, attempt) => total + attempt.score, 0),
-  }));
-
-  // Sort users by score in descending order and assign rank
-  leaderboardData.sort((a, b) => b.score - a.score);
-  return leaderboardData.map((user, index) => ({
-    rank: index + 1,
-    name: user.name,
-    score: user.score,
-  }));
-}
-
-export default Leaderboard;
+export default AnalyticsPage;
