@@ -487,10 +487,10 @@ h1 {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   position: relative;
   overflow: hidden;
-  animation: flip 5s infinite linear;
+  animation: pop 5s infinite linear;
 }
 
-h1::before, h1::after {
+h2::before, h2::after {
   content: "";
   position: absolute;
   top: 0;
