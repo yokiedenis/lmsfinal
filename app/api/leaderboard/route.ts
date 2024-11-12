@@ -1,4 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+// app/api/leaderboard/route.ts
+
+import { NextResponse } from 'next/server';  // Next.js 13+ API route handling
 import prisma from '@/lib/prisma'; // Adjust the import based on your folder structure
 
 interface LeaderboardEntry {
@@ -8,10 +10,7 @@ interface LeaderboardEntry {
   progressPercentage: number;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<LeaderboardEntry[] | { message: string }>
-) {
+export async function GET() {
   try {
     const data = await prisma.user.findMany({
       select: {
@@ -40,9 +39,9 @@ export default async function handler(
 
     const sortedLeaderboard = leaderboard.sort((a, b) => b.totalScore - a.totalScore);
 
-    res.status(200).json(sortedLeaderboard);
+    return NextResponse.json(sortedLeaderboard, { status: 200 });
   } catch (error) {
     console.error('Error fetching leaderboard:', error);
-    res.status(500).json({ message: 'Failed to fetch leaderboard data' });
+    return NextResponse.json({ message: 'Failed to fetch leaderboard data' }, { status: 500 });
   }
 }
