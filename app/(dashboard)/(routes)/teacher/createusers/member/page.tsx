@@ -10,29 +10,24 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { MemberRole, Profile } from "@prisma/client";
+
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Combobox } from "@/components/ui/combobox";
 
-// Define props interface for the component
-interface MemberRoleFormProps {
-  initialData: Profile; // Contains the Profile data
-}
-
-// Define form schema using zod
+// You don't need to export the interface separately in the page component file
 const formSchema = z.object({
   role: z.string().min(1),
 });
 
-// Map MemberRole to options for the combobox
 const options = Object.values(MemberRole).map((role) => ({
   label: role,
   value: role,
 }));
 
-// Main form component
-const MemberRoleForm = ({ initialData }: MemberRoleFormProps) => {
+// The page component definition
+const MemberRoleForm = ({ initialData }: { initialData: Profile }) => {
   const [isEditing, setIsEditing] = useState(false);
   const toggleEdit = () => setIsEditing((current) => !current);
 
@@ -110,5 +105,4 @@ const MemberRoleForm = ({ initialData }: MemberRoleFormProps) => {
   );
 };
 
-// Export the component as default
 export default MemberRoleForm;
