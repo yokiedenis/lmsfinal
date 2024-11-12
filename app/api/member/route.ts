@@ -1,26 +1,37 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import prisma from "@/lib/prisma";
+// app/api/member/route.ts
+
+import { NextRequest, NextResponse } from 'next/server';  // Import NextRequest and NextResponse for the App Router
+import prisma from '@/lib/prisma'; // Adjust the import based on your folder structure
 
 // Handle PATCH request to update the member's role
-export async function PATCH(req: NextApiRequest, res: NextApiResponse) {
-  const { userId } = req.query; // Get userId from query params
-  const { role } = req.body;    // Get the new role from the request body
+export async function PATCH(req: NextRequest) {
+  const userId = req.nextUrl.searchParams.get('userId');  // Get userId from query params using .get()
+  const { role } = await req.json();  // Get the new role from the request body
+
+  // Check if userId is provided
+  if (!userId) {
+    return NextResponse.json({ error: 'UserId is required' }, { status: 400 }); // If userId is missing, return 400 error
+  }
 
   try {
+    // Update the user's role in the database
     const updatedUsers = await prisma.profile.updateMany({
-      where: { userId: String(userId) }, // No need for a unique field with updateMany
+      where: { userId: String(userId) }, // Ensure userId is properly converted to a string
       data: {
         role: role,
       },
     });
 
+    // Check if any profile was updated
     if (updatedUsers.count === 0) {
-      return res.status(404).json({ error: "Profile not found" }); // Handle case if no profile is found
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 }); // Return 404 if no profile is found
     }
 
-    return res.status(200).json({ message: "Role updated successfully" }); // Return success message
+    // Return success response
+    return NextResponse.json({ message: "Role updated successfully" }, { status: 200 });
   } catch (error) {
     console.error("Error updating user role:", error);
-    return res.status(500).json({ error: "Unable to update role" });
+    // Return error response
+    return NextResponse.json({ error: "Unable to update role" }, { status: 500 });
   }
 }
