@@ -48,7 +48,8 @@ export const StudentPerformanceChart = ({
                         fill="#82ca9d" 
                         barSize={20} 
                         radius={[4, 4, 0, 0]} 
-                        animationDuration={500} // Smooth animation for the bars
+
+
                         isAnimationActive={true} // Enable live animation
                     />
                 </BarChart>

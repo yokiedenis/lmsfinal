@@ -1,5 +1,6 @@
 import { authMiddleware } from "@clerk/nextjs/server";
-import { isTeacher } from "@/lib/teacher"; // Assume this checks if the user is a teacher
+import { isTeacher } from "@/lib/teacher";
+import { isSuperAdmin } from "@/lib/isSuperAdmin";  // Import the new function
 
 export default authMiddleware({
   debug: false,
@@ -8,15 +9,23 @@ export default authMiddleware({
     "/api/uploadthing",
     "/",
     "/search",
-    // Use regular expressions to match any course and quiz IDs
     /^\/api\/courses\/[^/]+\/quizzes\/[^/]+\/get$/, // Matches /api/courses/{courseId}/quizzes/{quizId}/get
   ],
   afterAuth: async (auth, req) => {
     const { userId } = auth;
 
+    // Route accessible only by teachers and super admins
     if (req.nextUrl.pathname.startsWith("/teacher/feedback")) {
-      if (!userId || !(await isTeacher(userId))) {
-        // Optional: Redirect unauthorized users to sign-in or a custom page
+      if (!userId || (!isTeacher(userId) && !isSuperAdmin(userId))) {
+        // Redirect unauthorized users
+        return new Response(null, { status: 302, headers: { Location: "/" } });
+      }
+    }
+
+    // Route accessible only by super admins
+    if (req.nextUrl.pathname.startsWith("/admin")) {
+      if (!userId || !isSuperAdmin(userId)) {
+        // Redirect unauthorized users
         return new Response(null, { status: 302, headers: { Location: "/" } });
       }
     }

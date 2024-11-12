@@ -8,6 +8,8 @@ import { CoursesList } from "@/components/courses-list";
 import { InfoCard } from "./_components/info-card";
 import { BannerCard } from "./_components/banner-card";
 
+import ChatApp from "@/components/chatapp"
+
 //import StudentHelper from '@/components/studenthelper'; 
 
 //import Chatbot from "@/components/chatbot";
@@ -58,6 +60,8 @@ export default async function Dashboard() {
       />
 
       {/* <StudentHelper/> */}
+
+      {/* <ChatApp /> */}
        
       
      

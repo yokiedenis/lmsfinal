@@ -6,6 +6,8 @@ import { Chart } from './_components/chart';
 import { DailyUsageChart } from '@/components/DailyUsageChart';
 import { getStudentsPerformance } from "@/actions/get-students-performance";
 import { StudentPerformanceChart } from "./_components/studentperformancechart";
+import { FcHeatMap } from 'react-icons/fc';
+//import Heatmap from "@/components/heatmap"
 
 
 const AnalyticsPage = async () => {
@@ -52,8 +54,9 @@ const AnalyticsPage = async () => {
                 />
             </div>
             <Chart data={data} />
+             
 
-            <DailyUsageChart data={dailyUsage} /> {/* Use dailyUsage here */}
+            {/* <DailyUsageChart data={dailyUsage} /> Use dailyUsage here */}
 
             <StudentPerformanceChart data={studentPerformanceData} />
 

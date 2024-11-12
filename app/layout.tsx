@@ -11,6 +11,9 @@ import {
 import { ToastProvider } from '@/components/providers/toaster-provider'
 import { ConfettiProvider } from '@/components/providers/confetti-provider'
 
+import ThemeSwitch from "@/components/theme-switch";
+import ThemeContextProvider from '@/components/providers/theme-provider'
+
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -29,6 +32,7 @@ export default function RootLayout({
     <ClerkProvider>
     <html lang="en">
       <body className={inter.className}>
+        
         <ConfettiProvider/>
         <ToastProvider/>
         {children}

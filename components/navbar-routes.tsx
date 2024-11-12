@@ -1,28 +1,30 @@
 "use client";
 
 import { UserButton, useAuth } from "@clerk/nextjs";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { SearchInput } from "./search-input";
 import { SafeProfile } from "@/types";
 
-import { isTeacher } from "@/lib/teacher";
+import { isTeacher as checkIfTeacher } from "@/lib/teacher"; // Renamed import
 import { User } from "@clerk/nextjs/server";
 
-// interface NavbarRoutesProps  {
-//  // currentProfile?: SafeProfile | null
-// }
+interface NavbarRoutesProps {
+  //currentProfile?: SafeProfile | null;
+}
 
-export const NavbarRoutes = ( ) => {
-  const{ userId } = useAuth();
+export const NavbarRoutes: React.FC<NavbarRoutesProps> = ({
+  //currentProfile,
+}) => {
+  const { userId } = useAuth();
   const pathname = usePathname();
 
   const isTeacherPage = pathname?.startsWith("/teacher");
   const isPlayerPage = pathname?.includes("/chapters");
   const isSearchPage = pathname === "/search";
- // const isTeacher = currentProfile?.role === "ADMIN" || currentProfile?.role === "TEACHER";
+  //const isUserTeacher = currentProfile?.role === "ADMIN" || currentProfile?.role === "TEACHER"; // Renamed variable
 
   return (
     <>
@@ -40,15 +42,15 @@ export const NavbarRoutes = ( ) => {
               Exit
             </Button>
           </Link>
-        ) : isTeacher(userId)? (
+        ) : checkIfTeacher(userId) ? ( // Call the function
           <Link href="/teacher/courses">
             <Button size="sm" variant="success">
-              Teacher Mode
+              Admin Mode
             </Button>
           </Link>
         ) : null}
 
-       <UserButton afterSignOutUrl="/" />
+        <UserButton afterSignOutUrl="/" />
       </div>
     </>
   );

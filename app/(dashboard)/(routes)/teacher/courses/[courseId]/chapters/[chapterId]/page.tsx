@@ -74,10 +74,10 @@ const ChapterIdPage = async ({
                 
                 <div className="flex items-center justify-between w-full">
                     <div className="flex flex-col gap-y-2">
-                          <h1 className="text-2xl font-medium">
+                          <h1 className="text-2xl font-medium text-[#d19a00] ">
                             Chapter Creation
                           </h1>
-                          <span className="text-sm text-slate-700">
+                          <span className="text-sm text-[#c0272d]">
                             Complete all Fields {completionText}
                           </span>
                     </div>
@@ -101,7 +101,7 @@ const ChapterIdPage = async ({
                 <div>
                     <div className="flex items-center gap-x-2">
                       <IconBadge  icon={LayoutDashboard}/>
-                      <h2 className="text-xl">
+                      <h2 className="text-xl text-[#d19a00]">
                         Customize Your Chapter
                       </h2>
                     </div>
@@ -122,7 +122,7 @@ const ChapterIdPage = async ({
                 <div>
                     <div className="flex items-center gap-x-2">
                         <IconBadge icon={Eye}/>
-                        <h2 className="text-xl">
+                        <h2 className="text-xl text-[#d19a00]">
                             Access Settings
                         </h2>
                     </div>
@@ -137,7 +137,7 @@ const ChapterIdPage = async ({
             <div>
             <div className="flex items-center gap-x-2">
                <IconBadge icon={Video}/>
-               <h2 className="text-xl">
+               <h2 className="text-xl text-[#d19a00]">
                 Add a Video
                </h2>
             </div>

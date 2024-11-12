@@ -4,18 +4,34 @@ import { db } from "@/lib/db";
 import { getProgress } from "@/actions/get-progress";
 import { CourseSidebar } from "./_components/course-sidebar";
 import { CourseNavbar } from "./_components/course-navbar";
+import { NextRequest } from "next/server";
+
+//import getCurrentProfile from "@/actions";
+//import getSafeProfile from "@/actions/get-safe-profile";
 
 const CourseLayout = async ({
   children,
-  params
+  params,
+  req
 }: {
   children: React.ReactNode;
   params: { courseId: string };
+  req: NextRequest;
 }) => {
   const { userId } = auth();
   if (!userId) {
     return redirect("/");
   }
+
+   
+  // Log to console currentProfile with component name to identify
+   
+  // const safeProfile = await getSafeProfile(req);
+  // if (!safeProfile) {
+  //   return redirect("/");
+  // }
+
+
 
   const course = await db.course.findUnique({
     where: {
@@ -58,6 +74,7 @@ const CourseLayout = async ({
           course={course}
           progressCount={progressCount}
           quizId={quizId} // Pass quizId to CourseNavbar
+         // currentProfile={safeProfile}
         />
       </div>
       <div className="hidden md:flex h-full w-80 flex-col fixed inset-y-0 z-50">

@@ -6,16 +6,16 @@ const QuizPage = ({ params }: { params: { courseId: string; quizId: string;  } }
   
 
   return (
-    
+     
     <StudentQuizForm
       courseId={params.courseId} // Pass courseId
       quizId={params.quizId}     // Pass quizId
       //studentId={params.studentId}   // Replace this with the actual student ID
       
     />
+   
+ 
 
-    
-    
   );
 };
 

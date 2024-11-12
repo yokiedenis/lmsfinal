@@ -239,7 +239,125 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+
+
+/* styles/globals.css or styles/Leaderboard.module.css */
+/* table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f4f4f4;
+} */
+
+.leaderboard-container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.leaderboard-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.leaderboard {
+  display: flex;
+  flex-direction: column;
+}
+
+.leaderboard-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.leaderboard-item:last-child {
+  border-bottom: none;
+}
+
+.rank,
+.name,
+.score {
+  display: flex;
+  align-items: center;
+}
+
+.rank span,
+.score span {
+  margin-left: 8px;
+}
+
+
+
 /* Add any other global styles as needed */
+
+
+ /* styles.css or your global CSS file */
+@keyframes pop {
+  0% {
+      transform: scale(1);
+  }
+  50% {
+      transform: scale(1.1); /* Increase the size to 110% */
+  }
+  100% {
+      transform: scale(1); /* Return to original size */
+  }
+}
+
+.popping-logo {
+  animation: pop 0.6s infinite; /* Adjust the duration as needed */
+}
+
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 1s ease-out;
+}
+
+
+.color-empty {
+  fill: #ebedf0;
+}
+.color-scale-1 {
+  fill: #c6e48b;
+}
+.color-scale-2 {
+  fill: #7bc96f;
+}
+.color-scale-3 {
+  fill: #239a3b;
+}
+.color-scale-4 {
+  fill: #196127;
+}
+
+
 
 
 

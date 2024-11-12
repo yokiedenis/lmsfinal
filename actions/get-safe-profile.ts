@@ -1,53 +1,48 @@
-// import { db } from "@/lib/db";
-// import { SafeProfile } from "@/types";
-// import { auth, currentUser } from "@clerk/nextjs/server"
-// import { redirect } from "next/navigation";
+// actions/get-safe-profile.ts
+import { db } from "@/lib/db";
+import { SafeProfile } from "@/types";
+import { getAuth } from "@clerk/nextjs/server"; // Correct import for server-side authentication
+import { NextRequest } from "next/server"; // Import NextRequest for type handling
+import { redirect } from "next/navigation";
 
-// export default async function getSafeProfile() {
-//   try {
+// Change the function to accept req as parameter
+export default async function getSafeProfile(userId: string) {
+  try {
+    // If userId is invalid, redirect
+    if (!userId) {
+      return null; // or you can throw an error
+    }
 
-//     const { userId } = auth();
+    const currentProfile = await db.profile.findUnique({
+      where: {
+        userId,
+      },
+      select: {
+        id: true,
+        userId: true,
+        name: true,
+        imageUrl: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
 
-//     if (!userId) {
-//         return redirect("/");
-//     }
+    if (!currentProfile) {
+      return null; // Return null if the profile does not exist
+    }
 
-//     const currentProfile = await db.profile.findUnique({
-//         where: {
-//           userId,
-//         },
-//         select: {
-//           id: true,
-//           userId: true,
-//           name: true,
-//           imageUrl: true,
-//           email: true,
-//           role: true,
-//           createdAt: true,
-//           updatedAt: true,
-//         },
-//       });
-      
-//       if (!currentProfile) {
-//         return null;
-//       }
-      
-//       // Convert createdAt and updatedAt to ISO strings
-//       const safeProfile: SafeProfile = {
-//         ...currentProfile,
-//         createdAt: currentProfile.createdAt.toISOString(),
-//         updatedAt: currentProfile.updatedAt.toISOString(),
-//       };
+    // Convert createdAt and updatedAt to ISO strings
+    const safeProfile: SafeProfile = {
+      ...currentProfile,
+      createdAt: currentProfile.createdAt.toISOString(),
+      updatedAt: currentProfile.updatedAt.toISOString(),
+    };
 
-//         // currentProfile is passed to client component and client components
-//         // can only pass stringified JSON objects. So we need to convert   
-//         // Date objects to ISO strings.
-//         // The ... operator is used to copy all properties from currentProfile
-//         // to a new object. We then overwrite the createdAt, updatedAt and
-//         // emailVerified properties with their ISO string values.
-//     return safeProfile;
-//   } catch (error: any) {
-//     return null;
-//   }
-// }
-
+    return safeProfile; // Return the safe profile
+  } catch (error: any) {
+    console.error("Error fetching safe profile:", error); // Log error for debugging
+    return null; // Return null in case of an error
+  }
+}

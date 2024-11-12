@@ -22,7 +22,7 @@ enum MemberRole {
 
 model Profile {
   id String @id @default(uuid()) @map("_id")
-  userId String @unique
+  userId String? 
   name String
   imageUrl String?  
   email String  
@@ -130,7 +130,12 @@ model UserProgress{
   chapterId String
   chapter Chapter @relation(fields: [chapterId], references: [id], onDelete:Cascade)
 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Add this line
+
+
   isCompleted Boolean @default(false)
+   level Int @default(1) // Track user level
+  points Int @default(0) // Track points earned
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -145,6 +150,9 @@ model Purchase{
   userId String
   courseId String
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  user     User    @relation(fields: [userId], references: [id])
+
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -220,8 +228,10 @@ model Option {
 model QuizAttempt {
   id           String    @id @default(uuid()) @map("_id")
   quizId        String
-  studentId     String
-  student       User     @relation(fields: [studentId], references: [id])
+  studentId     String?
+  student       User?     @relation(fields: [studentId], references: [id])
+
+  
 
   score         Int
   totalQuestions Int
@@ -239,6 +249,10 @@ model QuizAttempt {
   name         String
   email        String       @unique
   quizAttempts QuizAttempt[] // Relation back to QuizAttempt
+  purchases    Purchase[]    // Ensure this relation exists
+
+  userProgress UserProgress[] // Add this line to establish the relation
+  
 }
 
 
