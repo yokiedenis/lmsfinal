@@ -13,10 +13,10 @@ export const currentProfile = async (req: NextRequest) => {
         return redirectToSignIn(); 
     }
 
-    // Attempt to find the user's profile in the database
+    // Attempt to find the user's profile in the database using userId
     let profile = await db.profile.findUnique({
         where: {
-            userId: userId,
+            userId: userId, // Now `userId` is a unique field in the schema
         },
     });
 

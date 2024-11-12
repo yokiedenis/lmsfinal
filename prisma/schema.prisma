@@ -22,7 +22,7 @@ enum MemberRole {
 
 model Profile {
   id String @id @default(uuid()) @map("_id")
-  userId String? 
+  userId String  @unique 
   name String
   imageUrl String?  
   email String  
