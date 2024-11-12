@@ -18,6 +18,8 @@ export const getStudentsPerformance = async () => {
 
     quizAttempts.forEach((attempt) => {
       const studentId = attempt.studentId;
+      if (!studentId) return; // Skip if studentId is null or undefined
+
       const studentName = attempt.student?.name || "Unknown"; // Optional chaining in case of null
 
       if (!scoresByStudent[studentId]) {
