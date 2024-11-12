@@ -37,7 +37,7 @@ const AnalyticsPage: React.FC = () => {
 
   return (
     <div className="analytics-container">
-      <h1>Students LeaderBoard</h1>
+      <h2>Students LeaderBoard</h2>
       <table className="analytics-table">
         <thead>
           <tr>
