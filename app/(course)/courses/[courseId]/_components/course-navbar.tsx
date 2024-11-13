@@ -25,7 +25,7 @@ export const CourseNavbar = ({
  // console.log("CourseNavbar currentProfile", currentProfile);
 
   return (
-    <div className="p-4 border-b h-full flex items-center shadow-sm">
+    <div className="sticky top-0 p-4 border-b h-full flex items-center shadow-sm bg-white z-10">
       <CourseMobileSidebar
         course={course}
         progressCount={progressCount}

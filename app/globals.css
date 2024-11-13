@@ -643,6 +643,77 @@ h1 {
   animation: flip 5s infinite linear;
 }
 
+/* Leaderboard.module.css */
+
+.leaderboard {
+  max-width: 100%;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+}
+
+th {
+  background-color: #f3f4f6;
+  font-weight: bold;
+}
+
+tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+tr:hover {
+  background-color: #e5e7eb;
+}
+
+
+/* styles.css or in a global CSS file */
+table.dataTable {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table.dataTable thead th {
+  background-color: #1a1a1a;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+}
+
+table.dataTable tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+table.dataTable tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+table.dataTable tbody tr:hover {
+  background-color: #e6e6e6;
+}
+
+.dataTables_filter input {
+  border-radius: 4px;
+  padding: 5px;
+  margin-left: 10px;
+}
+
+.dataTables_wrapper {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+
  
 
  

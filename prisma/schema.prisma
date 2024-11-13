@@ -130,7 +130,7 @@ model UserProgress{
   chapterId String
   chapter Chapter @relation(fields: [chapterId], references: [id], onDelete:Cascade)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Add this line
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade) // Add this line
 
 
   isCompleted Boolean @default(false)
@@ -326,17 +326,17 @@ model Learner {
 
 
 
-model Learner {
-  id                       String   @id @default(uuid()) @map("_id")
-  name                     String
-  imageUrl                 String?  // Optional field for profile images
-  statistics               Float
-  lessonStatus             String
-  quizScore                String
-  assignmentStatus         String
-  webinarStatus            String
-  feedbackAssignmentStatus String
-  feedbackWebinarStatus    String
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
-}
+// model Learner {
+//   id                       String   @id @default(uuid()) @map("_id")
+//   name                     String
+//   imageUrl                 String?  // Optional field for profile images
+//   statistics               Float
+//   lessonStatus             String
+//   quizScore                String
+//   assignmentStatus         String
+//   webinarStatus            String
+//   feedbackAssignmentStatus String
+//   feedbackWebinarStatus    String
+//   createdAt                DateTime @default(now())
+//   updatedAt                DateTime @updatedAt
+// }
