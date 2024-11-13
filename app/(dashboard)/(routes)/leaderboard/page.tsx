@@ -1,97 +1,53 @@
-"use client";
-import { useEffect, useState } from "react";
-import * as $ from "jquery"; // Import jQuery to enable DataTables
+"use client"
+import { useEffect, useState } from 'react';
 
-interface LeaderboardItem {
-  rank: number;
+interface User {
   name: string;
-  level: number;
   points: number;
+  level: number; // Add level to the user data
 }
 
-function LeaderboardPage() {
-  const [leaderboardData, setLeaderboardData] = useState<LeaderboardItem[]>([]);
-  const [error, setError] = useState<string | null>(null);
+export default function Leaderboard() {
+  const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    const fetchLeaderboardData = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("/api/leaderboard");
+        const response = await fetch('/api/leaderboard');
         const data = await response.json();
-
-        if (Array.isArray(data)) {
-          setLeaderboardData(data);
-        } else {
-          setError("Unexpected data format");
-          console.error("Unexpected data format:", data);
-        }
+        setUsers(data);
       } catch (error) {
-        setError("Failed to fetch leaderboard data");
-        console.error("Error fetching leaderboard data:", error);
+        console.error('Error fetching leaderboard data:', error);
       }
     };
 
-    fetchLeaderboardData();
+    fetchData();
   }, []);
 
-  useEffect(() => {
-    // Initialize DataTables once the component is mounted
-    if (leaderboardData.length) {
-      if ($.fn.DataTable) { // Check if DataTable is available
-        $("#leaderboardTable").DataTable({
-          responsive: true, // Enable responsive design for different screen sizes
-          paging: true,     // Enable pagination
-          searching: true,  // Enable search functionality
-          ordering: true,   // Enable sorting
-          order: [[3, "desc"]], // Sort by points (descending)
-          pageLength: 5,    // Set default page length to 5
-          language: {
-            search: "Filter records:", // Customize the search placeholder
-          },
-          animation: true,  // Enable animations (DataTables handles animations automatically)
-        });
-      } else {
-        console.error("DataTable plugin is not loaded correctly.");
-      }
-    }
-
-    // Cleanup DataTables initialization when component unmounts
-    return () => {
-      if ($.fn.DataTable && $.fn.DataTable.isDataTable("#leaderboardTable")) {
-        $("#leaderboardTable").DataTable().destroy();
-      }
-    };
-  }, [leaderboardData]);
-
-  if (error) {
-    return <p>{error}</p>;
-  }
-
   return (
-    <div>
-      <h1>Leaderboard</h1>
-      <table id="leaderboardTable" className="display" width="100%">
-        <thead>
-          <tr >
-            <th style={{ backgroundColor: '#fcb61a', color:'blue' }}>Rank</th>
-            <th style={{ backgroundColor: '#fcb61a', color:'blue' }}>Name</th>
-            <th style={{ backgroundColor: '#fcb61a', color:'blue' }}>Level</th>
-            <th style={{ backgroundColor: '#fcb61a', color:'blue' }}>Points</th>
-          </tr>
-        </thead>
-        <tbody>
-          {leaderboardData.map((user) => (
-            <tr key={user.rank}>
-              <td>{user.rank}</td>
-              <td>{user.name}</td>
-              <td>{user.level}</td>
-              <td>{user.points}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="p-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg shadow-lg">
+      <h2 className="text-3xl font-bold text-white mb-6 text-center animate__animated animate__fadeIn">
+       Eduskill Student Leaderboard
+      </h2>
+      <div className="grid grid-cols-4 font-semibold text-yellow-400  border-b-2 pb-3 mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-md animate__animated animate__fadeIn animate__delay-1s">
+        <div>Rank</div>
+        <div>User</div>
+        <div>Points</div>
+        <div>Level</div>
+      </div>
+      <div className="overflow-x-auto">
+        {users.map((user, index) => (
+          <div 
+            key={index} 
+            className={`grid grid-cols-4 py-3 px-4 bg-white rounded-lg mb-4 shadow-md transform transition-transform hover:scale-105 duration-300 ease-in-out animate__animated animate__fadeIn animate__delay-${index + 1}s`}
+          >
+            <div className="text-gray-800">#{index + 1}</div>
+            <div className="text-gray-800 font-medium">{user.name}</div>
+            <div className="text-gray-800">{user.points}</div>
+            <div className="text-gray-800">Level {user.level}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
-
-export default LeaderboardPage;

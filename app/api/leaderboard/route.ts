@@ -1,58 +1,42 @@
-import { NextResponse } from 'next/server';
-import { getAuth } from '@clerk/nextjs/server';
-import prisma from '@/lib/prisma';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'; 
+import { PrismaClient } from '@prisma/client';
 
-export async function GET(request: NextRequest) {
+const prisma = new PrismaClient();
+
+// Export named GET function for API route
+export async function GET(req: NextRequest) {
   try {
-    const { userId } = getAuth(request);
-
-    if (!userId) {
-      return NextResponse.json({ error: 'User  not authenticated' }, { status: 401 });
-    }
-
-    const leaderboard = await prisma.userProgress.findMany({
-      where: {
-        userId: userId,
-      },
-      select: {
-        user: {
-          select: {
-            name: true,
-          },
-        },
-        level: true,
-        points: true,
-      },
+    // Fetch all users from the User model
+    const users = await prisma.user.findMany({
       orderBy: {
-        points: 'desc',
+        points: 'desc', // Sort by points if necessary
+      },
+      include: {
+        userProgress: {
+          where: { isCompleted: true }, // Fetch completed courses only
+        },
       },
     });
 
-    if (!leaderboard.length) {
-      return NextResponse.json({ error: 'No leaderboard data found for this user' }, { status: 404 });
-    }
+    // Add level and points based on completed courses
+    const usersWithPoints = users.map((user) => {
+      const completedCourses = user.userProgress.length;
+      const level = completedCourses >= 1 ? completedCourses : 1; // Minimum level 1
 
-    const leaderboardData = leaderboard.map((item, index) => ({
-      rank: index + 1,
-      name: item.user ? item.user.name : 'Unknown', // Handle null user
-      level: item.level,
-      points: item.points,
-    }));
+      // Calculate points: 100 points for each completed course
+      const points = completedCourses * 100;
 
-    console.log('Leaderboard Data:', leaderboardData);
-    return NextResponse.json(leaderboardData);
-  } catch (error: unknown) {
-    console.error('Error fetching leaderboard:', error);
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { error: `Failed to fetch leaderboard data: ${error.message}` },
-        { status: 500 }
-      );
-    }
+      return { ...user, level, points };
+    });
+
+    // Respond with the users data
+    return NextResponse.json(usersWithPoints);  // Use NextResponse.json for response
+
+  } catch (error) {
+    console.error('Error fetching users data:', error);
     return NextResponse.json(
-      { error: 'An unknown error occurred' },
+      { message: 'An error occurred while fetching users data' },
       { status: 500 }
-    );
+    ); // Use status and response correctly with NextResponse
   }
 }

@@ -48,6 +48,7 @@ model Course{
   isPublished Boolean @default(false) 
   categoryId String?
   category Category? @relation(fields: [categoryId], references: [id])
+  name String?
 
   chapters Chapter[]
   attachments Attachment[]
@@ -130,7 +131,7 @@ model UserProgress{
   chapterId String
   chapter Chapter @relation(fields: [chapterId], references: [id], onDelete:Cascade)
 
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade) // Add this line
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Add this line
 
 
   isCompleted Boolean @default(false)
@@ -250,7 +251,8 @@ model QuizAttempt {
   email        String       @unique
   quizAttempts QuizAttempt[] // Relation back to QuizAttempt
   purchases    Purchase[]    // Ensure this relation exists
-
+  points       Int            @default(0)
+  level        Int            @default(1)  // Default level is 1
   userProgress UserProgress[] // Add this line to establish the relation
   
 }
