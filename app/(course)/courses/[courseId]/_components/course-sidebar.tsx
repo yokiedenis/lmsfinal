@@ -54,13 +54,37 @@ export const CourseSidebar = async ({
       <h1
   className="font-semibold"
   style={{
-    color: 'yellow', // White text color
+    color: 'gold',           // White text color for better contrast
     backgroundColor: '#6A0DAD', // Rich purple background
-    padding: '12px 20px', // Add padding for spacing
-    borderRadius: '8px' // Rounded corners for a modern look
+    padding: '10px 8px',    // Smaller padding for a more compact look       
+    borderRadius: '4px',      // Slightly rounded corners
+    fontSize: '16px',
+                 // Text size
+    overflow: 'hidden',            // Hide overflow if needed
+    display: 'flex',               // Center the text inside
+    alignItems: 'center',
+    justifyContent: 'center',
   }}
 >
+    <div
+    style={{
+      animation: 'pop 1s ease-in-out infinite', // Apply pop animation
+    }}
+      >
   {course.title}
+  </div>
+    
+  <style>
+    {`
+      @keyframes pop {
+        0%, 100% { transform: scale(1); }  /* Normal size */
+        50% { transform: scale(1.2); }     /* Scale up for pop effect */
+      }
+    `}
+  </style>
+
+
+
 </h1>
         {purchase && (
           <div className="mt-10">
