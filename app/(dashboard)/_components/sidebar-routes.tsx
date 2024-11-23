@@ -10,7 +10,7 @@ import { isSuperAdmin } from "@/lib/isSuperAdmin";
 const studentRoutes = [
     { icon: Layout, label: "Dashboard", href: "/" },
     { icon: Compass, label: "Browse", href: "/search" },
-    { icon: CircleHelp, label: "Student Helper", href: "/help" },
+  //  { icon: CircleHelp, label: "Student Helper", href: "/help" },
     { icon: BarChart, label: "Student Analytics", href: "/analytics" },
     { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
 ];
