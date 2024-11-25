@@ -17,15 +17,19 @@ export async function DELETE(
 ){
   try{
       const {userId} = auth();
+      console.log("User ID:", userId);
 
       if(!userId || isTeacher(userId)){
-        return new NextResponse("Unauthorized", {status: 401});
+        console.log("Unauthorized access attempt by user:", userId);
+        return new NextResponse("Unauthorized", { status: 401 });
       }
+
+      
 
       const course = await db.course.findUnique({
         where: { 
           id: params.courseId,
-          userId
+          userId:userId
         },
         include: {
          chapters:{

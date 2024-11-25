@@ -82,7 +82,7 @@ const ChatInterface: React.FC = () => {
 
     return (
         <div className={styles.container}>
-            <div className={styles.chatHeader}>Eduskill Student Support</div>
+            <div className={styles.chatHeader}>Eduskill Teacher Support</div>
             <div className={styles.chatMessages}>
                 {messages.map((message, index) => (
                     <div key={index} className={`${styles.messageContainer}`}>

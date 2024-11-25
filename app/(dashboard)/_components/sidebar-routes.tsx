@@ -1,6 +1,6 @@
 "use client";
 
-import { Layout, Compass, List, BarChart, Users, CircleHelp, MessageCircle, Trophy } from "lucide-react";
+import { Layout, Compass, List, BarChart, Users, CircleHelp, MessageCircle, Trophy, Video } from "lucide-react";
 import SidebarItem from "./sidebar-item";
 import { usePathname } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
@@ -13,18 +13,21 @@ const studentRoutes = [
     { icon: CircleHelp, label: "Student Helper", href: "/help" },
     { icon: BarChart, label: "Student Analytics", href: "/analytics" },
     { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
+    { icon: Video, label: "Class Live Stream", href: "/livestream" },
 ];
 
 const teacherRoutes = [
     { icon: List, label: "Courses", href: "/teacher/courses" },
     { icon: BarChart, label: "Analytics", href: "/teacher/analytics" },
     { icon: MessageCircle, label: "Student Feedback", href: "/teacher/feedback" },
+    { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
+    { icon: Video, label: "Class Live Stream", href: "/livestream" },
 ];
 
 const superAdminRoutes = [
     ...teacherRoutes,
     { icon: Users, label: "Manage Users", href: "/teacher/users" },
-    { icon: Trophy, label: "Student Leaderboard", href: "/leaderboard" },
+    // { icon: Trophy, label: "Student Leaderboard", href: "/leaderboard" },
 ];
 
 export const SidebarRoutes = () => {

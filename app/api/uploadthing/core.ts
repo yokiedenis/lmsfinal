@@ -20,9 +20,15 @@ export const ourFileRouter = {
    .middleware(()=> handleAuth())
    .onUploadComplete(()=>{}),
 
-   courseAttachment: f(["text","image","video","pdf", "audio",])
+   courseAttachment: f(["text","image","video","pdf", "audio",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+
+   ])
    .middleware(()=> handleAuth())
-   .onUploadComplete(()=>{}),
+   .onUploadComplete(( )=>{
+    }),
 
    chapterVideo: f({video:{maxFileCount: 1, maxFileSize: "512GB"}})
    .middleware(()=> handleAuth())

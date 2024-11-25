@@ -714,7 +714,56 @@ table.dataTable tbody tr:hover {
 }
 
 
- 
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+
+
+
+/* Styling for the text */
+.center {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #4a90e2;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  animation: glowing-text 2s infinite ease-in-out;
+}
+
+/* Continuous animation */
+@keyframes glowing-text {
+  0% {
+    text-shadow: 0 0 5px #4a90e2, 0 0 10px #4a90e2, 0 0 15px #4a90e2;
+    color: #4a90e2;
+  }
+  50% {
+    text-shadow: 0 0 10px #50e3c2, 0 0 20px #50e3c2, 0 0 30px #50e3c2;
+    color: #50e3c2;
+  }
+  100% {
+    text-shadow: 0 0 5px #4a90e2, 0 0 10px #4a90e2, 0 0 15px #4a90e2;
+    color: #4a90e2;
+  }
+}
 
  
 
