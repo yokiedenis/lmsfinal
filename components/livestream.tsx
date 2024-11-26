@@ -4,16 +4,17 @@ import { db } from "../firebase";
 import { collection, doc, setDoc, onSnapshot } from "firebase/firestore";
 import VideoPlayer from "./videoplayer";
 import ChatLive from "./chatlive";
-import { ScreenShare, Mic, MicOff, Video, VideoOff } from "lucide-react"; // Add Video and VideoOff icons
+import { ScreenShare, Mic, MicOff, Video, VideoOff } from "lucide-react";
 
 const LiveStream: React.FC = () => {
   const localVideoRef = useRef<HTMLVideoElement>(null);
-  const chatRef = useRef<HTMLDivElement | null>(null); // Explicitly type as HTMLDivElement or null
+  const chatRef = useRef<HTMLDivElement | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStreams, setRemoteStreams] = useState<MediaStream[]>([]);
   const [isChatVisible, setIsChatVisible] = useState(false);
-  const [isMuted, setIsMuted] = useState(false); // State to track mute status
-  const [isVideoEnabled, setIsVideoEnabled] = useState(true); // State to track video status
+  const [isMuted, setIsMuted] = useState(false);
+  const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+  const [isHandRaised, setIsHandRaised] = useState(false); // State for hand raise
 
   const toggleChat = () => {
     setIsChatVisible((prev) => !prev);
@@ -29,7 +30,6 @@ const LiveStream: React.FC = () => {
     }
   };
 
-  // Screen Share Logic
   const shareScreen = async () => {
     try {
       const screenStream = await navigator.mediaDevices.getDisplayMedia({
@@ -38,12 +38,10 @@ const LiveStream: React.FC = () => {
       });
       setLocalStream(screenStream);
 
-      // Attach screen stream to the local video player
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = screenStream;
       }
 
-      // Stop sharing event
       screenStream.getTracks()[0].onended = () => {
         alert("Screen sharing stopped");
         setLocalStream(null);
@@ -54,28 +52,31 @@ const LiveStream: React.FC = () => {
     }
   };
 
-  // Toggle mute/unmute
   const toggleMute = () => {
     if (localStream) {
       localStream.getTracks().forEach((track) => {
         if (track.kind === "audio") {
-          track.enabled = !isMuted; // Toggle audio track
+          track.enabled = !isMuted;
         }
       });
       setIsMuted((prev) => !prev);
     }
   };
 
-  // Toggle video on/off
   const toggleVideo = () => {
     if (localStream) {
       localStream.getTracks().forEach((track) => {
         if (track.kind === "video") {
-          track.enabled = !isVideoEnabled; // Toggle video track
+          track.enabled = !isVideoEnabled;
         }
       });
       setIsVideoEnabled((prev) => !prev);
     }
+  };
+
+  const raiseHand = () => {
+    setIsHandRaised(true);
+    setTimeout(() => setIsHandRaised(false), 3000); // Auto-hide after 3 seconds
   };
 
   useEffect(() => {
@@ -118,12 +119,10 @@ const LiveStream: React.FC = () => {
           flexWrap: "wrap",
         }}
       >
-        {/* Local Stream */}
         <div style={{ flex: 1, position: "relative" }}>
           <VideoPlayer ref={localVideoRef} isLocal={true} stream={localStream} />
         </div>
 
-        {/* Remote Streams */}
         {remoteStreams.map((stream, index) => (
           <div key={index} style={{ flex: 1, position: "relative" }}>
             <VideoPlayer isLocal={false} stream={stream} />
@@ -131,7 +130,6 @@ const LiveStream: React.FC = () => {
         ))}
       </main>
 
-      {/* Chat Toggle Button */}
       <button
         onClick={toggleChat}
         style={{
@@ -151,7 +149,6 @@ const LiveStream: React.FC = () => {
         💬
       </button>
 
-      {/* Chat Component */}
       <div
         ref={chatRef}
         style={{
@@ -171,7 +168,6 @@ const LiveStream: React.FC = () => {
         {isChatVisible && <ChatLive />}
       </div>
 
-      {/* Buttons Container */}
       <div
         style={{
           position: "fixed",
@@ -182,11 +178,10 @@ const LiveStream: React.FC = () => {
           gap: "10px",
         }}
       >
-        {/* Share Screen Button */}
         <button
           onClick={shareScreen}
           style={{
-            backgroundColor: "#1a73e8",
+            backgroundColor: "purple",
             color: "#fff",
             border: "none",
             borderRadius: "5px",
@@ -200,11 +195,10 @@ const LiveStream: React.FC = () => {
           <ScreenShare size={24} />
         </button>
 
-        {/* Mute/Unmute Button */}
         <button
           onClick={toggleMute}
           style={{
-            backgroundColor: "#1a73e8",
+            backgroundColor: "purple",
             color: "#fff",
             border: "none",
             borderRadius: "5px",
@@ -218,11 +212,10 @@ const LiveStream: React.FC = () => {
           {isMuted ? <MicOff size={24} /> : <Mic size={24} />}
         </button>
 
-        {/* Video On/Off Button */}
         <button
           onClick={toggleVideo}
           style={{
-            backgroundColor: "#1a73e8",
+            backgroundColor: "purple",
             color: "#fff",
             border: "none",
             borderRadius: "5px",
@@ -235,7 +228,41 @@ const LiveStream: React.FC = () => {
         >
           {isVideoEnabled ? <Video size={24} /> : <VideoOff size={24} />}
         </button>
+
+        <button
+          onClick={raiseHand}
+          style={{
+            backgroundColor: "purple",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            padding: "10px 15px",
+            cursor: "pointer",
+            fontSize: "16px",
+          }}
+        >
+          ✋ Raise Hand
+        </button>
       </div>
+
+      {isHandRaised && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "100px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            backgroundColor: "#fff",
+            color: "#000",
+            padding: "10px 20px",
+            borderRadius: "5px",
+            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.3)",
+            fontSize: "16px",
+          }}
+        >
+          Someone is raising their hand! ✋
+        </div>
+      )}
     </div>
   );
 };
