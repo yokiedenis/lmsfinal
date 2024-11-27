@@ -21,18 +21,94 @@ export default function Page() {
 
 
   return (
-    <div className="relative h-full w-full">
-      <img
-        src="/sign11.jpeg" // The image is assumed to be in the public folder.
-        alt="Background"
-        className="absolute inset-0 h-full w-full object-cover z-0"
-      />
-      <div className="relative z-10 flex flex-col items-center justify-center h-full bg-black bg-opacity-50">
-        <div className="p-8 bg-white bg-opacity-20 rounded-lg shadow-md backdrop-blur-md">
-        <h1  style={{ color: 'gold', fontWeight: 'bold' }} className="text-gold-200 font-bold text-2xl mb-4 text-center">Eduskill LMS SignUp</h1>
-        <SignUp />
+    <div className="relative h-screen w-full">
+      {/* Background Carousel */}
+      <div className="absolute inset-0 h-full w-full">
+        <div className="h-full w-full relative">
+          <div className="absolute w-full h-full z-0">
+            <div className="carousel-container">
+              {/* Add a few images to the carousel */}
+              <div className="carousel-slide">
+                <img
+                  src="/sign11.jpeg" // Image 1
+                  alt="Carousel Image 1"
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <div className="carousel-slide">
+                <img
+                  src="/sii.avif" // Image 2
+                  alt="Carousel Image 2"
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <div className="carousel-slide">
+                <img
+                  src="/sign.avif" // Image 3
+                  alt="Carousel Image 3"
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <div className="carousel-slide">
+                <img
+                  src="/woo.avif" // Image 4
+                  alt="Carousel Image 4"
+                  className="object-cover w-full h-full"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Overlay for form */}
+      <div className="absolute inset-0 z-10 flex justify-end items-center">
+        <SignUp />
+      </div>
+
+      {/* Carousel Styling */}
+      <style jsx>{`
+        .carousel-container {
+          display: flex;
+          width: 100%; /* Ensure the total width is the same as the container */
+          height: 100%;
+          position: relative;
+          animation: carouselAnimation 12s infinite; /* Adjusted for 12 seconds total, for 4 images with 3 seconds each */
+        }
+
+        .carousel-slide {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          opacity: 0; /* Hide all images initially */
+          transition: opacity 1s ease-in-out;
+        }
+
+        .carousel-slide:nth-child(1) {
+          animation: showImage 12s infinite 0s; /* First image shows for 3 seconds */
+        }
+        
+        .carousel-slide:nth-child(2) {
+          animation: showImage 12s infinite 3s; /* Second image shows for 3 seconds */
+        }
+
+        .carousel-slide:nth-child(3) {
+          animation: showImage 12s infinite 6s; /* Third image shows for 3 seconds */
+        }
+
+        .carousel-slide:nth-child(4) {
+          animation: showImage 12s infinite 9s; /* Fourth image shows for 3 seconds */
+        }
+
+        @keyframes showImage {
+          0%, 100% {
+            opacity: 0; /* Hide image at the start and end of the cycle */
+          }
+          25%, 75% {
+            opacity: 1; /* Show image during the middle of its cycle */
+          }
+        }
+      `}</style>
     </div>
   );
 }
