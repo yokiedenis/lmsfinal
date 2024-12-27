@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma"; // Import your Prisma client instance
-import { z } from "zod"; // Import Zod for validation
+import prisma from "@/lib/prisma";
+import { z } from "zod";
 
 // Zod schema for validating the quiz creation request
 const quizSchema = z.object({
@@ -18,36 +18,47 @@ const quizSchema = z.object({
 
 // API route handler for quizzes
 export async function POST(request: Request, { params }: { params: { courseId: string } }) {
-  const { courseId } = params; // Extract courseId from parameters
+  const { courseId } = params;
 
   // Parse the request body
-  const body = await request.json();
+  let body;
+  try {
+    body = await request.json();
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Invalid JSON in request body" },
+      { status: 400 }
+    );
+  }
 
   // Validate the request body against the schema
   const result = quizSchema.safeParse(body);
 
   if (!result.success) {
+    // Log the validation errors to the console for debugging
+    console.error("Validation failed:", result.error.errors);
     return NextResponse.json(
       { message: "Validation failed", errors: result.error.errors },
       { status: 400 }
     );
   }
 
-  const { title, questions } = result.data; // Destructure validated data
+  const { title, questions } = result.data;
 
   try {
-    // Create a new quiz in the database
+    // Create the quiz and its associated questions
     const quiz = await prisma.quiz.create({
       data: {
         title,
-        courseId, // Associate the quiz with the specified course
+        courseId, // Associate with the course
+        position: 0, // Default position value (modify if needed)
         questions: {
           create: questions.map((question) => ({
-            questionText: question.text, // Map question text
-            correctAnswer: question.correctAnswer, // Map correct answer
-            options: { // Now using the new Option model structure
+            questionText: question.text,
+            correctAnswer: question.correctAnswer,
+            options: {
               create: question.options.map((option) => ({
-                text: option, // Map each option text
+                text: option,
               })),
             },
           })),
@@ -55,12 +66,21 @@ export async function POST(request: Request, { params }: { params: { courseId: s
       },
     });
 
-    return NextResponse.json(quiz, { status: 201 }); // Return the created quiz
-  } catch (error) {
-    console.error("Failed to create quiz:", error); // Log the error
-    return NextResponse.json(
-      { message: "Failed to create quiz" },
-      { status: 500 }
-    ); // Return an error response
+    return NextResponse.json(quiz, { status: 201 });
+  } catch (error: unknown) {
+    // Cast the error to an Error object for TypeScript type safety
+    if (error instanceof Error) {
+      console.error("Error creating quiz:", error.message); // Log the error message
+      return NextResponse.json(
+        { message: "Failed to create quiz", error: error.message },
+        { status: 500 }
+      );
+    } else {
+      console.error("Unknown error:", error); // Log unknown errors
+      return NextResponse.json(
+        { message: "Failed to create quiz", error: "An unknown error occurred" },
+        { status: 500 }
+      );
+    }
   }
 }

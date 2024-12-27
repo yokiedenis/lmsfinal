@@ -55,6 +55,7 @@ model Course{
   purchases Purchase[]
 
   quizzes Quiz[] // Add this line
+  chapterQuizzes ChapterQuiz[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -105,6 +106,11 @@ model Chapter{
   Course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   userProgress UserProgress[]
+  quizzes      Quiz[]       // Add this line to establish a reverse relation to Quiz
+
+  chapterquizzes   ChapterQuiz[] // This defines the reverse relation to ChapterQuiz
+
+
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -201,6 +207,15 @@ model Quiz {
   courseId  String
   course    Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
   questions Question[] // Relation to Question model
+
+  chapterId String?   // Make chapterId optional if not all quizzes are tied to a chapter
+  chapter   Chapter?  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  position Int
+
+
+
+
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
@@ -226,13 +241,13 @@ model Option {
 }
 
 
+
+
 model QuizAttempt {
   id           String    @id @default(uuid()) @map("_id")
   quizId        String
   studentId     String?
   student       User?     @relation(fields: [studentId], references: [id])
-
-  
 
   score         Int
   totalQuestions Int
@@ -245,17 +260,7 @@ model QuizAttempt {
 
 }
 
- model User {
-  id           String       @id @default(uuid()) @map("_id")
-  name         String
-  email        String       @unique
-  quizAttempts QuizAttempt[] // Relation back to QuizAttempt
-  purchases    Purchase[]    // Ensure this relation exists
-  points       Int            @default(0)
-  level        Int            @default(1)  // Default level is 1
-  userProgress UserProgress[] // Add this line to establish the relation
-  
-}
+
 
 
 
@@ -325,20 +330,93 @@ model Learner {
 
 
 
+ model ChapterQuiz {
+  id        String         @id @default(uuid()) @map("_id") // MongoDB ID mapping
+  title     String
+  courseId  String
+  course    Course         @relation(fields: [courseId], references: [id])
+  chapterId String          @unique
+  chapter   Chapter        @relation(fields: [chapterId], references: [id])
+  questions ChapterQuestion[] // Relation to ChapterQuestion
+  attempts  ChapterQuizAttempt[] // Added back reference for relation
+  results   ChapterQuizResult[] // Added back reference for relation
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([courseId, chapterId]) // Composite unique constraint
+}
+
+model ChapterQuestion {
+  id            String       @id @default(uuid()) @map("_id") // MongoDB ID mapping
+  chapterQuizId String
+  chapterQuiz   ChapterQuiz @relation(fields: [chapterQuizId], references: [id], onDelete: Cascade)
+  questionText  String   
+  //options       Option[] @relation("QuestionOptions") // Relation to options
+  correctAnswer String   // Correct answer
+  chapterOptions ChapterOption[] // Relation to ChapterOption
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ChapterOption {
+  id              String         @id @default(uuid()) @map("_id") // MongoDB ID mapping
+  chapterQuestionId String
+  text       String
+
+  chapterQuestion ChapterQuestion @relation(fields: [chapterQuestionId], references: [id], onDelete: Cascade)
+  optionId        String
+  //option          Option         @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  isCorrect       Boolean        // Flag indicating if this option is the correct one
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+ 
+
+model ChapterQuizAttempt {
+  id           String           @id @default(uuid()) @map("_id") // MongoDB ID mapping
+  chapterQuizId String
+  studentId    String
+
+  score         Int
+  totalQuestions Int
+  answers       String   // Storing answers as JSON string
+  chapterQuiz  ChapterQuiz      @relation(fields: [chapterQuizId], references: [id], onDelete: Cascade)
+  student      User?             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
 
 
+ 
 
-// model Learner {
-//   id                       String   @id @default(uuid()) @map("_id")
-//   name                     String
-//   imageUrl                 String?  // Optional field for profile images
-//   statistics               Float
-//   lessonStatus             String
-//   quizScore                String
-//   assignmentStatus         String
-//   webinarStatus            String
-//   feedbackAssignmentStatus String
-//   feedbackWebinarStatus    String
-//   createdAt                DateTime @default(now())
-//   updatedAt                DateTime @updatedAt
-// }
+model ChapterQuizResult {
+  id           String           @id @default(uuid()) @map("_id") // MongoDB ID mapping
+  chapterQuizId String
+  score        Int
+  total        Int
+  studentId    String
+  chapterQuiz  ChapterQuiz      @relation(fields: [chapterQuizId], references: [id], onDelete: Cascade)
+  student      User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+ 
+
+
+ model User {
+  id           String       @id @default(uuid()) @map("_id")
+  name         String
+  email        String       @unique
+  quizAttempts QuizAttempt[] // Relation back to QuizAttempt
+  chapterQuizAttempts ChapterQuizAttempt[]
+  chapterQuizResults  ChapterQuizResult[]
+  purchases    Purchase[]    // Ensure this relation exists
+  points       Int            @default(0)
+  level        Int            @default(1)  // Default level is 1
+  userProgress UserProgress[] // Add this line to establish the relation
+  
+}
+
+
+ 

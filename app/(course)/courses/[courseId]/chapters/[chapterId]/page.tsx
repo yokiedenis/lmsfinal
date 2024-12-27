@@ -58,7 +58,7 @@ const ChapterIdPage = async ({
           label="You need to purchase this course to watch this chapter."
         />
       )}
-      <div className="flex flex-col max-w-4xl mx-auto pb-20" style={{ paddingTop: '64px' }}>
+      <div className="flex flex-col max-w-4xl mx-auto pb-20" style={{ paddingTop: '20px' }}>
         <div className="p-4 ">
           <VideoPlayer
             chapterId={params.chapterId}
@@ -105,7 +105,7 @@ const ChapterIdPage = async ({
                 borderRadius: '5px' // Optional: rounded corners for a softer look
             }}
           >
-            <Preview value={chapter.description!} />
+{/*             <Preview value={chapter.description!} /> */}
           </div>
           {!!attachments.length && (
             <>

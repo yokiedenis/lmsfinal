@@ -13,3 +13,13 @@ export type SafeProfile = Omit<
   createdAt: string;
   updatedAt: string;
 };
+
+
+// Define the Metadata type
+type Metadata = {
+  purchaseStatus: string | null; // Can be 'completed', 'pending', or null
+  // Add other properties relevant to your use case
+  chapterId?: string; // Optional chapter identifier
+  userId?: string; // Optional user identifier
+  [key: string]: any; // To allow additional properties if needed
+};

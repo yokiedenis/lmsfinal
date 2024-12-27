@@ -1,15 +1,14 @@
-// components/ResultPopup.tsx
-
 import React from 'react';
 
 interface ResultPopupProps {
   score: number;
   totalQuestions: number;
+  showRevisitMessage: boolean; // New prop to show the revisit message
   onClose: () => void; // Function to close the popup
 }
 
-const ResultPopup: React.FC<ResultPopupProps> = ({ score, totalQuestions, onClose }) => {
-  const percentage = totalQuestions > 0 ? ((score / totalQuestions) * 100).toFixed(2) : 0;
+const ResultPopup: React.FC<ResultPopupProps> = ({ score, totalQuestions, showRevisitMessage, onClose }) => {
+  const percentage = totalQuestions > 0 ? ((score / totalQuestions) * 100).toFixed(2) : '0';
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
@@ -18,7 +17,15 @@ const ResultPopup: React.FC<ResultPopupProps> = ({ score, totalQuestions, onClos
         <p className="mt-2">
           You scored {score} out of {totalQuestions} ({percentage}%)
         </p>
-        <button onClick={onClose} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition-colors">
+        {showRevisitMessage && (
+          <p className="mt-2 text-yellow-600 font-semibold">
+            You may revisit the material to improve your score.
+          </p>
+        )}
+        <button 
+          onClick={onClose} 
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition-colors"
+        >
           Close
         </button>
       </div>

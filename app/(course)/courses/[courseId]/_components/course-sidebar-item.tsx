@@ -50,11 +50,11 @@ export const CourseSidebarItem = ({
     >
       <div className="flex items-center gap-x-2 py-4">
         <Icon
-          size={22}
+          size={28} // Resize the icon
           className={cn(
-            "text-slate-500",
-            isActive && "text-slate-700 dark:text-slate-300",
-            isCompleted && "text-emerald-700 dark:text-emerald-400"
+            "text-slate-500", 
+            isActive && "text-slate-700 dark:text-slate-300", 
+            isCompleted ? "text-emerald-500" : "text-slate-500", // Change color based on completion status
           )}
         />
         {label}

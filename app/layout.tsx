@@ -10,6 +10,7 @@ import {
 } from '@clerk/nextjs'
 import { ToastProvider } from '@/components/providers/toaster-provider'
 import { ConfettiProvider } from '@/components/providers/confetti-provider'
+ 
 
 import ThemeSwitch from "@/components/theme-switch";
 import ThemeContextProvider from '@/components/providers/theme-provider'

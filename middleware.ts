@@ -10,6 +10,7 @@ export default authMiddleware({
     "/",
     "/search",
     /^\/api\/courses\/[^/]+\/quizzes\/[^/]+\/get$/, // Matches /api/courses/{courseId}/quizzes/{quizId}/get
+    /^\/api\/courses\/[^/]+\/chapterquizzes\/[^/]+\/get$/, // Matches /api/courses/{courseId}/chapterquizzes/{chapterQuizId}/get
   ],
   afterAuth: async (auth, req) => {
     const { userId } = auth;

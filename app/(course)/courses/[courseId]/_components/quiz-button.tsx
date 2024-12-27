@@ -4,7 +4,8 @@ import { useRouter } from 'next/navigation';
 
 interface QuizButtonProps {
   courseId: string; // Receive courseId as a prop
-  quizId: string;
+  chapterId?: string; // Add chapterId as a prop
+  quizId: string | null;
 }
 
 const QuizButton: React.FC<QuizButtonProps> = ({ courseId, quizId }) => {

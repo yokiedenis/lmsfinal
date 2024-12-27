@@ -59,7 +59,7 @@ export const ChapterVideoForm = ({
     return (
         <div className="mt-6 border bg-slate-100 rounded-md p-4">
            <div className="font-medium flex items-center justify-between">
-             Chapter Video
+             Section Video
              <Button onClick={toggleEdit} variant="ghost">
                 {isEditing && (
                     <>Cancel </>
@@ -109,7 +109,7 @@ export const ChapterVideoForm = ({
                }}
               />
               <div className="text-xs text-muted-foreground mt-4">
-                Upload this chapters video
+                Upload this sections video
               </div>
 
 

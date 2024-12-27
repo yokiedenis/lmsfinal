@@ -27,23 +27,39 @@ const CourseIdPage = async ({
 
     const course = await db.course.findUnique({
         where: {
-            id: params.courseId,
-            userId,
+          id: params.courseId,
+          userId, // Ensure `userId` is part of the query structure
         },
         include: {
-            chapters: {
-                orderBy: {
-                    position: "asc",
-                },
+          chapters: {
+            orderBy: {
+              position: 'asc',
             },
-            attachments: {
-                orderBy: {
-                    createdAt: "desc",
-                },
+          },
+          attachments: {
+            orderBy: {
+              createdAt: 'desc',
             },
+          },
+          quizzes: {
+            select: {
+              id: true,
+              title: true,
+              createdAt: true,
+              updatedAt: true,
+              courseId: true,
+              chapterId: true, // Now this field exists and can be selected
+              _count: {
+                select: {
+                  questions: true,
+                },
+              },
+              questions: true, // Optional: Include related questions
+            },
+          },
         },
-    });
-
+      });
+      
     // Fetching categories
     const categories = await db.category.findMany({
         orderBy: {
@@ -174,6 +190,10 @@ const CourseIdPage = async ({
                             </div>
 
                             <TeacherQuizForm
+                                //   initialData={{
+                                // quizzes: course.quizzes,  // Pass quizzes from the course
+                                //     // You can also include other relevant data from the course here if needed
+                                // }}// Pass initialData prop here
                                 courseId={params.courseId}
                             />
                         </div>

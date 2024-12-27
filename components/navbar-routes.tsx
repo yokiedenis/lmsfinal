@@ -3,28 +3,49 @@
 import { UserButton, useAuth } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Bell, Book } from "lucide-react"; // Added Book icon for Course Materials
 import Link from "next/link";
 import { SearchInput } from "./search-input";
-import { SafeProfile } from "@/types";
-
 import { isTeacher as checkIfTeacher } from "@/lib/teacher"; // Renamed import
-import { User } from "@clerk/nextjs/server";
+import { useState, useEffect } from "react"; // Add useState and useEffect
 
-interface NavbarRoutesProps {
-  //currentProfile?: SafeProfile | null;
-}
+interface NavbarRoutesProps {}
 
-export const NavbarRoutes: React.FC<NavbarRoutesProps> = ({
-  //currentProfile,
-}) => {
+export const NavbarRoutes: React.FC<NavbarRoutesProps> = () => {
   const { userId } = useAuth();
   const pathname = usePathname();
 
   const isTeacherPage = pathname?.startsWith("/teacher");
   const isPlayerPage = pathname?.includes("/chapters");
   const isSearchPage = pathname === "/search";
-  //const isUserTeacher = currentProfile?.role === "ADMIN" || currentProfile?.role === "TEACHER"; // Renamed variable
+
+  // Quotes for AI and LMS systems
+  const quotes = [
+    "AI is transforming the way we learn",
+    "The future of learning is powered by AI",
+    "Tech is revolutionizing education",
+    "Unlock your potential with technology",
+  ];
+
+  const [currentQuote, setCurrentQuote] = useState<string>(quotes[0]);
+
+  useEffect(() => {
+    const quoteInterval = setInterval(() => {
+      setCurrentQuote((prevQuote) => {
+        const currentIndex = quotes.indexOf(prevQuote);
+        return quotes[(currentIndex + 1) % quotes.length];
+      });
+    }, 5000); // Change quote every 5 seconds
+
+    return () => clearInterval(quoteInterval);
+  }, []);
+
+  // Condition to render the quote only on the Dashboard and other specific pages
+  const showQuote = pathname === "/"; // Add more pages if necessary
+
+  // Extract chapterId if it exists in the pathname
+  const chapterIdMatch = pathname?.match(/\/chapters\/(\d+)/); // Assuming chapterId is numeric
+  const chapterId = chapterIdMatch ? chapterIdMatch[1] : null;
 
   return (
     <>
@@ -34,7 +55,44 @@ export const NavbarRoutes: React.FC<NavbarRoutesProps> = ({
         </div>
       )}
 
-      <div className="flex gap-x-2 ml-auto">
+      <div className="flex gap-x-4 items-center ml-auto">
+        {/* Animated Quote */}
+        {showQuote && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "10px 20px",
+              fontSize: "15px",
+            }}
+          >
+            <span className="center animated-text">{currentQuote}</span>
+          </div>
+        )}
+
+        {/* Notifications */}
+        <Link href="/notifications">
+          <div className="flex items-center gap-2 cursor-pointer">
+            <Bell className="h-5 w-5 text-blue-500" /> {/* Notification Icon */}
+            <span className="hidden md:block text-sm text-custom-yellow">
+              Notifications
+            </span>
+          </div>
+        </Link>
+
+        {/* Course Materials icon only for chapter pages */}
+        {chapterId && (
+          <Link href="/coursematerials">
+            <div className="flex items-center gap-2 cursor-pointer">
+              <Book className="h-5 w-5 text-green-500" /> {/* Course Materials Icon */}
+              <span className="hidden md:block text-sm text-green-500">
+                Materials
+              </span>
+            </div>
+          </Link>
+        )}
+
         {isTeacherPage || isPlayerPage ? (
           <Link href="/">
             <Button size="sm" variant="destructive">
@@ -42,7 +100,7 @@ export const NavbarRoutes: React.FC<NavbarRoutesProps> = ({
               Exit
             </Button>
           </Link>
-        ) : checkIfTeacher(userId) ? ( // Call the function
+        ) : checkIfTeacher(userId) ? (
           <Link href="/teacher/courses">
             <Button size="sm" variant="success">
               Admin Mode

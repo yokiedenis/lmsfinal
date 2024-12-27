@@ -364,7 +364,7 @@ th {
 
 h1 {
   text-align: center;
-  color: #333;
+  color: #fff;
   font-size: 2.5rem;
   margin-bottom: 1rem;
 }
@@ -517,7 +517,7 @@ h1 {
 
 h1 {
   text-align: center;
-  color: #333;
+  color: #fff;
   font-size: 2.5rem;
   margin-bottom: 1rem;
 }
@@ -715,6 +715,16 @@ table.dataTable tbody tr:hover {
 
 
 
+.cl-headerTitle {
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  text-transform: lowercase;
+  letter-spacing: 2px;
+}
+
+
+
 
 @keyframes fadeIn {
   from {
@@ -765,9 +775,8 @@ table.dataTable tbody tr:hover {
   }
 }
 
+
  
-
-
 
 
 

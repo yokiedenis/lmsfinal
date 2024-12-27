@@ -1,21 +1,17 @@
-// app/quiz/[quizId]/page.tsx
-import {StudentQuizForm} from "@/components/studentquizform";
+import { StudentQuizForm } from "@/components/studentquizform";
 
-const QuizPage = ({ params }: { params: { courseId: string; quizId: string;  } }) => {
-  console.log('Route Params:', params); // Log the params to check if quizId exists
+const QuizPage = ({ params }: { params: { courseId: string; quizId: string; chapterId?: string; } }) => {
+  console.log('Route Params:', params); // Log the params to check if chapterId exists
   
+  // Check if chapterId exists in the route params, else set a default value.
+  const chapterId = params.chapterId || "default-chapter-id"; // Replace with the actual logic to get chapterId
 
   return (
-     
     <StudentQuizForm
-      courseId={params.courseId} // Pass courseId
-      quizId={params.quizId}     // Pass quizId
-      //studentId={params.studentId}   // Replace this with the actual student ID
-      
+      courseId={params.courseId}   // Pass courseId
+      quizId={params.quizId}       // Pass quizId
+      chapterId={chapterId}        // Pass chapterId (either from params or default value)
     />
-   
- 
-
   );
 };
 
