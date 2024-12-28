@@ -10,20 +10,20 @@ export async function GET(req: NextApiRequest, { params }: { params: { courseId:
         courseId: params.courseId,
       },
       select: {
-        id: true,         // Include the ID of the chapter quiz
+        id: true,         // Include the ID of the ChapterQuiz
         title: true,      // Include the title
-        chapterId: true,  // Include the chapterId if needed
         _count: {
-          select: { questions: true },  // Include the count of questions related to each chapter quiz
+          select: { questions: true },  // Include the count of questions related to each ChapterQuiz
         },
+        chapterId: true,  // Include the chapterId if needed
       },
     });
 
-    return new Response(JSON.stringify(chapterQuizzes), { status: 200 }); // Send chapter quizzes as response
+    return new Response(JSON.stringify(chapterQuizzes), { status: 200 }); // Send ChapterQuizzes as response
   } catch (error) {
-    console.error("Error fetching chapter quizzes:", error);
+    console.error("Error fetching ChapterQuizzes:", error);
     return new Response(
-      JSON.stringify({ error: "Error fetching chapter quizzes" }),
+      JSON.stringify({ error: "Error fetching ChapterQuizzes" }),
       { status: 500 }
     );
   }

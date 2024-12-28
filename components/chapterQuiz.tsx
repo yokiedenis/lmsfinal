@@ -1,98 +1,196 @@
 "use client";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 
-interface Question {
+import { useEffect, useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
+import ResultPopup from "@/components/resultpopup";
+import Confetti from "react-confetti";
+import { Banner } from "@/components/banner";
+
+interface QuizOption {
   id: string;
-  question: string;
-  options: string[];
+  text: string;
 }
 
-interface ChapterQuizProps {
+interface QuizQuestion {
+  id: string;
+  questionText: string;
+  options: QuizOption[];
+  correctAnswer: string;
+}
+
+interface ChapterQuizPageProps {
   courseId: string;
   chapterId: string;
 }
 
-const ChapterQuiz = ({ courseId, chapterId }: ChapterQuizProps) => {
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+export const ChapterQuizPage = ({ courseId, chapterId }: ChapterQuizPageProps) => {
+  const [quiz, setQuiz] = useState<QuizQuestion[]>([]);
+  const [answers, setAnswers] = useState<{ [key: string]: string }>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [result, setResult] = useState<{ score: number; totalQuestions: number } | null>(null);
+  const [isResultPopupVisible, setIsResultPopupVisible] = useState(false);
+  const [showFireworks, setShowFireworks] = useState(false);
+  const [showRevisitMessage, setShowRevisitMessage] = useState(false);
+  const [showCongratsBanner, setShowCongratsBanner] = useState(false);
+
+  const { userId } = useAuth();
 
   useEffect(() => {
-    const fetchQuestions = async () => {
-      const response = await fetch(`/api/courses/${courseId}/chapters/${chapterId}/chapterquizzes`);
-      const data = await response.json();
-      setQuestions(data.questions);
+    const fetchQuiz = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axios.get(`/api/courses/${courseId}/chapters/${chapterId}/chapterquizzes`);
+        if (response.data && response.data.questions) {
+          setQuiz(response.data.questions);
+        } else {
+          toast.error("No questions found for this quiz.");
+        }
+      } catch (error) {
+        toast.error("Failed to load quiz.");
+        console.error("Error fetching quiz:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    fetchQuestions();
-  }, [courseId, chapterId]);
+    fetchQuiz();
+  }, [chapterId, courseId]);
 
-  const handleOptionSelect = (option: string) => {
-    setSelectedOption(option);
-  };
+  const fetchResults = async () => {
+    try {
+      if (!userId) {
+        toast.error("User  not authenticated.");
+        return;
+      }
 
-  const handleNextQuestion = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedOption(null);
-    } else {
-      setIsSubmitted(true);
+      const response = await axios.get(`/api/courses/${courseId}/quizzes/`, {
+        headers: {
+          "user-id": userId,
+        },
+      });
+
+      setResult(response.data);
+      setIsResultPopupVisible(true);
+
+      const scorePercentage = (response.data.score / response.data.totalQuestions) * 100;
+
+      if (scorePercentage < 60) {
+        setShowRevisitMessage(true);
+        setShowCongratsBanner(false);
+        setShowFireworks(false);
+      } else {
+        setShowCongratsBanner(true);
+        setShowFireworks(true);
+        setShowRevisitMessage(false);
+
+        setTimeout(() => {
+          setShowCongratsBanner(false);
+        }, 15000);
+
+        setTimeout(() => setShowFireworks(false), 120000);
+      }
+    } catch (error) {
+      toast.error("Failed to fetch results.");
+      console.error("Error fetching results:", error);
     }
   };
 
-  if (isSubmitted) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.5 }}
-          className="bg-white p-8 rounded-lg shadow-lg text-center"
-        >
-          <h1 className="text-2xl font-bold">Quiz Submitted!</h1>
-          <p className="mt-4">Thank you for completing the quiz.</p>
-        </motion.div>
-      </div>
-    );
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const answersToSubmit = Object.entries(answers).map(([questionId, answerId]) => {
+        const question = quiz.find((q) => q.id === questionId);
+        const submittedAnswer = question?.options.find((option) => option.id === answerId)?.text;
+        return {
+          questionId,
+          answer: submittedAnswer || "",
+        };
+      });
+
+      if (!userId) {
+        toast.error("User  not authenticated.");
+        return;
+      }
+
+      const response = await axios.post(
+        `/api/courses/${courseId}/quizzes/`,
+        { answers: answersToSubmit },
+        { headers: { "user-id": userId } }
+      );
+
+      if (response.data) {
+        fetchResults();
+      } else {
+        toast.error("Failed to submit quiz.");
+      }
+    } catch (error) {
+      toast.error("Failed to submit quiz.");
+      console.error("Error submitting quiz:"), error } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleChange = (questionId: string, optionId: string) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: optionId,
+    }));
+  };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <motion.div
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -50 }}
-        transition={{ duration: 0.5 }}
-        className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md"
-      >
-        <h2 className="text-xl font-bold mb-4">{questions[currentQuestionIndex]?.question}</h2>
-        <div className="space-y-4">
-          {questions[currentQuestionIndex]?.options.map((option) => (
-            <button
-              key={option}
-              onClick={() => handleOptionSelect(option)}
-              className={`w-full py-2 px-4 rounded-md transition duration-300 ${
-                selectedOption === option
-                  ? "bg-purple-600 text-white"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-              }`}
-            >
-              {option}
-            </button>
-          ))}
+    <div className="p-6">
+      {showCongratsBanner && <Banner variant="success" label="Congratulations! You passed the quiz." />}
+      {showFireworks && <Confetti />}
+      {isResultPopupVisible && result && (
+        <ResultPopup
+          score={result.score}
+          totalQuestions={result.totalQuestions}
+          showRevisitMessage={showRevisitMessage}
+          onClose={() => setIsResultPopupVisible(false)}
+        />
+      )}
+
+      {isLoading ? (
+        <div className="flex justify-center items-center">
+          <Loader2 className="animate-spin" />
         </div>
-        <button
-          onClick={handleNextQuestion}
-          className="mt-4 w-full py-2 px-4 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition duration-300"
-          disabled={!selectedOption}
-        >
-          {currentQuestionIndex < questions.length - 1 ? "Next Question" : "Submit Quiz"}
-        </button>
-      </motion.div>
+      ) : (
+        <form onSubmit={handleSubmit}>
+          {quiz.map((question) => (
+            <div key={question.id} className="mb-4">
+              <p className="font-semibold">{question.questionText}</p>
+              <div>
+                {question.options.map((option) => (
+                  <div key={option.id} className="mb-2">
+                    <input
+                      type="radio"
+                      name={question.id}
+                      id={option.id}
+                      value={option.id}
+                      checked={answers[question.id] === option.id}
+                      onChange={() => handleChange(question.id, option.id)}
+                    />
+                    <label htmlFor={option.id} className="ml-2">
+                      {option.text}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          <Button type="submit" disabled={isSubmitting} className="w-full mt-6" variant="success">
+            {isSubmitting ? "Submitting..." : "Submit Quiz"}
+          </Button>
+        </form>
+      )}
     </div>
   );
-};
-
-export default ChapterQuiz;
+}

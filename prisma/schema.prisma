@@ -366,7 +366,7 @@ model ChapterOption {
   text       String
 
   chapterQuestion ChapterQuestion @relation(fields: [chapterQuestionId], references: [id], onDelete: Cascade)
-  optionId        String
+  optionId         String         @default(uuid())                // Ensure a default value for optionId
   //option          Option         @relation(fields: [optionId], references: [id], onDelete: Cascade)
   isCorrect       Boolean        // Flag indicating if this option is the correct one
 
