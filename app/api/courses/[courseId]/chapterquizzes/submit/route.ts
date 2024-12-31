@@ -1,7 +1,7 @@
-import { NextResponse, NextRequest } from "next/server"; 
-import prisma from "@/lib/prisma"; 
-import { z } from "zod"; 
-import { getAuth } from "@clerk/nextjs/server"; 
+import { NextResponse, NextRequest } from "next/server";
+import prisma from "@/lib/prisma";
+import { z } from "zod";
+import { getAuth } from "@clerk/nextjs/server";
 
 // Zod schema for validating the answer submission
 const answerSchema = z.object({
@@ -16,7 +16,10 @@ const answerSchema = z.object({
 });
 
 // API route handler for submitting quiz answers
-export async function POST(request: NextRequest, { params }: { params: { courseId: string; chapterQuizId: string } }) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { courseId: string; chapterQuizId: string } }
+) {
   const { chapterQuizId } = params;
 
   // Parse the request body
@@ -36,19 +39,18 @@ export async function POST(request: NextRequest, { params }: { params: { courseI
   const { answers } = result.data;
 
   // Get user authentication details from the request
-  const { userId } = getAuth(request); 
+  const { userId } = getAuth(request);
 
   // Check if the user is authenticated
   if (!userId) {
     return NextResponse.json(
       { message: "User not authenticated" },
-      
       { status: 401 }
     );
   }
 
   try {
-    // Fetch the quiz questions and their correct answers
+    // Fetch the quiz questions and their correct answers matching the provided chapterQuizId
     const quizQuestions = await prisma.chapterQuestion.findMany({
       where: { chapterQuizId },
       select: { id: true, correctAnswer: true },
@@ -63,15 +65,17 @@ export async function POST(request: NextRequest, { params }: { params: { courseI
 
     // Create a mapping of correct answers for quick lookup
     const correctAnswersMap = Object.fromEntries(
-      quizQuestions.map(question => [question.id, question.correctAnswer])
+      quizQuestions.map((question) => [question.id, question.correctAnswer])
     );
 
     // Iterate through answers to calculate the score
-    answers.forEach(answer => {
-      const submittedAnswer = answer.answer.split('.')[0].trim(); // Extract the letter and trim any whitespace
+    answers.forEach((answer) => {
+      const submittedAnswer = answer.answer.split(".")[0].trim(); // Extract the letter and trim any whitespace
       const correctAnswer = correctAnswersMap[answer.questionId];
 
-      console.log(`Checking: Question ID: ${answer.questionId}, Submitted Answer: ${submittedAnswer}, Correct Answer: ${correctAnswer}`);
+      console.log(
+        `Checking: Question ID: ${answer.questionId}, Submitted Answer: ${submittedAnswer}, Correct Answer: ${correctAnswer}`
+      );
 
       // Compare the submitted answer with the correct answer
       if (correctAnswer && correctAnswer === submittedAnswer) {
@@ -123,7 +127,8 @@ export async function POST(request: NextRequest, { params }: { params: { courseI
     );
   } catch (error) {
     console.error("Failed to submit answers:", error);
-    const errorMessage = (error instanceof Error) ? error.message : "Failed to submit answers";
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to submit answers";
 
     return NextResponse.json(
       { message: errorMessage },

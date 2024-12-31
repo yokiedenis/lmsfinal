@@ -80,7 +80,7 @@ const ChapterIdPage = async ({
              padding: '10px', // Add some padding for better readability
              borderRadius: '5px' // Optional: rounded corners for a softer look
          }}   >
-                    {chapter.title}
+                    {/* {chapter.title} */}
                </h2>
             {purchase ? (
               <CourseProgressButton

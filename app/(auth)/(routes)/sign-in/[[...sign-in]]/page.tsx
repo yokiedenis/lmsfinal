@@ -13,28 +13,28 @@ export default function Page() {
               {/* Add a few images to the carousel */}
               <div className="carousel-slide">
                 <img
-                  src="/pure5.jpg" // Image 1
+                  src="/De.png" // Image 1
                   alt="Carousel Image 1"
                   className="object-cover w-full h-full"
                 />
               </div>
               <div className="carousel-slide">
                 <img
-                  src="/pure2.jpg" // Image 2
+                  src="/DeW.png" // Image 2
                   alt="Carousel Image 2"
                   className="object-cover w-full h-full"
                 />
               </div>
               <div className="carousel-slide">
                 <img
-                  src="/pure4.jpg" // Image 3
+                  src="/D.png" // Image 3
                   alt="Carousel Image 3"
                   className="object-cover w-full h-full"
                 />
               </div>
               <div className="carousel-slide">
                 <img
-                  src="/pure1.jpg" // Image 4
+                  src="/N.png" // Image 4
                   alt="Carousel Image 4"
                   className="object-cover w-full h-full"
                 />
@@ -96,3 +96,72 @@ export default function Page() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+// "use client";
+
+// import { useState } from 'react';
+// import { signInWithEmailAndPassword } from 'firebase/auth';
+// import { auth } from '@/firebase';
+
+// export default function SignInPage() {
+//   const [email, setEmail] = useState('');
+//   const [password, setPassword] = useState('');
+//   const [error, setError] = useState('');
+
+//   const handleSignIn = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     try {
+//       await signInWithEmailAndPassword(auth, email, password);
+//       alert('Signed in successfully!');
+//     } catch (err: any) {
+//       setError(err.message);
+//     }
+//   };
+
+//   return (
+//     <div className="relative h-screen w-full">
+//       <div className="absolute inset-0 h-full w-full">
+//         {/* Background Carousel */}
+//         {/* Add your carousel code here */}
+//       </div>
+
+//       <div className="absolute inset-0 z-10 flex justify-center items-center">
+//         <form onSubmit={handleSignIn} className="bg-white p-6 rounded shadow-md">
+//           <h1 className="text-xl font-bold mb-4">Sign In</h1>
+//           {error && <p className="text-red-500">{error}</p>}
+//           <input
+//             type="email"
+//             value={email}
+//             onChange={(e) => setEmail(e.target.value)}
+//             placeholder="Email"
+//             className="block w-full p-2 mb-4 border rounded"
+//             required
+//           />
+//           <input
+//             type="password"
+//             value={password}
+//             onChange={(e) => setPassword(e.target.value)}
+//             placeholder="Password"
+//             className="block w-full p-2 mb-4 border rounded"
+//             required
+//           />
+//           <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
+//             Sign In
+//           </button>
+//         </form>
+//       </div>
+//     </div>
+//   );
+// }

@@ -1,42 +1,54 @@
-import { NextRequest, NextResponse } from 'next/server'; 
+import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Export named GET function for API route
-export async function GET(req: NextRequest) {
+// Export named POST function to update points
+export async function POST(req: NextRequest) {
   try {
-    // Fetch all users from the User model
-    const users = await prisma.user.findMany({
-      orderBy: {
-        points: 'desc', // Sort by points if necessary
-      },
-      include: {
-        userProgress: {
-          where: { isCompleted: true }, // Fetch completed courses only
-        },
+    const { userId, score, totalQuestions, passingPercentage, chapterId } = await req.json();
+
+    const percentage = totalQuestions > 0 ? (score / totalQuestions) * 100 : 0;
+    const hasPassed = percentage >= passingPercentage;
+
+    if (!hasPassed) {
+      return NextResponse.json({ message: "You failed. No points added." }, { status: 400 });
+    }
+
+    // Calculate points based on quiz results (100 points for passing)
+    const pointsEarned = 100;
+
+    // Update user's progress in the database
+    const updatedUserProgress = await prisma.userProgress.create({
+      data: {
+        userId,
+        chapterId,
+        score, // Store the score here
+        isCompleted: true, // Mark as completed
+        points: pointsEarned, // Store the points here
       },
     });
 
-    // Add level and points based on completed courses
-    const usersWithPoints = users.map((user) => {
-      const completedCourses = user.userProgress.length;
-      const level = completedCourses >= 1 ? completedCourses : 1; // Minimum level 1
-
-      // Calculate points: 100 points for each completed course
-      const points = completedCourses * 100;
-
-      return { ...user, level, points };
+    // Now we need to calculate and update the user's total points and level
+    const userProgress = await prisma.userProgress.findMany({
+      where: { userId, isCompleted: true },
     });
 
-    // Respond with the users data
-    return NextResponse.json(usersWithPoints);  // Use NextResponse.json for response
+    const updatedLevel = userProgress.length;
+    const updatedPoints = updatedLevel * 100; // 100 points per completed course
 
+    // Update user's points and level in the User model
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        points: updatedPoints,
+        level: updatedLevel,
+      },
+    });
+
+    return NextResponse.json({ message: "Points updated successfully", points: updatedPoints });
   } catch (error) {
-    console.error('Error fetching users data:', error);
-    return NextResponse.json(
-      { message: 'An error occurred while fetching users data' },
-      { status: 500 }
-    ); // Use status and response correctly with NextResponse
+    console.error('Error updating points:', error);
+    return NextResponse.json({ message: 'An error occurred while updating points' }, { status: 500 });
   }
 }

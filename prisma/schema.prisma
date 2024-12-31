@@ -138,6 +138,8 @@ model UserProgress{
   chapter Chapter @relation(fields: [chapterId], references: [id], onDelete:Cascade)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Add this line
+  score      Int     @default(0) // Add the score field here
+
 
 
   isCompleted Boolean @default(false)

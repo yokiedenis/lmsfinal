@@ -38,7 +38,8 @@ export const StudentQuizForm = ({ quizId, courseId, chapterId }: StudentQuizForm
   const [showFireworks, setShowFireworks] = useState(false);
   const [showRevisitMessage, setShowRevisitMessage] = useState(false);
   const [showCongratsBanner, setShowCongratsBanner] = useState(false);
-
+  
+  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes timer
   const { userId } = useAuth();
 
   useEffect(() => {
@@ -61,6 +62,19 @@ export const StudentQuizForm = ({ quizId, courseId, chapterId }: StudentQuizForm
 
     fetchQuiz();
   }, [quizId, courseId]);
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      setIsSubmitting(true);
+      handleSubmit();  // Automatically submit when time runs out
+    } else {
+      const timer = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [timeLeft]);
 
   const fetchResults = async () => {
     try {
@@ -101,8 +115,8 @@ export const StudentQuizForm = ({ quizId, courseId, chapterId }: StudentQuizForm
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
+    if (e) e.preventDefault();
     setIsSubmitting(true);
 
     try {
@@ -146,8 +160,14 @@ export const StudentQuizForm = ({ quizId, courseId, chapterId }: StudentQuizForm
     }));
   };
 
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
+  };
+
   return (
-    <div className="p-6">
+    <div className="p-6 bg-blue-50 rounded-lg shadow-lg">
       {showCongratsBanner && <Banner variant="success" label="Congratulations! You passed the quiz." />}
       {showFireworks && <Confetti />}
       {isResultPopupVisible && result && (
@@ -159,18 +179,32 @@ export const StudentQuizForm = ({ quizId, courseId, chapterId }: StudentQuizForm
         />
       )}
 
+      <div className="timer flex justify-center items-center py-4 mb-6">
+        <div className="relative">
+          <div className="absolute inset-0 bg-gray-200 rounded-full animate-pulse opacity-50"></div>
+          <div className="text-4xl font-bold text-blue-600">{formatTime(timeLeft)}</div>
+        </div>
+      </div>
+
       {isLoading ? (
         <div className="flex justify-center items-center">
           <Loader2 className="animate-spin" />
         </div>
       ) : (
-        <form onSubmit={handleSubmit}>
-          {quiz.map((question) => (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {quiz.map((question, index) => (
             <div key={question.id} className="mb-4">
-              <p className="font-semibold">{question.questionText}</p>
-              <div>
+              <p className="font-semibold text-lg text-blue-800 uppercase">{`${index + 1}. ${question.questionText}`}</p>
+              <div className="bg-white p-4 rounded-lg shadow-lg">
                 {question.options.map((option) => (
-                  <div key={option.id} className="mb-2">
+                  <div
+                    key={option.id}
+                    className={`mb-2 p-3 border rounded-lg cursor-pointer transition-all duration-300 ${
+                      answers[question.id] === option.id
+                        ? "bg-blue-600 text-white"
+                        : "bg-blue-200 hover:bg-blue-300"
+                    }`}
+                  >
                     <input
                       type="radio"
                       name={question.id}
@@ -178,17 +212,16 @@ export const StudentQuizForm = ({ quizId, courseId, chapterId }: StudentQuizForm
                       value={option.id}
                       checked={answers[question.id] === option.id}
                       onChange={() => handleChange(question.id, option.id)}
+                      className="mr-2"
                     />
-                    <label htmlFor={option.id} className="ml-2">
-                      {option.text}
-                    </label>
+                    <label htmlFor={option.id} className="text-blue-800">{option.text}</label>
                   </div>
                 ))}
               </div>
             </div>
           ))}
 
-          <Button type="submit" disabled={isSubmitting} className="w-full mt-6" variant="success">
+          <Button type="submit" disabled={isSubmitting} className="w-full mt-6 bg-blue-600 text-white hover:bg-blue-700">
             {isSubmitting ? "Submitting..." : "Submit Quiz"}
           </Button>
         </form>

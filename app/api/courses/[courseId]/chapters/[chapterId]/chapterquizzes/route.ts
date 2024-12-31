@@ -34,16 +34,26 @@ export async function GET(
       return NextResponse.json({ error: "Quiz not found" }, { status: 404 });
     }
 
-    // Format the questions for the response
-    const formattedQuestions = quiz.questions.map((question) => ({
-      id: question.id,
-      questionText: question.questionText, // Ensure this field is correctly populated in the database
-      options: question.chapterOptions.map((option) => ({
-        id: option.id,
-        text: option.text,
-        isCorrect: option.isCorrect,
-      })),
-    }));
+    // Format the questions for the response with numbering and options as A, B, C, D
+    const formattedQuestions = quiz.questions.map((question, index) => {
+      const formattedOptions = question.chapterOptions.map((option, optionIndex) => {
+        // Map options to letters starting from A
+        const optionLetter = String.fromCharCode(65 + optionIndex); // 65 is the ASCII code for 'A'
+        return {
+          id: option.id,
+          letter: optionLetter, // Add letter (A, B, C, D)
+          text: option.text,
+          isCorrect: option.isCorrect,
+        };
+      });
+
+      return {
+        id: question.id,
+        questionNumber: index + 1, // Numbering questions starting from 1
+        questionText: question.questionText, // Ensure this field is correctly populated in the database
+        options: formattedOptions,
+      };
+    });
 
     // Return the formatted questions
     return NextResponse.json({ questions: formattedQuestions }, { status: 200 });

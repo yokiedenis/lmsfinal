@@ -2,9 +2,8 @@
 
 import { Profile, MemberRole } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal, Pencil } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, Pencil, X } from "lucide-react"; // Import X for the close button
 import { useState } from "react";
-import Link from "next/link";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -38,16 +37,13 @@ const updateUserProfile = async (id: string, formData: { name?: string; email?: 
   }
 };
 
-;
-
 // Table columns definition
 export const columns: ColumnDef<Profile, keyof Profile>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      className="text-[#fcb61a]"
-      >
+        className="text-[#fcb61a]">
         Name
         {column.getIsSorted() && <ArrowUpDown className="h-4 w-4 ml-2" />}
       </Button>
@@ -57,8 +53,7 @@ export const columns: ColumnDef<Profile, keyof Profile>[] = [
     accessorKey: "email",
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      className="text-[#fcb61a]"
-      >
+        className="text-[#fcb61a]">
         Email
         {column.getIsSorted() && <ArrowUpDown className="h-4 w-4 ml-2" />}
       </Button>
@@ -68,8 +63,7 @@ export const columns: ColumnDef<Profile, keyof Profile>[] = [
     accessorKey: "role",
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-       className="text-[#fcb61a]"
-      >
+        className="text-[#fcb61a]">
         Role
         {column.getIsSorted() && <ArrowUpDown className="h-4 w-4 ml-2" />}
       </Button>
@@ -121,13 +115,19 @@ export const columns: ColumnDef<Profile, keyof Profile>[] = [
           {isModalOpen && (
             <Modal isOpen={isModalOpen} onClose={handleModalClose}>
               <div className="p-6 space-y-4">
-                <h2 className="text-xl font-semibold">Edit Profile</h2>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-2xl font-semibold text-[#fcb61a]">Edit Profile</h2>
+                  <Button variant="ghost" onClick={handleModalClose} className="text-red-500 hover:text-red-700">
+                    <X className="h-6 w-6" />
+                  </Button>
+                </div>
                 <form onSubmit={(e) => e.preventDefault()}>
                   <div>
                     <Input
                       label="Name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="bg-white text-black" // Ensure the input text is clearly visible
                     />
                   </div>
                   <div>
@@ -136,6 +136,7 @@ export const columns: ColumnDef<Profile, keyof Profile>[] = [
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="bg-white text-black" // Ensure the input text is clearly visible
                     />
                   </div>
                   <div>
@@ -143,6 +144,7 @@ export const columns: ColumnDef<Profile, keyof Profile>[] = [
                       label="Role"
                       value={formData.role}
                       onChange={(e) => setFormData({ ...formData, role: e.target.value as MemberRole })}
+                      className="bg-white text-black" // Ensure the input text is clearly visible
                     />
                   </div>
                   <div className="mt-4 flex justify-end space-x-4">
