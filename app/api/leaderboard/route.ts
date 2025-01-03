@@ -1,54 +1,53 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+// app/api/leaderboard/route.ts
+import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// Export named POST function to update points
-export async function POST(req: NextRequest) {
+export async function GET() {
   try {
-    const { userId, score, totalQuestions, passingPercentage, chapterId } = await req.json();
-
-    const percentage = totalQuestions > 0 ? (score / totalQuestions) * 100 : 0;
-    const hasPassed = percentage >= passingPercentage;
-
-    if (!hasPassed) {
-      return NextResponse.json({ message: "You failed. No points added." }, { status: 400 });
-    }
-
-    // Calculate points based on quiz results (100 points for passing)
-    const pointsEarned = 100;
-
-    // Update user's progress in the database
-    const updatedUserProgress = await prisma.userProgress.create({
-      data: {
-        userId,
-        chapterId,
-        score, // Store the score here
-        isCompleted: true, // Mark as completed
-        points: pointsEarned, // Store the points here
+    // Fetch all users and calculate points and levels
+    const users = await prisma.user.findMany({
+      include: {
+        profile: true,
+        userProgress: {
+          include: {
+            chapter: {
+              select: { courseId: true },
+            },
+          },
+        },
       },
     });
 
-    // Now we need to calculate and update the user's total points and level
-    const userProgress = await prisma.userProgress.findMany({
-      where: { userId, isCompleted: true },
+    // Calculate total points and level for each user
+    const leaderboard = users.map((user) => {
+      const completedChapters = user.userProgress.filter((p) => p.isCompleted);
+      const totalPoints = completedChapters.reduce(
+        (sum, progress) => sum + progress.points,
+        0
+      );
+      const uniqueCourses = new Set(
+        completedChapters.map((p) => p.chapter.courseId)
+      );
+      const level = uniqueCourses.size;
+
+      return {
+        name: user.profile?.name || "Anonymous",
+        points: totalPoints,
+        level,
+      };
     });
 
-    const updatedLevel = userProgress.length;
-    const updatedPoints = updatedLevel * 100; // 100 points per completed course
+    // Sort by points descending and return the data
+    leaderboard.sort((a, b) => b.points - a.points);
 
-    // Update user's points and level in the User model
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: {
-        points: updatedPoints,
-        level: updatedLevel,
-      },
-    });
-
-    return NextResponse.json({ message: "Points updated successfully", points: updatedPoints });
+    return NextResponse.json(leaderboard);
   } catch (error) {
-    console.error('Error updating points:', error);
-    return NextResponse.json({ message: 'An error occurred while updating points' }, { status: 500 });
+    console.error("Error fetching leaderboard data:", error);
+    return NextResponse.json(
+      { message: "Failed to fetch leaderboard data" },
+      { status: 500 }
+    );
   }
 }

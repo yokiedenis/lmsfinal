@@ -13,28 +13,28 @@ export default function Page() {
               {/* Add a few images to the carousel */}
               <div className="carousel-slide">
                 <img
-                  src="/De.png" // Image 1
+                  src="/pppp.jpg" // Image 1
                   alt="Carousel Image 1"
                   className="object-cover w-full h-full"
                 />
               </div>
               <div className="carousel-slide">
                 <img
-                  src="/DeW.png" // Image 2
+                  src="/ppp.jpg" // Image 2
                   alt="Carousel Image 2"
                   className="object-cover w-full h-full"
                 />
               </div>
               <div className="carousel-slide">
                 <img
-                  src="/D.png" // Image 3
+                  src="/ccc.jpg" // Image 3
                   alt="Carousel Image 3"
                   className="object-cover w-full h-full"
                 />
               </div>
               <div className="carousel-slide">
                 <img
-                  src="/N.png" // Image 4
+                  src="/ppp.jpg" // Image 4
                   alt="Carousel Image 4"
                   className="object-cover w-full h-full"
                 />
@@ -46,6 +46,9 @@ export default function Page() {
 
       {/* Overlay for form */}
       <div className="absolute inset-0 z-10 flex justify-end items-center">
+      {/* <p className="mt-4 text-white text-sm">
+          * To sign in, you must be 18 years or older.
+        </p> */}
         <SignIn 
         routing="hash" />
       </div>

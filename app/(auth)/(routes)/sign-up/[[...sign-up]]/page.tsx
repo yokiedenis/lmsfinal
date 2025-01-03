@@ -30,28 +30,35 @@ export default function Page() {
               {/* Add a few images to the carousel */}
               <div className="carousel-slide">
                 <img
-                  src="/pure4.jpg" // Image 1
+                  src="/ccc.jpg" // Image 1
                   alt="Carousel Image 1"
                   className="object-cover w-full h-full"
                 />
               </div>
               <div className="carousel-slide">
                 <img
-                  src="/pure2.jpg" // Image 2
+                  src="/ccc.jpg" // Image 2
                   alt="Carousel Image 2"
                   className="object-cover w-full h-full"
                 />
               </div>
               <div className="carousel-slide">
                 <img
-                  src="/pure4.jpg" // Image 3
+                  src="/ppp.jpg" // Image 3
                   alt="Carousel Image 3"
                   className="object-cover w-full h-full"
                 />
               </div>
               <div className="carousel-slide">
                 <img
-                  src="/pure1.jpg" // Image 4
+                  src="/pppp.jpg" // Image 4
+                  alt="Carousel Image 4"
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <div className="carousel-slide">
+                <img
+                  src="/ccc.jpg" // Image 4
                   alt="Carousel Image 4"
                   className="object-cover w-full h-full"
                 />

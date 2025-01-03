@@ -16,12 +16,15 @@ export async function POST(req: NextRequest) {
     const user = await clerkClient.users.getUser(userId);
     const email = user.emailAddresses[0]?.emailAddress;
     const username = user.username || user.firstName || 'Anonymous';
+    const phoneNumber = user.phoneNumbers[0]?.phoneNumber || null; // Fetch phone number if available
 
     // Save user details to Prisma
     const newUser = await prisma.user.create({
       data: {
         name: username,
         email,
+        number: phoneNumber, // Save the phone number
+        
       },
     });
 

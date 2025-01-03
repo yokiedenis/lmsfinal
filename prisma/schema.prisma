@@ -26,6 +26,8 @@ model Profile {
   name String
   imageUrl String?  
   email String  
+  user      User    @relation(fields: [userId], references: [id]) // Relation defined here
+
 
    
    //answers Answer[] // Relation to Answer
@@ -431,6 +433,11 @@ model ChapterQuizResult {
   points       Int            @default(0)
   level        Int            @default(1)  // Default level is 1
   userProgress UserProgress[] // Add this line to establish the relation
+  number String? // Optional field for phone number
+
+  profile  Profile? @relation             // Relation defined without `fields` or `references`
+
+  
   
 }
 
