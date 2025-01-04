@@ -1,6 +1,10 @@
 // import { NextRequest, NextResponse } from 'next/server';
 // import formidable from 'formidable';
+<<<<<<< HEAD
 // //import { Readable } from 'stream';
+=======
+// import { Readable } from 'stream';
+>>>>>>> a185412ce250d9dcd1ae993f1371d4b3fafb32d6
 
 // // Use edge runtime for this API route
 // export const runtime = 'edge';
@@ -22,6 +26,7 @@
 //   return Buffer.concat(chunks);
 // }
 
+<<<<<<< HEAD
 // // // Utility function to parse form data using formidable
 // // const parseFormData = async (req: NextRequest) => {
 // //   return new Promise<{ fields: formidable.Fields; files: formidable.Files }>((resolve, reject) => {
@@ -46,11 +51,41 @@
 // //       .catch(reject);
 // //   });
 // // };
+=======
+// // Utility function to parse form data using formidable
+// const parseFormData = async (req: NextRequest) => {
+//   return new Promise<{ fields: formidable.Fields; files: formidable.Files }>((resolve, reject) => {
+//     const form = formidable({
+//       // Use relative path or handle uploads in a different manner
+//       uploadDir: '/tmp/uploads', // This is an example, you may need to handle it according to Edge capabilities
+//       keepExtensions: true,
+//     });
+
+//     // Convert the NextRequest body stream into a buffer
+//     const bodyBuffer = streamToBuffer(req.body as ReadableStream<Uint8Array>);
+
+//     bodyBuffer
+//       .then((buffer) => {
+//         const reqStream = Readable.from(buffer);
+
+//         form.parse(reqStream as any, (err, fields, files) => {
+//           if (err) reject(err);
+//           else resolve({ fields, files });
+//         });
+//       })
+//       .catch(reject);
+//   });
+// };
+>>>>>>> a185412ce250d9dcd1ae993f1371d4b3fafb32d6
 
 // export async function POST(req: NextRequest) {
 //   try {
 //     // Parse form data
+<<<<<<< HEAD
 //    // const { fields, files } = await parseFormData(req);
+=======
+//     const { fields, files } = await parseFormData(req);
+>>>>>>> a185412ce250d9dcd1ae993f1371d4b3fafb32d6
 
 //     // Check if the file is uploaded
 //     const uploadedFile = Array.isArray(files.file) ? files.file[0] : files.file;
