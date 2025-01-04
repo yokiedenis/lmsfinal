@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import formidable from 'formidable';
-import path from 'path';
 import { Readable } from 'stream';
 
 // Use edge runtime for this API route
@@ -27,7 +26,8 @@ async function streamToBuffer(stream: ReadableStream<Uint8Array>): Promise<Buffe
 const parseFormData = async (req: NextRequest) => {
   return new Promise<{ fields: formidable.Fields; files: formidable.Files }>((resolve, reject) => {
     const form = formidable({
-      uploadDir: path.join(process.cwd(), '/public/uploads'),
+      // Use relative path or handle uploads in a different manner
+      uploadDir: '/tmp/uploads', // This is an example, you may need to handle it according to Edge capabilities
       keepExtensions: true,
     });
 
