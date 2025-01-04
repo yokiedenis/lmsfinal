@@ -3,10 +3,12 @@
 import { AttachmentForm } from "../teacher/courses/[courseId]/_components/attachment-form";
 import { Course, Attachment } from "@prisma/client";
 
+// Define the props interface for CourseMaterials
 interface CourseMaterialsProps {
   course: Course & { attachments: Attachment[] };
 }
 
+// Define the functional component that accepts CourseMaterialsProps
 const CourseMaterials = ({ course }: CourseMaterialsProps) => {
   return (
     <div className="container mx-auto p-6 bg-gray-50 min-h-screen">
@@ -36,4 +38,6 @@ const CourseMaterials = ({ course }: CourseMaterialsProps) => {
   );
 };
 
+// Default export of the component
 export default CourseMaterials;
+
