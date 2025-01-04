@@ -11,14 +11,14 @@ const studentRoutes = [
     { icon: Layout, label: "Dashboard", href: "/" },
     { icon: Compass, label: "Browse", href: "/search" },
     { icon: CircleHelp, label: "Student Helper", href: "/help" },
-    { icon: BarChart, label: "Student Analytics", href: "/analytics" },
+  //  { icon: BarChart, label: "Student Analytics", href: "/analytics" },
     { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
     { icon: Video, label: "Class Live Stream", href: "/livestream" },
 ];
 
 const teacherRoutes = [
     { icon: List, label: "Courses", href: "/teacher/courses" },
-    { icon: BarChart, label: "Analytics", href: "/teacher/analytics" },
+  //  { icon: BarChart, label: "Analytics", href: "/teacher/analytics" },
     { icon: MessageCircle, label: "Student Feedback", href: "/teacher/feedback" },
     { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
     { icon: Video, label: "Class Live Stream", href: "/livestream" },
@@ -26,7 +26,8 @@ const teacherRoutes = [
 
 const superAdminRoutes = [
     ...teacherRoutes,
-    { icon: Users, label: "Manage Users", href: "/teacher/users" },
+    { icon: BarChart, label: "Analytics", href: "/teacher/analytics" }
+   // { icon: Users, label: "Manage Users", href: "/teacher/users" },
     // { icon: Trophy, label: "Student Leaderboard", href: "/leaderboard" },
 ];
 

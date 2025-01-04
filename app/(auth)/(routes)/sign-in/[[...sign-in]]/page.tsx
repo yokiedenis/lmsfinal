@@ -1,8 +1,19 @@
-"use client"; // This line makes this file a client component.
+"use client";
 
-import { SignIn } from '@clerk/nextjs';
+import React, { useState, useEffect } from "react";
+import { SignIn } from "@clerk/nextjs";
 
 export default function Page() {
+  const [showMessage, setShowMessage] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowMessage(false);
+    }, 10000); // 30 seconds
+
+    return () => clearTimeout(timer); // Cleanup the timer
+  }, []);
+
   return (
     <div className="relative h-screen w-full">
       {/* Background Carousel */}
@@ -44,127 +55,65 @@ export default function Page() {
         </div>
       </div>
 
+      {/* Message Overlay */}
+      {showMessage && (
+        <div className="absolute top-10 left-10 z-20 bg-blue-500 text-white p-4 rounded shadow-lg">
+          <p className="text-lg font-bold">
+            To Sign Up You Must Be 18 and Above
+          </p>
+        </div>
+      )}
+
       {/* Overlay for form */}
       <div className="absolute inset-0 z-10 flex justify-end items-center">
-      {/* <p className="mt-4 text-white text-sm">
-          * To sign in, you must be 18 years or older.
-        </p> */}
-        <SignIn 
-        routing="hash" />
+        <SignIn routing="hash" />
       </div>
 
       {/* Carousel Styling */}
       <style jsx>{`
         .carousel-container {
           display: flex;
-          width: 100%; /* Ensure the total width is the same as the container */
+          width: 100%;
           height: 100%;
           position: relative;
-          animation: carouselAnimation 12s infinite; /* Adjusted for 12 seconds total, for 4 images with 3 seconds each */
+          animation: carouselAnimation 12s infinite;
         }
 
         .carousel-slide {
           position: absolute;
           width: 100%;
           height: 100%;
-          opacity: 0; /* Hide all images initially */
+          opacity: 0;
           transition: opacity 1s ease-in-out;
         }
 
         .carousel-slide:nth-child(1) {
-          animation: showImage 12s infinite 0s; /* First image shows for 3 seconds */
+          animation: showImage 12s infinite 0s;
         }
-        
+
         .carousel-slide:nth-child(2) {
-          animation: showImage 12s infinite 3s; /* Second image shows for 3 seconds */
+          animation: showImage 12s infinite 3s;
         }
 
         .carousel-slide:nth-child(3) {
-          animation: showImage 12s infinite 6s; /* Third image shows for 3 seconds */
+          animation: showImage 12s infinite 6s;
         }
 
         .carousel-slide:nth-child(4) {
-          animation: showImage 12s infinite 9s; /* Fourth image shows for 3 seconds */
+          animation: showImage 12s infinite 9s;
         }
 
         @keyframes showImage {
-          0%, 100% {
-            opacity: 0; /* Hide image at the start and end of the cycle */
+          0%,
+          100% {
+            opacity: 0;
           }
-          25%, 75% {
-            opacity: 1; /* Show image during the middle of its cycle */
+          25%,
+          75% {
+            opacity: 1;
           }
         }
       `}</style>
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import { useState } from 'react';
-// import { signInWithEmailAndPassword } from 'firebase/auth';
-// import { auth } from '@/firebase';
-
-// export default function SignInPage() {
-//   const [email, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
-//   const [error, setError] = useState('');
-
-//   const handleSignIn = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     try {
-//       await signInWithEmailAndPassword(auth, email, password);
-//       alert('Signed in successfully!');
-//     } catch (err: any) {
-//       setError(err.message);
-//     }
-//   };
-
-//   return (
-//     <div className="relative h-screen w-full">
-//       <div className="absolute inset-0 h-full w-full">
-//         {/* Background Carousel */}
-//         {/* Add your carousel code here */}
-//       </div>
-
-//       <div className="absolute inset-0 z-10 flex justify-center items-center">
-//         <form onSubmit={handleSignIn} className="bg-white p-6 rounded shadow-md">
-//           <h1 className="text-xl font-bold mb-4">Sign In</h1>
-//           {error && <p className="text-red-500">{error}</p>}
-//           <input
-//             type="email"
-//             value={email}
-//             onChange={(e) => setEmail(e.target.value)}
-//             placeholder="Email"
-//             className="block w-full p-2 mb-4 border rounded"
-//             required
-//           />
-//           <input
-//             type="password"
-//             value={password}
-//             onChange={(e) => setPassword(e.target.value)}
-//             placeholder="Password"
-//             className="block w-full p-2 mb-4 border rounded"
-//             required
-//           />
-//           <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
-//             Sign In
-//           </button>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// }

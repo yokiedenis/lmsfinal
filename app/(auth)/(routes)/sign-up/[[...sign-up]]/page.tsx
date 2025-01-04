@@ -1,9 +1,11 @@
 "use client";
-import { SignUp, useSignUp } from '@clerk/nextjs'
-import { useEffect } from 'react';
+
+import { SignUp, useSignUp } from '@clerk/nextjs';
+import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const  isSignedUp  = useSignUp();
+  const isSignedUp = useSignUp();
+  const [showMessage, setShowMessage] = useState(true);
 
   useEffect(() => {
     if (isSignedUp) {
@@ -13,12 +15,15 @@ export default function Page() {
           'Content-Type': 'application/json',
         },
         credentials: 'include', // Ensures cookies are sent with the request
-
       });
     }
+
+    const timer = setTimeout(() => {
+      setShowMessage(false);
+    }, 30000); // Message disappears after 30 seconds
+
+    return () => clearTimeout(timer); // Clean up the timer
   }, [isSignedUp]);
-
-
 
   return (
     <div className="relative h-screen w-full">
@@ -73,6 +78,13 @@ export default function Page() {
         <SignUp />
       </div>
 
+      {/* Notification Message */}
+      {showMessage && (
+        <div className="absolute top-4 left-4 bg-blue-500 text-white px-4 py-2 rounded-md z-20">
+          To Sign Up You Must Be 18 and Above
+        </div>
+      )}
+
       {/* Carousel Styling */}
       <style jsx>{`
         .carousel-container {
@@ -94,7 +106,7 @@ export default function Page() {
         .carousel-slide:nth-child(1) {
           animation: showImage 12s infinite 0s; /* First image shows for 3 seconds */
         }
-        
+
         .carousel-slide:nth-child(2) {
           animation: showImage 12s infinite 3s; /* Second image shows for 3 seconds */
         }
