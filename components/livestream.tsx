@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import { db } from "../firebase";
+//import { db } from "../firebase";
 import { collection, doc, setDoc, onSnapshot } from "firebase/firestore";
 import VideoPlayer from "./videoplayer";
 import ChatLive from "./chatlive";

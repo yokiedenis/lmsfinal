@@ -27,7 +27,13 @@ type FormData = {
   questions: Question[];
 };
 
-const QuizUpdate = ({ courseId, quizId }: { courseId: string; quizId: string }) => {
+// Define the type for the props
+interface QuizUpdateProps {
+  courseId: string;
+  quizId: string;
+}
+
+const QuizUpdate = ({ courseId, quizId }: QuizUpdateProps) => {
   const { control, handleSubmit, setValue, watch } = useForm<FormData>({
     defaultValues: {
       title: "",
@@ -211,4 +217,5 @@ const QuizUpdate = ({ courseId, quizId }: { courseId: string; quizId: string }) 
   );
 };
 
+// This page component now correctly exports QuizUpdate with props
 export default QuizUpdate;

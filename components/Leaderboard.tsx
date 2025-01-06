@@ -4,23 +4,23 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-interface UserProgress {
+interface LeaderboardUser {
   id: string;
-  userId: string;
   name: string;
   level: number;
   points: number;
 }
 
 export default function Leaderboard() {
-  const [leaderboardData, setLeaderboardData] = useState<UserProgress[]>([]);
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardUser[]>([]);
   const { user } = useUser();
 
   useEffect(() => {
     async function fetchLeaderboard() {
       try {
+        // Fetch leaderboard data from the backend
         const response = await fetch('/api/leaderboard');
-        const data: UserProgress[] = await response.json();
+        const data: LeaderboardUser[] = await response.json();
         setLeaderboardData(data);
       } catch (error) {
         console.error('Error fetching leaderboard data:', error);
