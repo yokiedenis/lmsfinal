@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { SignIn } from "@clerk/nextjs";
 
-export default function Page() {
-  const [showMessage, setShowMessage] = useState(true);
+const SignInPage: React.FC = () => {
+  const [showMessage, setShowMessage] = useState<boolean>(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowMessage(false);
-    }, 10000); // 30 seconds
+    }, 10000); // 10 seconds
 
     return () => clearTimeout(timer); // Cleanup the timer
   }, []);
@@ -21,31 +21,30 @@ export default function Page() {
         <div className="h-full w-full relative">
           <div className="absolute w-full h-full z-0">
             <div className="carousel-container">
-              {/* Add a few images to the carousel */}
               <div className="carousel-slide">
                 <img
-                  src="/pppp.jpg" // Image 1
+                  src="/pppp.jpg"
                   alt="Carousel Image 1"
                   className="object-cover w-full h-full"
                 />
               </div>
               <div className="carousel-slide">
                 <img
-                  src="/ppp.jpg" // Image 2
+                  src="/ppp.jpg"
                   alt="Carousel Image 2"
                   className="object-cover w-full h-full"
                 />
               </div>
               <div className="carousel-slide">
                 <img
-                  src="/ccc.jpg" // Image 3
+                  src="/ccc.jpg"
                   alt="Carousel Image 3"
                   className="object-cover w-full h-full"
                 />
               </div>
               <div className="carousel-slide">
                 <img
-                  src="/ppp.jpg" // Image 4
+                  src="/ppp.jpg"
                   alt="Carousel Image 4"
                   className="object-cover w-full h-full"
                 />
@@ -67,6 +66,15 @@ export default function Page() {
       {/* Overlay for form */}
       <div className="absolute inset-0 z-10 flex justify-end items-center">
         <SignIn routing="hash" />
+      </div>
+
+      {/* Logo at the Bottom */}
+      <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 z-20">
+        <img
+          src="/lgg.png"
+          alt="Logo"
+          className="h-12 w-auto"
+        />
       </div>
 
       {/* Carousel Styling */}
@@ -116,4 +124,6 @@ export default function Page() {
       `}</style>
     </div>
   );
-}
+};
+
+export default SignInPage;

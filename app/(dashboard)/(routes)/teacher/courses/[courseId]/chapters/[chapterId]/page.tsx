@@ -75,7 +75,7 @@ const ChapterIdPage = async ({
             <div className="flex items-center justify-between w-full">
               <div className="flex flex-col gap-y-2">
                 <h1 className="text-2xl font-medium text-[#d19a00] ">
-                  Section Creation
+                  Session Creation
                 </h1>
                 <span className="text-sm text-[#c0272d]">
                   Complete all Fields {completionText}
@@ -98,7 +98,7 @@ const ChapterIdPage = async ({
               <div className="flex items-center gap-x-2">
                 <IconBadge icon={LayoutDashboard} />
                 <h2 className="text-xl text-[#d19a00]">
-                  Customize Your Section
+                  Customize Your Session
                 </h2>
               </div>
               <ChapterTitleForm

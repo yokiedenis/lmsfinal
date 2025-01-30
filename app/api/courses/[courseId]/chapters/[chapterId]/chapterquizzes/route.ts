@@ -19,11 +19,7 @@ export async function GET(
       include: {
         questions: {
           include: {
-            chapterOptions: {
-              orderBy: {
-                id: "asc", // Ensure options are ordered by ID
-              },
-            },
+            chapterOptions: true,
           },
         },
       },
@@ -36,7 +32,10 @@ export async function GET(
 
     // Format the questions for the response with numbering and options as A, B, C, D
     const formattedQuestions = quiz.questions.map((question, index) => {
-      const formattedOptions = question.chapterOptions.map((option, optionIndex) => {
+      // Sort the options by their text in alphabetical order
+      const sortedOptions = question.chapterOptions.sort((a, b) => a.text.localeCompare(b.text));
+      
+      const formattedOptions = sortedOptions.map((option, optionIndex) => {
         // Map options to letters starting from A
         const optionLetter = String.fromCharCode(65 + optionIndex); // 65 is the ASCII code for 'A'
         return {

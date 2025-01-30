@@ -40,9 +40,11 @@ const ChapterIdPage = async ({
     return redirect("/")
   }
 
-
   const isLocked = !chapter.isFree && !purchase;
   const completeOnEnd = !!purchase && !userProgress?.isCompleted;
+
+  // Define serviceType based on your business logic or configuration
+  const serviceType = 3854; // Example: Assuming this is the correct service type for this course
 
   return ( 
     <div>
@@ -72,16 +74,17 @@ const ChapterIdPage = async ({
         </div>
         <div>
           <div className="p-4 flex flex-col md:flex-row items-center justify-between">
-             <h2
-             className="text-2xl font-semibold mb-2"
-             style={{
-             color: '#FFFF', // Gold light color
-             backgroundColor: '#6b4fbb', // Soft off-white background for navy blue
-             padding: '10px', // Add some padding for better readability
-             borderRadius: '5px' // Optional: rounded corners for a softer look
-         }}   >
-                    {/* {chapter.title} */}
-               </h2>
+            <h2
+              className="text-2xl font-semibold mb-2"
+              style={{
+                color: '#FFFF', // Gold light color
+                backgroundColor: '#6b4fbb', // Soft off-white background for navy blue
+                padding: '10px', // Add some padding for better readability
+                borderRadius: '5px' // Optional: rounded corners for a softer look
+              }}
+            >
+              {chapter.title}
+            </h2>
             {purchase ? (
               <CourseProgressButton
                 chapterId={params.chapterId}
@@ -93,20 +96,21 @@ const ChapterIdPage = async ({
               <CourseEnrollButton
                 courseId={params.courseId}
                 price={course.price!}
+                serviceType={serviceType} // Here we pass the serviceType
               />
             )}
           </div>
           <Separator />
-          <div
-              style={{
-                color: 'green', // Gold light color
-                backgroundColor: '#6b4fbb', // Soft off-white background for navy blue
-                padding: '10px', // Add some padding for better readability
-                borderRadius: '5px' // Optional: rounded corners for a softer look
+          {/* <div
+            style={{
+              color: 'green', // Gold light color for text
+              backgroundColor: '#6b4fbb', // Soft off-white background for navy blue
+              padding: '10px', // Add some padding for better readability
+              borderRadius: '5px' // Optional: rounded corners for a softer look
             }}
           >
-{/*             <Preview value={chapter.description!} /> */}
-          </div>
+            <Preview value={chapter.description!} />
+          </div> */}
           {!!attachments.length && (
             <>
               <Separator />
@@ -116,7 +120,7 @@ const ChapterIdPage = async ({
                     href={attachment.url}
                     target="_blank"
                     key={attachment.id}
-                   className='flex items-center p3 w-full bg-sky-200 dark:bg-sky-800 text-sky-700 dark:text-sky-300 hover:underline'
+                    className='flex items-center p-3 w-full bg-sky-200 dark:bg-sky-800 text-sky-700 dark:text-sky-300 hover:underline'
                   >
                     <File />
                     <p className="line-clamp-1">
@@ -130,7 +134,7 @@ const ChapterIdPage = async ({
         </div>
       </div>
     </div>
-   );
+  );
 }
  
 export default ChapterIdPage;

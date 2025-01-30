@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/format";
 
 interface DataCardProps {
@@ -7,26 +7,23 @@ interface DataCardProps {
     shouldFormat?: boolean;
 }
 
-
 export const DataCard = ({
     value,
     label,
     shouldFormat = true,
 }: DataCardProps) => {
-
     return (
-<Card className="bg-blue-500"> {/* A darker purple from Tailwind's palette */}
-<CardHeader className="flex flex-row  items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-white">
+        <Card className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-white font-semibold text-lg">
                     {label}
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold text-white">
+                <div className="text-3xl font-bold text-white">
                     {shouldFormat ? formatPrice(value) : value}
                 </div>
             </CardContent>
         </Card>
-       
-    )
-}
+    );
+};

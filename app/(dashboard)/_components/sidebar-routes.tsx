@@ -1,6 +1,6 @@
 "use client";
 
-import { Layout, Compass, List, BarChart, Users, CircleHelp, MessageCircle, Trophy, Video } from "lucide-react";
+import { Layout, Compass, List, BarChart, Users, CircleHelp, MessageCircle, Trophy, Video, User } from "lucide-react";
 import SidebarItem from "./sidebar-item";
 import { usePathname } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
@@ -13,7 +13,8 @@ const studentRoutes = [
     { icon: CircleHelp, label: "Student Helper", href: "/help" },
   //  { icon: BarChart, label: "Student Analytics", href: "/analytics" },
     { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
-    { icon: Video, label: "Class Live Stream", href: "/livestream" },
+    { icon: Video, label: "Class Live Stream",  href: "/livestream" },
+    { icon: User, label: "User Profile",  href: "/profile" },
 ];
 
 const teacherRoutes = [

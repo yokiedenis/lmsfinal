@@ -62,6 +62,7 @@ export const CourseSidebar = async ({
           }}
         >
           <div>{course.title}</div>
+          
         </h1>
         {purchase && (
           <div className="mt-10">

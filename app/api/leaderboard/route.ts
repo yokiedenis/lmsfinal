@@ -58,12 +58,12 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Named export for the GET method
 export async function GET() {
   try {
-    // Fetch user progress and quiz data
+    // Fetch users with their profiles
     const users = await prisma.user.findMany({
       include: {
+        profile: true,
         userProgress: true,
         quizAttempts: true,
         chapterQuizAttempts: true,
@@ -71,6 +71,7 @@ export async function GET() {
     });
 
     const leaderboardData = users.map((user) => {
+      // Calculate points from quiz and chapter quiz attempts
       const totalQuizPoints = user.quizAttempts.reduce(
         (total, attempt) => total + attempt.score,
         0
@@ -81,12 +82,21 @@ export async function GET() {
         0
       );
 
-      const totalPoints = totalQuizPoints + totalChapterQuizPoints;
-      const level = Math.floor(totalPoints / 100) + 1; // Example: Level up every 100 points
+      // Points for completed courses
+      const completedCourses = user.userProgress.filter(progress => progress.isCompleted);
+      const coursePoints = completedCourses.length * 100; // 100 points per completed course
+
+      const totalPoints = totalQuizPoints + totalChapterQuizPoints + coursePoints;
+
+      // Determine level based on course completions
+      const level = completedCourses.length; // Level is equal to number of courses completed
+
+      // Use the name from the profile if it exists, otherwise fall back to the user's name
+      const name = user.profile?.name || user.name;
 
       return {
         id: user.id,
-        name: user.name,
+        name,
         level,
         points: totalPoints,
       };

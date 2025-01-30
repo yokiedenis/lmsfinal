@@ -13,3 +13,13 @@ export type SafeProfile = Omit<
   createdAt: string;
   updatedAt: string;
 };
+
+
+export interface UserProfileProps {
+  name: string;
+  email: string;
+  dob?: string;
+  occupation?: string;
+  bio?: string;
+  imageUrl?: string;
+};

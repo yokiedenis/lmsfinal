@@ -1,13 +1,18 @@
 import { db } from "@/lib/db";
-import { Course, Purchase, Quiz } from "@prisma/client";
+import { Course, Purchase, Profile, UserProgress } from "@prisma/client";
 
 type PurchaseWithCourse = Purchase & {
   course: Course;
 };
 
-// Define a type for quiz scores
-type QuizScore = {
-  score: number; // Assuming score is a number; adjust if needed
+type UserDetails = {
+  name: string;
+  imageUrl: string;
+  coursesEnrolled: number;
+  lastLogin: Date;
+  dateOfEnrollment: Date;
+  studentLevel: number;
+  certificatesEarned: number;
 };
 
 const groupByCourse = (purchases: PurchaseWithCourse[]) => {
@@ -18,7 +23,7 @@ const groupByCourse = (purchases: PurchaseWithCourse[]) => {
     if (!grouped[courseTitle]) {
       grouped[courseTitle] = 0;
     }
-    grouped[courseTitle] += purchase.course.price!; // Accumulate revenue by course
+    grouped[courseTitle] += purchase.course.price!;
   });
 
   return grouped;
@@ -26,7 +31,6 @@ const groupByCourse = (purchases: PurchaseWithCourse[]) => {
 
 export const getAnalytics = async (userId: string) => {
   try {
-    // Fetch purchases associated with the user
     const purchases = await db.purchase.findMany({
       where: {
         course: {
@@ -38,40 +42,49 @@ export const getAnalytics = async (userId: string) => {
       }
     });
 
-    // Fetch quiz scores for the user (assuming a Quiz model exists)
-    const quizScoresData = await db.quizResult.findMany({
-      where: {
-         studentId: userId, 
+    const users = await db.user.findMany({
+      include: {
+        profile: true,
+        purchases: true,
+        userProgress: true,
       }
     });
-    
-    // Extract scores from the fetched quiz scores
-    const quizScores: number[] = quizScoresData.map((quiz: QuizScore) => quiz.score);
 
-    // Group earnings by course title
     const groupedEarnings = groupByCourse(purchases);
     const data = Object.entries(groupedEarnings).map(([courseTitle, total]) => ({
       name: courseTitle,
       total: total,
     }));
 
-    // Calculate total revenue and total sales
     const totalRevenue = data.reduce((acc, curr) => acc + curr.total, 0);
     const totalSales = purchases.length;
+    const totalUsers = users.length;
+
+    const userDetails: UserDetails[] = users.map(user => ({
+      name: user.name,
+      imageUrl: user.profile?.imageUrl || '',
+      coursesEnrolled: user.purchases.length,
+      lastLogin: user.profile?.updatedAt || new Date(),
+      dateOfEnrollment: user.profile?.createdAt || new Date(),
+      studentLevel: user.userProgress[0]?.level || 1,
+      certificatesEarned: user.profile?.certificatesEarned || 0,
+    }));
 
     return {
-      quizScores,      // Return quiz scores
       data,
       totalRevenue,
       totalSales,
+      totalUsers,
+      userDetails,
     }
   } catch (error) {
     console.log("[GET_ANALYTICS]", error);
     return {
-      quizScores: [], // Return an empty array for quiz scores on error
       data: [],
       totalRevenue: 0,
       totalSales: 0,
+      totalUsers: 0,
+      userDetails: [],
     }
   }
 }
