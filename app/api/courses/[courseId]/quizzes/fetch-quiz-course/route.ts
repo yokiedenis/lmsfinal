@@ -1,8 +1,9 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 
-// Named export for GET request
-export async function GET(req: NextApiRequest, { params }: { params: { courseId: string } }) {
+const prisma = new PrismaClient();
+
+export async function GET(req: NextRequest, { params }: { params: { courseId: string } }) {
   try {
     // Fetch quizzes by courseId, including the _count field for questions
     const quizzes = await prisma.quiz.findMany({
@@ -19,11 +20,11 @@ export async function GET(req: NextApiRequest, { params }: { params: { courseId:
       },
     });
 
-    return new Response(JSON.stringify(quizzes), { status: 200 }); // Send quizzes as response
+    return NextResponse.json(quizzes, { status: 200 }); // Send quizzes as response
   } catch (error) {
     console.error("Error fetching quizzes:", error);
-    return new Response(
-      JSON.stringify({ error: "Error fetching quizzes" }),
+    return NextResponse.json(
+      { error: "Error fetching quizzes" },
       { status: 500 }
     );
   }
