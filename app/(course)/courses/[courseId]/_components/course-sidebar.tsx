@@ -106,8 +106,8 @@ export const CourseSidebar = async ({
       {!allChaptersCompleted && (
         <div className="p-6 bg-gradient-to-r from-indigo-500 to-purple-600 border-l-4 border-purple-400 text-white rounded-lg shadow-lg animate__animated animate__pulse">
           <span className="w-full text-center">
-            <h2 className="text-3xl font-extrabold mb-2">🚀 Unlock the Final Quiz!</h2>
-            <p className="text-lg">Complete all chapters to gain access.</p>
+            <h2 className="text-2xl font-extrabold mb-2">🚀 Unlock the Final Quiz!</h2>
+         
           </span>
         </div>
       )}
@@ -115,3 +115,12 @@ export const CourseSidebar = async ({
   );
 };
 
+
+
+
+
+
+
+
+
+ 

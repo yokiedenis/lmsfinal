@@ -50,7 +50,7 @@ export const CourseSidebarItem = ({
     >
       <div className="flex items-center gap-x-2 py-4">
         <Icon
-          size={28} // Resize the icon
+          size={25} // Resize the icon
           className={cn(
             "text-slate-500", 
             isActive && "text-slate-700 dark:text-slate-300", 

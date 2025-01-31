@@ -170,6 +170,7 @@ import { db } from "@/lib/db";
 
 const DPO_API_URL = 'https://secure.3gdirectpay.com/API/v6/';
 const COMPANY_TOKEN = '8D3DA73D-9D7F-4E09-96D4-3D44E7A83EA3';
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://eduskill-mu.vercel.app/';
 
 const createToken = async (
   amount: number | null | undefined,
@@ -182,7 +183,6 @@ const createToken = async (
 
   const formattedAmount = Number(amount).toFixed(2);
   const serviceDate = new Date().toISOString().split('T')[0];
-  const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://eduskill-mu.vercel.app/';
   const redirectUrl = `${baseURL}/api/payment-success?courseId=${params.courseId}&chapterId=${params.chapterId}`;
 
   const xmlPayload = `<?xml version="1.0" encoding="UTF-8"?>
@@ -278,16 +278,20 @@ export async function POST(req: Request, { params }: { params: { courseId: strin
       return new NextResponse("Already Purchased", { status: 400 });
     }
 
-    // Store transaction details and purchase record in the database
+    // Create transaction
     const transaction = await db.transaction.create({
       data: {
         userId: user.id,
         courseId: params.courseId,
         amount: amount,
         dpoToken: token,
+        status: 'PENDING', // Initial status
       }
     });
 
+    console.log('Transaction created:', transaction);
+
+    // Create purchase
     const purchase = await db.purchase.create({
       data: {
         userId: user.id,
@@ -296,9 +300,10 @@ export async function POST(req: Request, { params }: { params: { courseId: strin
       }
     });
 
+    console.log('Purchase created:', purchase);
+
     // Redirect to payment success page
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://eduskill-mu.vercel.app/';
-    const successRedirectUrl = `${baseURL}/api/payment-success?courseId=${params.courseId}&chapterId=${params.chapterId}&token=${token}`;
+    const successRedirectUrl = `${baseURL}/api/payment-success?courseId=${params.courseId}&chapterId=${params.chapterId}&TransactionToken=${token}`;
 
     return NextResponse.redirect(successRedirectUrl);
 
@@ -313,6 +318,7 @@ export async function POST(req: Request, { params }: { params: { courseId: strin
         });
       }
 
+      console.error('Error in payment processing:', error);
       return NextResponse.json({ error: errorMessage }, { status: 500 });
     } else {
       console.error('Unexpected error:', error);
