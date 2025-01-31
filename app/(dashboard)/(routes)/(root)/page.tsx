@@ -187,7 +187,7 @@ export default async function Dashboard() {
   const { userId } = await auth();
 
   if (!userId) {
-    return redirect("/");
+    return redirect("/sign-in");
   }
 
   const {
