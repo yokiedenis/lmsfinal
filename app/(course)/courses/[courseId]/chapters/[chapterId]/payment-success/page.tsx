@@ -1,34 +1,38 @@
 "use client";
 import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
-
 
 const PaymentSuccessPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Here you can verify the token to check if the payment was successful
     const verifyPayment = async () => {
-      const token = router.query.token; // Assuming the token is passed as a query parameter
+      const token = searchParams.get('token');
+      const courseId = searchParams.get('courseId');
+      const chapterId = searchParams.get('chapterId');
+
       if (token) {
         try {
           const response = await axios.post('/api/verify-payment', { token });
           if (response.data.success) {
-            // Handle successful payment
-            // You can update user course progress or send a confirmation
+            console.log('Payment verification successful');
+            // Here you can update user course progress or send a confirmation
           } else {
-            // Handle failed payment
             console.error('Payment verification failed');
+            // Handle failed payment
           }
         } catch (error) {
           console.error('Error verifying payment', error);
         }
+      } else {
+        console.error('No token found in URL');
       }
     };
 
     verifyPayment();
-  }, [router.query.token]);
+  }, [searchParams]);
 
   return (
     <div>
