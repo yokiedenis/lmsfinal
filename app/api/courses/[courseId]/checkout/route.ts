@@ -182,7 +182,7 @@ const createToken = async (
 
   const formattedAmount = Number(amount).toFixed(2);
   const serviceDate = new Date().toISOString().split('T')[0];
-  const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://eduskill-mu.vercel.app/';
   const redirectUrl = `${baseURL}/api/payment-success?courseId=${params.courseId}&chapterId=${params.chapterId}`;
 
   const xmlPayload = `<?xml version="1.0" encoding="UTF-8"?>
@@ -297,7 +297,7 @@ export async function POST(req: Request, { params }: { params: { courseId: strin
     });
 
     // Redirect to payment success page
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://eduskill-mu.vercel.app/';
     const successRedirectUrl = `${baseURL}/api/payment-success?courseId=${params.courseId}&chapterId=${params.chapterId}`;
 
     return NextResponse.redirect(successRedirectUrl);
