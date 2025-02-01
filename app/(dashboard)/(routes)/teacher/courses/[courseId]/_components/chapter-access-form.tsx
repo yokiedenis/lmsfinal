@@ -69,14 +69,14 @@ export const ChapterAccessForm = ({
   return (
     <div className="mt-6 border bg-slate-100 rounded-md p-4 dark:bg-gray-800">
       <div className="font-medium flex items-center justify-between">
-        Section Access
+        Session Access
         <Button onClick={toggleEdit} variant="ghost">
           {isEditing ? (
             <>Cancel</>
           ) : (
             <>
               <Pencil className="h-4 w-4 mr-2" />
-              Edit section access
+              Edit session access
             </>
           )}
         </Button>
@@ -88,9 +88,9 @@ export const ChapterAccessForm = ({
         )}>
      
           {initialData.isFree ? (
-            <>This section is available for free preview</>
+            <>This session is available for free preview</>
           ) : (
-            <>This section is not free.</>
+            <>This session is not free.</>
           )}
         </p>
       )}
@@ -113,7 +113,7 @@ export const ChapterAccessForm = ({
                   </FormControl>
                   <div className="space-y-1 leading-none">
                     <FormDescription>
-                        Check this box if you want to make this section free for preview.
+                        Check this box if you want to make this session free for preview.
                     </FormDescription>
                   </div>
                 </FormItem>
