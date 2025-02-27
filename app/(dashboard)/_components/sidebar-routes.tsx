@@ -26,8 +26,9 @@ const teacherRoutes = [
 ];
 
 const superAdminRoutes = [
+    { icon: BarChart, label: "Main DashBoard", href: "/teacher/analytics" },
     ...teacherRoutes,
-    { icon: BarChart, label: "Analytics", href: "/teacher/analytics" }
+   
    // { icon: Users, label: "Manage Users", href: "/teacher/users" },
     // { icon: Trophy, label: "Student Leaderboard", href: "/leaderboard" },
 ];

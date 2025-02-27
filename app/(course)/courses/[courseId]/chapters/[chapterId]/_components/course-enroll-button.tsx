@@ -177,6 +177,7 @@ interface CourseEnrollButtonProps {
   price: number;
   courseId: string;
   serviceType: number;
+  className?: string; // Added to fix TypeScript error
 }
 
 export const CourseEnrollButton = ({

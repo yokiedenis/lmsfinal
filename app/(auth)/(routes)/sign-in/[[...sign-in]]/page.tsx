@@ -65,17 +65,28 @@ const SignInPage: React.FC = () => {
 
       {/* Overlay for form */}
       <div className="absolute inset-0 z-10 flex justify-end items-center">
-        <SignIn routing="hash" />
+      <SignIn 
+           routing="hash" 
+           appearance={{
+           elements: {
+           headerTitle: {
+        // This might not work directly due to Clerk's internal handling
+        // But let's try to set the text content
+           textContent: 'Sign-In '
+          }
+          }
+             }} 
+                  />
       </div>
 
       {/* Logo at the Bottom */}
-      <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 z-20">
-        <img
-          src="/lgg.png"
-          alt="Logo"
-          className="h-12 w-auto"
-        />
-      </div>
+      <div className="absolute top-5 left-1/2 transform -translate-x-1/2 z-20">
+       <img
+            src="/lgg.png"
+            alt="Logo"
+            className="h-12 w-auto"
+           />
+               </div>
 
       {/* Carousel Styling */}
       <style jsx>{`

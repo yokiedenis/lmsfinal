@@ -22,21 +22,28 @@ enum MemberRole {
 
 model Profile {
   id String @id @default(uuid()) @map("_id")
-  userId String  @unique 
+  userId String @unique 
   name String
   imageUrl String?  
   email String  
-  user      User    @relation(fields: [userId], references: [id]) // Relation defined here
-  dob         DateTime
-  occupation  String
-  bio         String?
+  user User @relation(fields: [userId], references: [id]) // Relation defined here
+  dob DateTime
+  occupation String
+  bio String?
   purchases Purchase[]
   certificatesEarned Int @default(0)
 
-   
-   //answers Answer[] // Relation to Answer
-  //quizAttempts QuizAttempt[] // a relation to QuizAttempt
+  gender String?
+  country String?
+  contactNo String?
+  address String?
+  highestQualification String?
+  employeeStatus String?
+  industry String?
+  paymentOption String?
 
+  //answers Answer[] // Relation to Answer
+  //quizAttempts QuizAttempt[] // a relation to QuizAttempt
 
   role MemberRole @default(STUDENT)
   createdAt DateTime @default(now())
@@ -93,26 +100,74 @@ model Attachment{
   name String
   url String 
  
-   courseId String
-   Course Course @relation(fields: [courseId], references: [id], onDelete:Cascade)
+  courseId String
+  Course Course @relation(fields: [courseId], references: [id], onDelete:Cascade)
 
-   createdAt DateTime @default(now())
-   updatedAt DateTime @updatedAt
+  //chapterId String
+  //Chapter Chapter @relation(fields: [chapterId], references: [id], onDelete:Cascade)
+
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
  
    @@index([courseId])
 
    }
 
 
+  model ChapterAttachment{
+  id String @id @default(uuid()) @map("_id")
+  name String
+  url String 
+ 
+  chapterId String
+  Chapter Chapter @relation(fields: [chapterId], references: [id], onDelete:Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ 
+   @@index([chapterId])
+
+   }
+
+
+
+
+model Recording {
+  id        String   @id @default(uuid()) @map("_id")
+  title     String   // Title of the recording
+  url       String   // URL or link to the recording
+  duration  Int?     // Duration in minutes (optional)
+  uploadedAt DateTime @default(now()) // When the recording was uploaded
+  isActive  Boolean  @default(true)   // Whether the recording is active
+
+  chapterId String   // Foreign key to link to Chapter
+  chapter   Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([chapterId]) // Index for faster queries by chapter
+}   
+
+
 model Chapter{
   id String @id @default(uuid()) @map("_id")
   title String
+  userId String
   description String?  
   videoUrl String? 
   position Int
   isPublished Boolean @default(false)
   isFree Boolean @default(false)
   muxData muxData?
+  chapterattachments ChapterAttachment[]
+
+  googleDriveUrl String? // New field for Google Drive URLs
+
+
+  recordings Recording[] // New relation to the Recording model
+
 
   courseId String
   Course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
@@ -174,6 +229,8 @@ model Purchase{
 
   user     User    @relation(fields: [userId], references: [id])
   transactionId String  // Adding transactionId to the model
+  transaction   Transaction? @relation(fields: [transactionId], references: [id]) // Add this line
+
 
   profile Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -243,8 +300,6 @@ model Quiz {
   chapter   Chapter?  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 
   position Int
-
-
 
 
   createdAt DateTime   @default(now())
@@ -440,7 +495,7 @@ model ChapterQuizResult {
  
 
 
- model User {
+model User {
   id           String       @id @default(uuid()) @map("_id")
   name         String
   email        String       @unique
@@ -455,7 +510,6 @@ model ChapterQuizResult {
   transactions Transaction[]
 
   profile  Profile? @relation             // Relation defined without `fields` or `references`
-
    
 }
 
@@ -469,6 +523,8 @@ model Transaction {
   status    String   @default("PENDING")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  purchases Purchase[] // Add this line to define the reverse relation
+
 
   user   User    @relation(fields: [id], references: [id], onDelete: Cascade)
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)

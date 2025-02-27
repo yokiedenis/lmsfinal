@@ -16,6 +16,7 @@ const AnalyticsPage = async () => {
         totalRevenue,
         totalSales,
         totalUsers,
+        totalEnrolledCourses, // Destructure the new field
         userDetails,
     } = await getAnalytics(userId);
 
@@ -37,6 +38,13 @@ const AnalyticsPage = async () => {
                     value={totalUsers}
                     shouldFormat={false}
                 />
+
+                <DataCard
+                    label="Total Enrolled Courses"
+                    value={totalEnrolledCourses}
+                    shouldFormat={false}
+                />
+
             </div>
             <UserDetails userDetails={userDetails} />
             <Chart data={data} />

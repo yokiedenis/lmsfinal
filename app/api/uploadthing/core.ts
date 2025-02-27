@@ -30,6 +30,17 @@ export const ourFileRouter = {
    .onUploadComplete(( )=>{
     }),
 
+
+    chapterAttachment: f(["text","image","video","pdf", "audio",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    
+       ])
+       .middleware(()=> handleAuth())
+       .onUploadComplete(( )=>{
+        }),
+
    chapterVideo: f({video:{maxFileCount: 1, maxFileSize: "512GB"}})
    .middleware(()=> handleAuth())
    .onUploadComplete(()=>{}),

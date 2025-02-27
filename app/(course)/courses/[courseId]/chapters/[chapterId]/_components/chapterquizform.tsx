@@ -152,11 +152,12 @@ export const ChapterQuizForm = ({ quizId, courseId, chapterId }: ChapterQuizForm
       {showFireworks && <Confetti />}
       {isResultPopupVisible && result && (
         <ResultPopup
-          score={result.score}
-          totalQuestions={result.totalQuestions}
-          showRevisitMessage={showRevisitMessage}
-          onClose={() => setIsResultPopupVisible(false)}
-        />
+    score={result.score}
+    totalQuestions={result.totalQuestions}
+    passingPercentage={60} // Add this, matching your logic in fetchResults
+    showRevisitMessage={showRevisitMessage}
+    onClose={() => setIsResultPopupVisible(false)}
+       />
       )}
 
       {isLoading ? (

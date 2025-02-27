@@ -41,6 +41,7 @@ export async function POST(
                 title,
                 courseId: params.courseId,
                 position: newPosition,
+                userId: userId,
                 
             },
              

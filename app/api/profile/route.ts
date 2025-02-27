@@ -30,7 +30,24 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { userId, name, dob, occupation, bio, imageUrl, email, role } = body;
+    const { 
+      userId, 
+      name, 
+      dob, 
+      occupation, 
+      bio, 
+      imageUrl, 
+      email, 
+      role, 
+      gender, 
+      country, 
+      contactNo, 
+      address, 
+      highestQualification, 
+      employeeStatus, 
+      industry, 
+      paymentOption 
+    } = body;
 
     if (!userId || !name || !email) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -52,6 +69,14 @@ export async function POST(req: NextRequest) {
           imageUrl,
           email,
           role,
+          gender,
+          country,
+          contactNo,
+          address,
+          highestQualification,
+          employeeStatus,
+          industry,
+          paymentOption,
         },
       });
     } else {
@@ -66,6 +91,14 @@ export async function POST(req: NextRequest) {
           imageUrl,
           email,
           role,
+          gender,
+          country,
+          contactNo,
+          address,
+          highestQualification,
+          employeeStatus,
+          industry,
+          paymentOption,
         },
       });
     }
@@ -88,7 +121,23 @@ export async function PUT(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { name, dob, occupation, bio, imageUrl, email, role } = body;
+    const { 
+      name, 
+      dob, 
+      occupation, 
+      bio, 
+      imageUrl, 
+      email, 
+      role, 
+      gender, 
+      country, 
+      contactNo, 
+      address, 
+      highestQualification, 
+      employeeStatus, 
+      industry, 
+      paymentOption 
+    } = body;
 
     const updatedProfile = await prisma.profile.update({
       where: { userId },
@@ -100,6 +149,14 @@ export async function PUT(req: NextRequest) {
         imageUrl,
         email,
         role,
+        gender,
+        country,
+        contactNo,
+        address,
+        highestQualification,
+        employeeStatus,
+        industry,
+        paymentOption,
       },
     });
 

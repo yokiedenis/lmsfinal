@@ -39,7 +39,9 @@ export async function PATCH(
         }
      });
 
-     if(!chapter || !muxData || !chapter.title || !chapter.description || !chapter.videoUrl){
+     if (!chapter || !chapter.title || !chapter.description || 
+        (!chapter.videoUrl && !chapter.googleDriveUrl) || 
+        (chapter.videoUrl && !muxData)){
         return new NextResponse("Missing Required Field",{status:400});
      }
 
