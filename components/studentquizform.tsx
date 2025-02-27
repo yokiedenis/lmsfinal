@@ -174,6 +174,7 @@ export const StudentQuizForm = ({ quizId, courseId, chapterId }: StudentQuizForm
         <ResultPopup
           score={result.score}
           totalQuestions={result.totalQuestions}
+          passingPercentage={60}  
           showRevisitMessage={showRevisitMessage}
           onClose={() => setIsResultPopupVisible(false)}
         />
