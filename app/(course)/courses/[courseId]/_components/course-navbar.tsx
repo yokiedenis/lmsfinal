@@ -1,18 +1,26 @@
 // CourseNavbar.tsx
 
-import { Chapter, Course, UserProgress } from "@prisma/client";
+// 
+
+
+
+
+import { Prisma } from "@prisma/client";
 import { NavbarRoutes } from "@/components/navbar-routes";
 import { CourseMobileSidebar } from "./course-mobile-sidebar";
-//import { SafeProfile } from "@/types";
 
 interface CourseNavbarProps {
-  course: Course & {
-    chapters: (Chapter & {
-      userProgress: UserProgress[] | null;
-    })[];
-  };
+  course: Prisma.CourseGetPayload<{
+    include: {
+      chapters: {
+        include: {
+          userProgress: true;
+          chapterattachments?: true;
+        };
+      };
+    };
+  }>;
   progressCount: number;
-  // currentProfile?: SafeProfile | null; // Optional currentProfile prop
   quizId: string;
 }
 
@@ -20,10 +28,7 @@ export const CourseNavbar = ({
   course,
   progressCount,
   quizId,
- // currentProfile,
 }: CourseNavbarProps) => {
- // console.log("CourseNavbar currentProfile", currentProfile);
-
   return (
     <div className="sticky top-0 p-4 border-b h-full flex items-center shadow-sm bg-white z-10">
       <CourseMobileSidebar
@@ -31,7 +36,7 @@ export const CourseNavbar = ({
         progressCount={progressCount}
         quizId={quizId}
       />
-      <NavbarRoutes  /> {/* Pass currentProfile here */}
+      <NavbarRoutes />
     </div>
   );
 };
