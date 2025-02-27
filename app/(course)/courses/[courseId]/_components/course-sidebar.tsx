@@ -1320,8 +1320,408 @@
 
 
 
+// import { auth } from "@clerk/nextjs/server";
+// import { Chapter, Course, UserProgress, ChapterAttachment } from "@prisma/client";
+// import { redirect } from "next/navigation";
+// import { db } from "@/lib/db";
+// import { CourseProgress } from "@/components/course-progress";
+// import { CourseSidebarItem } from "./course-sidebar-item";
+// import QuizButton from "./quiz-button";
+// import ChapterQuizButton from "./chapter-quiz-button";
+// import { Logo } from "./logo";
+// import axios from "axios";
+
+// const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
+// interface CourseSidebarProps {
+//   course: Course & {
+//     chapters: (Chapter & {
+//       userProgress: UserProgress[] | null;
+//       chapterattachments: ChapterAttachment[];
+//     })[];
+//   };
+//   progressCount: number;
+//   quizId: string;
+// }
+
+// export const CourseSidebar = async ({
+//   course,
+//   progressCount,
+//   quizId,
+// }: CourseSidebarProps) => {
+//   const { userId, getToken } = auth();
+
+//   if (!userId) {
+//     return redirect("/");
+//   }
+
+//   const purchase = await db.purchase.findUnique({
+//     where: {
+//       userId_courseId: {
+//         userId,
+//         courseId: course.id,
+//       },
+//     },
+//   });
+
+//   const token = await getToken();
+
+//   // Fetch quiz pass status for each chapter
+//   const chapterQuizStatus = await Promise.all(
+//     course.chapters.map(async (chapter) => {
+//       try {
+//         const response = await axios.get(
+//           `${BASE_URL}/api/courses/${course.id}/chapters/${chapter.id}/chapterquizzes/results`,
+//           {
+//             headers: {
+//               "user-id": userId,
+//               Authorization: token ? `Bearer ${token}` : undefined,
+//             },
+//           }
+//         );
+//         const scorePercentage = (response.data.score / response.data.totalQuestions) * 100;
+//         return { chapterId: chapter.id, passed: scorePercentage >= 60 };
+//       } catch (error) {
+//         console.error(`Failed to fetch quiz results for chapter ${chapter.id}:`, error);
+//         return { chapterId: chapter.id, passed: false }; // Default to not passed
+//       }
+//     })
+//   );
+
+//   const allChaptersCompleted = course.chapters.every(
+//     (chapter) => !!chapter.userProgress?.[0]?.isCompleted
+//   );
+
+//   return (
+//     <div className="h-full border-r flex flex-col overflow-y-auto shadow-sm" style={{ width: '350px', backgroundColor: '#F9FAFB' }}>
+//       <div className="p-4 pb-5 bg-white">
+//         <Logo />
+//       </div>
+//       <div className="p-8 flex flex-col border-b" style={{ borderColor: '#E5E7EB' }}>
+//         <h1
+//           className="font-semibold"
+//           style={{
+//             color: "gold",
+//             backgroundColor: "#6A0DAD",
+//             padding: "8px 8px",
+//             borderRadius: "2px",
+//             fontSize: "14px", // Matched text size from image
+//             overflow: "hidden",
+//             display: "flex",
+//             alignItems: "center",
+//             justifyContent: "center",
+//           }}
+//         >
+//           {course.title}
+//         </h1>
+//         {purchase && (
+//           <div className="mt-5">
+//             <CourseProgress variant="success" value={progressCount} />
+//           </div>
+//         )}
+//       </div>
+
+//       <div className="flex flex-col w-full">
+//         {course.chapters.map((chapter, index) => {
+//           const isCurrentChapterPassed =
+//             chapterQuizStatus.find((status) => status.chapterId === chapter.id)?.passed || false;
+//           const isPreviousChapterPassed =
+//             index === 0 || (chapterQuizStatus[index - 1]?.passed ?? false);
+
+//           // Lock the next chapter if the current quiz isn't passed
+//           const isNextChapterLocked =
+//             index < course.chapters.length - 1 && // Check if there's a next chapter
+//             !isCurrentChapterPassed; // Lock if current quiz isn't passed
+
+//           return (
+//             <div key={chapter.id} className="mb-4">
+//               <CourseSidebarItem
+//                 id={chapter.id}
+//                 label={chapter.title}
+//                 isCompleted={!!chapter.userProgress?.[0]?.isCompleted}
+//                 courseId={course.id}
+//                 isLocked={
+//                   (!chapter.isFree && !purchase) || // Locked if not free and not purchased
+//                   (index > 0 && !isPreviousChapterPassed) // Locked if previous chapter quiz not passed
+//                 }
+//               />
+
+//               {/* Chapter Attachments Dropdown */}
+//               <div className="ml-4 mt-2">
+//                 {chapter.chapterattachments && chapter.chapterattachments.length > 0 && (
+//                   <details className="group">
+//                     <summary className="text-base font-medium text-gray-700 cursor-pointer flex items-center p-2 rounded-md hover:bg-gray-100 transition-colors duration-200">
+//                       <span className="mr-2 text-[#FF0000]" style={{ fontWeight: 'normal', fontSize: '16px' }}>📎</span> {/* Matched icon size from image */}
+//                       <span className="text-[#3b2f85]" style={{ fontSize: '14px' }}> {/* Matched text size from image */}
+//                         Chapter Attachments ({chapter.chapterattachments.length})
+//                       </span>
+//                     </summary>
+//                     <div className="mt-2 pl-4 pr-2">
+//                       {chapter.chapterattachments.map((attachment) => (
+//                         <div
+//                           key={attachment.id}
+//                           className="mb-2 p-3 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
+//                         >
+//                           <a
+//                             href={attachment.url}
+//                             target="_blank"
+//                             rel="noopener noreferrer"
+//                             className="flex items-center text-blue-700 font-medium text-sm hover:text-blue-900 transition-colors duration-200"
+//                           >
+//                             <span className="mr-2" style={{ fontWeight: 'normal', fontSize: '16px' }}>📄</span> {/* Matched icon size from image */}
+//                             <span className="truncate" style={{ fontSize: '14px' }}>{attachment.name}</span> {/* Matched text size from image */}
+//                           </a>
+//                         </div>
+//                       ))}
+//                     </div>
+//                   </details>
+//                 )}
+//               </div>
+
+//               {/* Chapter Quiz Button */}
+//               {!!chapter.userProgress?.[0]?.isCompleted && isPreviousChapterPassed && (
+//                 <div className="p-4">
+//                   <ChapterQuizButton courseId={course.id} chapterId={chapter.id} />
+//                 </div>
+//               )}
+//             </div>
+//           );
+//         })}
+//       </div>
+
+//       {allChaptersCompleted && (
+//         <div className="p-4">
+//           <QuizButton courseId={course.id} quizId={quizId} />
+//         </div>
+//       )}
+
+//       {!allChaptersCompleted && (
+//          <div className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-6 rounded-lg shadow-lg transform transition-all duration-300 hover:shadow-xl" style={{ fontSize: '16px' }}>
+//                    <h2 
+//                  className="text-xl font-bold mb-2 flex items-center justify-center" 
+//                 style={{ fontSize: '48px' }}  
+//                                               >
+//                                                 🎯
+//                        </h2>
+//          <p className="text-base mt-2 text-left" style={{ fontSize: '16px' }}>Unlock the final quiz to test your mastery!</p>
+//        </div>
+//       )}
+//     </div>
+//   );
+// };
+
+
+
+
+
+
+
+
+
+
+// import { auth } from "@clerk/nextjs/server";
+// import { redirect } from "next/navigation";
+// import { db } from "@/lib/db";
+// import { CourseProgress } from "@/components/course-progress";
+// import { CourseSidebarItem } from "./course-sidebar-item";
+// import QuizButton from "./quiz-button";
+// import ChapterQuizButton from "./chapter-quiz-button";
+// import { Logo } from "./logo";
+// import axios from "axios";
+
+// // Import Prisma types explicitly
+// import { Prisma } from "@prisma/client";
+
+// // Define the expected type for CourseSidebarProps using Prisma types
+// interface CourseSidebarProps {
+//   course: Prisma.CourseGetPayload<{
+//     include: {
+//       chapters: {
+//         include: {
+//           userProgress: true;
+//           chapterattachments?: true;
+//         };
+//       };
+//     };
+//   }>;
+//   progressCount: number;
+//   quizId: string;
+// }
+
+// const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
+// export const CourseSidebar = async ({
+//   course,
+//   progressCount,
+//   quizId,
+// }: CourseSidebarProps) => {
+//   const { userId, getToken } = auth();
+
+//   if (!userId) {
+//     return redirect("/");
+//   }
+
+//   const purchase = await db.purchase.findUnique({
+//     where: {
+//       userId_courseId: {
+//         userId,
+//         courseId: course.id,
+//       },
+//     },
+//   });
+
+//   const token = await getToken();
+
+//   // Fetch quiz pass status for each chapter
+//   const chapterQuizStatus = await Promise.all(
+//     course.chapters.map(async (chapter) => {
+//       try {
+//         const response = await axios.get(
+//           `${BASE_URL}/api/courses/${course.id}/chapters/${chapter.id}/chapterquizzes/results`,
+//           {
+//             headers: {
+//               "user-id": userId,
+//               Authorization: token ? `Bearer ${token}` : undefined,
+//             },
+//           }
+//         );
+//         const scorePercentage = (response.data.score / response.data.totalQuestions) * 100;
+//         return { chapterId: chapter.id, passed: scorePercentage >= 60 };
+//       } catch (error) {
+//         console.error(`Failed to fetch quiz results for chapter ${chapter.id}:`, error);
+//         return { chapterId: chapter.id, passed: false }; // Default to not passed
+//       }
+//     })
+//   );
+
+//   const allChaptersCompleted = course.chapters.every(
+//     (chapter) => !!chapter.userProgress?.[0]?.isCompleted
+//   );
+
+//   return (
+//     <div className="h-full border-r flex flex-col overflow-y-auto shadow-sm" style={{ width: '350px', backgroundColor: '#F9FAFB' }}>
+//       <div className="p-4 pb-5 bg-white">
+//         <Logo />
+//       </div>
+//       <div className="p-8 flex flex-col border-b" style={{ borderColor: '#E5E7EB' }}>
+//         <h1
+//           className="font-semibold"
+//           style={{
+//             color: "gold",
+//             backgroundColor: "#6A0DAD",
+//             padding: "8px 8px",
+//             borderRadius: "2px",
+//             fontSize: "14px",
+//             overflow: "hidden",
+//             display: "flex",
+//             alignItems: "center",
+//             justifyContent: "center",
+//           }}
+//         >
+//           {course.title}
+//         </h1>
+//         {purchase && (
+//           <div className="mt-5">
+//             <CourseProgress variant="success" value={progressCount} />
+//           </div>
+//         )}
+//       </div>
+
+//       <div className="flex flex-col w-full">
+//         {course.chapters.map((chapter, index) => {
+//           const isCurrentChapterPassed =
+//             chapterQuizStatus.find((status) => status.chapterId === chapter.id)?.passed || false;
+//           const isPreviousChapterPassed =
+//             index === 0 || (chapterQuizStatus[index - 1]?.passed ?? false);
+
+//           // Lock the next chapter if the current quiz isn't passed
+//           const isNextChapterLocked =
+//             index < course.chapters.length - 1 && !isCurrentChapterPassed;
+
+//           return (
+//             <div key={chapter.id} className="mb-4">
+//               <CourseSidebarItem
+//                 id={chapter.id}
+//                 label={chapter.title}
+//                 isCompleted={!!chapter.userProgress?.[0]?.isCompleted}
+//                 courseId={course.id}
+//                 isLocked={
+//                   (!chapter.isFree && !purchase) ||
+//                   (index > 0 && !isPreviousChapterPassed)
+//                 }
+//               />
+
+//               {/* Chapter Attachments Dropdown */}
+//               <div className="ml-4 mt-2">
+//                 {chapter.chapterattachments && chapter.chapterattachments.length > 0 && (
+//                   <details className="group">
+//                     <summary className="text-base font-medium text-gray-700 cursor-pointer flex items-center p-2 rounded-md hover:bg-gray-100 transition-colors duration-200">
+//                       <span className="mr-2 text-[#FF0000]" style={{ fontWeight: 'normal', fontSize: '16px' }}>📎</span>
+//                       <span className="text-[#3b2f85]" style={{ fontSize: '14px' }}>
+//                         Chapter Attachments ({chapter.chapterattachments.length})
+//                       </span>
+//                     </summary>
+//                     <div className="mt-2 pl-4 pr-2">
+//                       {chapter.chapterattachments.map((attachment) => (
+//                         <div
+//                           key={attachment.id}
+//                           className="mb-2 p-3 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
+//                         >
+//                           <a
+//                             href={attachment.url}
+//                             target="_blank"
+//                             rel="noopener noreferrer"
+//                             className="flex items-center text-blue-700 font-medium text-sm hover:text-blue-900 transition-colors duration-200"
+//                           >
+//                             <span className="mr-2" style={{ fontWeight: 'normal', fontSize: '16px' }}>📄</span>
+//                             <span className="truncate" style={{ fontSize: '14px' }}>{attachment.name}</span>
+//                           </a>
+//                         </div>
+//                       ))}
+//                     </div>
+//                   </details>
+//                 )}
+//               </div>
+
+//               {/* Chapter Quiz Button */}
+//               {!!chapter.userProgress?.[0]?.isCompleted && isPreviousChapterPassed && (
+//                 <div className="p-4">
+//                   <ChapterQuizButton courseId={course.id} chapterId={chapter.id} />
+//                 </div>
+//               )}
+//             </div>
+//           );
+//         })}
+//       </div>
+
+//       {allChaptersCompleted && (
+//         <div className="p-4">
+//           <QuizButton courseId={course.id} quizId={quizId} />
+//         </div>
+//       )}
+
+//       {!allChaptersCompleted && (
+//         <div className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-6 rounded-lg shadow-lg transform transition-all duration-300 hover:shadow-xl" style={{ fontSize: '16px' }}>
+//           <h2 
+//             className="text-xl font-bold mb-2 flex items-center justify-center" 
+//             style={{ fontSize: '48px' }}  
+//           >
+//             🎯
+//           </h2>
+//           <p className="text-base mt-2 text-left" style={{ fontSize: '16px' }}>Unlock the final quiz to test your mastery!</p>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+
+
+
+
+
+
 import { auth } from "@clerk/nextjs/server";
-import { Chapter, Course, UserProgress, ChapterAttachment } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { CourseProgress } from "@/components/course-progress";
@@ -1331,18 +1731,26 @@ import ChapterQuizButton from "./chapter-quiz-button";
 import { Logo } from "./logo";
 import axios from "axios";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+// Import Prisma types explicitly
+import { Prisma } from "@prisma/client";
 
+// Define the expected type for CourseSidebarProps using Prisma types
 interface CourseSidebarProps {
-  course: Course & {
-    chapters: (Chapter & {
-      userProgress: UserProgress[] | null;
-      chapterattachments: ChapterAttachment[];
-    })[];
-  };
+  course: Prisma.CourseGetPayload<{
+    include: {
+      chapters: {
+        include: {
+          userProgress: true; // userProgress is required and can be null
+          chapterattachments?: true; // chapterattachments is optional
+        };
+      };
+    };
+  }>;
   progressCount: number;
   quizId: string;
 }
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export const CourseSidebar = async ({
   course,
@@ -1405,7 +1813,7 @@ export const CourseSidebar = async ({
             backgroundColor: "#6A0DAD",
             padding: "8px 8px",
             borderRadius: "2px",
-            fontSize: "14px", // Matched text size from image
+            fontSize: "14px",
             overflow: "hidden",
             display: "flex",
             alignItems: "center",
@@ -1430,8 +1838,7 @@ export const CourseSidebar = async ({
 
           // Lock the next chapter if the current quiz isn't passed
           const isNextChapterLocked =
-            index < course.chapters.length - 1 && // Check if there's a next chapter
-            !isCurrentChapterPassed; // Lock if current quiz isn't passed
+            index < course.chapters.length - 1 && !isCurrentChapterPassed;
 
           return (
             <div key={chapter.id} className="mb-4">
@@ -1441,8 +1848,8 @@ export const CourseSidebar = async ({
                 isCompleted={!!chapter.userProgress?.[0]?.isCompleted}
                 courseId={course.id}
                 isLocked={
-                  (!chapter.isFree && !purchase) || // Locked if not free and not purchased
-                  (index > 0 && !isPreviousChapterPassed) // Locked if previous chapter quiz not passed
+                  (!chapter.isFree && !purchase) ||
+                  (index > 0 && !isPreviousChapterPassed)
                 }
               />
 
@@ -1451,8 +1858,8 @@ export const CourseSidebar = async ({
                 {chapter.chapterattachments && chapter.chapterattachments.length > 0 && (
                   <details className="group">
                     <summary className="text-base font-medium text-gray-700 cursor-pointer flex items-center p-2 rounded-md hover:bg-gray-100 transition-colors duration-200">
-                      <span className="mr-2 text-[#FF0000]" style={{ fontWeight: 'normal', fontSize: '16px' }}>📎</span> {/* Matched icon size from image */}
-                      <span className="text-[#3b2f85]" style={{ fontSize: '14px' }}> {/* Matched text size from image */}
+                      <span className="mr-2 text-[#FF0000]" style={{ fontWeight: 'normal', fontSize: '16px' }}>📎</span>
+                      <span className="text-[#3b2f85]" style={{ fontSize: '14px' }}>
                         Chapter Attachments ({chapter.chapterattachments.length})
                       </span>
                     </summary>
@@ -1468,8 +1875,8 @@ export const CourseSidebar = async ({
                             rel="noopener noreferrer"
                             className="flex items-center text-blue-700 font-medium text-sm hover:text-blue-900 transition-colors duration-200"
                           >
-                            <span className="mr-2" style={{ fontWeight: 'normal', fontSize: '16px' }}>📄</span> {/* Matched icon size from image */}
-                            <span className="truncate" style={{ fontSize: '14px' }}>{attachment.name}</span> {/* Matched text size from image */}
+                            <span className="mr-2" style={{ fontWeight: 'normal', fontSize: '16px' }}>📄</span>
+                            <span className="truncate" style={{ fontSize: '14px' }}>{attachment.name}</span>
                           </a>
                         </div>
                       ))}
@@ -1496,26 +1903,19 @@ export const CourseSidebar = async ({
       )}
 
       {!allChaptersCompleted && (
-         <div className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-6 rounded-lg shadow-lg transform transition-all duration-300 hover:shadow-xl" style={{ fontSize: '16px' }}>
-                   <h2 
-                 className="text-xl font-bold mb-2 flex items-center justify-center" 
-                style={{ fontSize: '48px' }}  
-                                              >
-                                                🎯
-                       </h2>
-         <p className="text-base mt-2 text-left" style={{ fontSize: '16px' }}>Unlock the final quiz to test your mastery!</p>
-       </div>
+        <div className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-6 rounded-lg shadow-lg transform transition-all duration-300 hover:shadow-xl" style={{ fontSize: '16px' }}>
+          <h2 
+            className="text-xl font-bold mb-2 flex items-center justify-center" 
+            style={{ fontSize: '48px' }}  
+          >
+            🎯
+          </h2>
+          <p className="text-base mt-2 text-left" style={{ fontSize: '16px' }}>Unlock the final quiz to test your mastery!</p>
+        </div>
       )}
     </div>
   );
 };
-
-
-
-
-
-
-
 
 
 
