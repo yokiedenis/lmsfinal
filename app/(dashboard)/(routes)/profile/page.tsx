@@ -48,73 +48,73 @@ const UserProfile: React.FC<UserProfileProps> = ({
         className="w-32 h-32 mx-auto rounded-full border-4 border-teal-500 shadow-md"
       />
       <h1 className="text-2xl font-bold mt-4">{name}</h1>
-      <p className="text-sm text-gray-400">{email}</p>
-      <p className="text-sm text-gray-400 mt-2">Role: {role}</p>
+      <p className="text-sm text-white">{email}</p>
+      <p className="text-sm text-white mt-2">Role: {role}</p>
     </div>
     <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
       {dob && (
         <div className="bg-gray-800 p-4 rounded-md shadow">
-          <p className="text-sm text-gray-400">Date of Birth</p>
+          <p className="text-sm text-white">Date of Birth</p>
           <p className="text-lg font-semibold">{dob}</p>
         </div>
       )}
       {occupation && (
         <div className="bg-gray-800 p-4 rounded-md shadow">
-          <p className="text-sm text-gray-400">Occupation</p>
+          <p className="text-sm text-white">Occupation</p>
           <p className="text-lg font-semibold">{occupation}</p>
         </div>
       )}
       {gender && (
         <div className="bg-gray-800 p-4 rounded-md shadow">
-          <p className="text-sm text-gray-400">Gender</p>
+          <p className="text-sm text-white">Gender</p>
           <p className="text-lg font-semibold">{gender}</p>
         </div>
       )}
       {country && (
         <div className="bg-gray-800 p-4 rounded-md shadow">
-          <p className="text-sm text-gray-400">Country</p>
+          <p className="text-sm text-white">Country</p>
           <p className="text-lg font-semibold">{country}</p>
         </div>
       )}
       {contactNo && (
         <div className="bg-gray-800 p-4 rounded-md shadow">
-          <p className="text-sm text-gray-400">Contact No</p>
+          <p className="text-sm text-white">Contact No</p>
           <p className="text-lg font-semibold">{contactNo}</p>
         </div>
       )}
       {address && (
         <div className="bg-gray-800 p-4 rounded-md shadow col-span-full">
-          <p className="text-sm text-gray-400">Address</p>
+          <p className="text-sm text-white">Address</p>
           <p className="text-lg font-semibold">{address}</p>
         </div>
       )}
       {highestQualification && (
         <div className="bg-gray-800 p-4 rounded-md shadow">
-          <p className="text-sm text-gray-400">Highest Qualification</p>
+          <p className="text-sm text-white">Highest Qualification</p>
           <p className="text-lg font-semibold">{highestQualification}</p>
         </div>
       )}
       {employeeStatus && (
         <div className="bg-gray-800 p-4 rounded-md shadow">
-          <p className="text-sm text-gray-400">Employee Status</p>
+          <p className="text-sm text-white">Employee Status</p>
           <p className="text-lg font-semibold">{employeeStatus}</p>
         </div>
       )}
       {industry && (
         <div className="bg-gray-800 p-4 rounded-md shadow">
-          <p className="text-sm text-gray-400">Industry</p>
+          <p className="text-sm text-white">Industry</p>
           <p className="text-lg font-semibold">{industry}</p>
         </div>
       )}
       {paymentOption && (
         <div className="bg-gray-800 p-4 rounded-md shadow">
-          <p className="text-sm text-gray-400">Payment Option</p>
+          <p className="text-smtext-white">Payment Option</p>
           <p className="text-lg font-semibold">{paymentOption}</p>
         </div>
       )}
       {bio && (
         <div className="bg-gray-800 p-4 rounded-md shadow col-span-full">
-          <p className="text-sm text-gray-400">Bio</p>
+          <p className="text-sm text-white">Bio</p>
           <p className="text-lg font-semibold">{bio}</p>
         </div>
       )}
@@ -307,7 +307,7 @@ const ProfilePage = () => {
           <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Form inputs for user profile */}
             <div>
-              <label className="block text-gray-400 text-sm">Name</label>
+              <label className="block text-white text-sm">Name</label>
               <input
                 type="text"
                 name="name"
@@ -317,7 +317,7 @@ const ProfilePage = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-400 text-sm">Email</label>
+              <label className="block text-white text-sm">Email</label>
               <input
                 type="text"
                 name="email"
@@ -328,7 +328,7 @@ const ProfilePage = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-400 text-sm">Date of Birth</label>
+              <label className="block text-white text-sm">Date of Birth</label>
               <input
                 type="date"
                 name="dob"
@@ -338,7 +338,7 @@ const ProfilePage = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-400 text-sm">Occupation</label>
+              <label className="block text-white text-sm">Occupation</label>
               <input
                 type="text"
                 name="occupation"
@@ -348,7 +348,7 @@ const ProfilePage = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-400 text-sm">Gender</label>
+              <label className="block text-white text-sm">Gender</label>
               <input
                 type="text"
                 name="gender"
@@ -358,7 +358,7 @@ const ProfilePage = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-400 text-sm">Country</label>
+              <label className="block text-white text-sm">Country</label>
               <select
                 name="country"
                 value={formData.country}
@@ -372,7 +372,7 @@ const ProfilePage = () => {
               </select>
             </div>
             <div>
-              <label className="block text-gray-400 text-sm">Contact No</label>
+              <label className="block text-white text-sm">Contact No</label>
               <input
                 type="text"
                 name="contactNo"
@@ -392,7 +392,7 @@ const ProfilePage = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-400 text-sm">Highest Qualification</label>
+              <label className="block text-white text-sm">Highest Qualification</label>
               <input
                 type="text"
                 name="highestQualification"
@@ -402,7 +402,7 @@ const ProfilePage = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-400 text-sm">Employee Status</label>
+              <label className="block text-white text-sm">Employee Status</label>
               <select
                 name="employeeStatus"
                 value={formData.employeeStatus}
@@ -416,7 +416,7 @@ const ProfilePage = () => {
               </select>
             </div>
             <div>
-              <label className="block text-gray-400 text-sm">Industry</label>
+              <label className="block text-white text-sm">Industry</label>
               <input
                 type="text"
                 name="industry"
@@ -426,7 +426,7 @@ const ProfilePage = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-400 text-sm">Payment Option</label>
+              <label className="block text-white text-sm">Payment Option</label>
               <select
                 name="paymentOption"
                 value={formData.paymentOption}
@@ -440,7 +440,7 @@ const ProfilePage = () => {
               </select>
             </div>
             <div className="col-span-full">
-              <label className="block text-gray-400 text-sm">Bio</label>
+              <label className="block text-white text-sm">Bio</label>
               <textarea
                 name="bio"
                 value={formData.bio}
@@ -450,7 +450,7 @@ const ProfilePage = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-400 text-sm">Profile Image</label>
+              <label className="block text-white text-sm">Profile Image</label>
               <input 
                 type="file" 
                 accept="image/*" 
@@ -459,7 +459,7 @@ const ProfilePage = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-400 text-sm">Role</label>
+              <label className="block text-white text-sm">Role</label>
               <select
                 name="role"
                 value={formData.role}

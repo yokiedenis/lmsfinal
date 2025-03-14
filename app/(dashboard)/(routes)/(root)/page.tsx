@@ -600,19 +600,180 @@
 
 
 
-import { auth } from "@clerk/nextjs/server";
+// import { auth } from "@clerk/nextjs/server";
+// import { redirect } from "next/navigation";
+// import { CheckCircle, Clock } from "lucide-react";
+// import { getDashboardCourses } from "@/actions/get-dashboard-courses";
+// import { CoursesList } from "@/components/courses-list";
+// import dynamic from "next/dynamic";
+// import { InfoCard } from "./_components/info-card";
+// import { BannerCard } from "./_components/banner-card";
+// import { getCourses } from "@/actions/get-courses";
+// import { clerkClient } from "@clerk/nextjs/server";
+// import { getUpcomingCourses } from "@/actions/get-upcoming-courses";
+// import { Carousel } from "@/components/carousel";
+
+// async function getUserDetails() {
+//   const { userId } = await auth();
+//   if (!userId) return null;
+//   const user = await clerkClient.users.getUser(userId);
+//   return user;
+// }
+
+// export default async function Dashboard() {
+//   const user = await getUserDetails();
+
+//   if (!user) {
+//     return redirect("/sign-in");
+//   }
+
+//   const { completedCourses, coursesInProgress } = await getDashboardCourses(user.id);
+//   const upcomingCourses = await getUpcomingCourses();
+
+//   return (
+//     <div className="p-6 space-y-4">
+//       {/* Welcome Section */}
+//       <div className="space-y-4">
+//         <div>
+       
+//         <div className="bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold">
+//             {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+//           </div>
+//         </div>
+       
+//         <div className="relative bg-green-100 p-4 rounded-lg shadow-md flex items-center justify-between">
+//           <div>
+//             <h3 className="text-xl font-semibold text-yellow-600">Welcome to a World of Continuous Learning!</h3>
+//             <p className="text-sm text-gray-700 mt-1">
+//               Embark on your journey to success today with Eduskill. Stay updated with all course announcements here.
+//             </p>
+//           </div>
+//           <div className="flex-shrink-0 ml-4">
+//             <div className="bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold">
+//               {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+//             </div>
+//           </div>
+//           {/* Chevron cutout effect using pseudo-element */}
+//           <div className="absolute right-0 top-0 h-full w-4 bg-green-100 clip-path-polygon(100% 0, 75% 50%, 100% 100%)"></div>
+//         </div>
+//       </div>
+
+//       {/* Info Cards */}
+//       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+//         <InfoCard icon={Clock} label="In Progress" numberOfItems={coursesInProgress.length} />
+//         <InfoCard icon={CheckCircle} label="Completed" numberOfItems={completedCourses.length} variant="success" />
+//       </div>
+
+//       {/* Courses List */}
+//       <CoursesList items={[...coursesInProgress, ...completedCourses]} />
+
+//       {/* Integrating and Running Multiple Learning Solutions Section */}
+//       <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+//       <h2 className="text-2xl font-bold text-gray-600 text-center mb-6">From rookie to expert
+// Onboard your new joiners to success in no time.</h2>
+//         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+//           <div className="bg-white p-4 rounded-lg shadow flex flex-col items-center text-center">
+//             <div className="mb-2">
+//               <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+//               </svg>
+//             </div>
+//             <h3 className="text-lg font-medium text-yellow-600">100% Pratical Courses</h3>
+//             <p className="text-sm text-gray-600 mt-2">100% Practical Courses is a dynamic learning initiative focused on hands-on, real-world training that equips learners with actionable skills.
+//                Designed for immediate application, these courses emphasize practical exercises, simulations, and projects over theoretical content, ensuring participants gain confidence and competence in their chosen fields.
+// </p>
+//             <a href="#" className="mt-2 text-sm text-purple-600">→</a>
+//           </div>
+//           <div className="bg-white p-4 rounded-lg shadow flex flex-col items-center text-center">
+//             <div className="mb-2">
+//               <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10m-5 4h4m-4 4h4m-4-8h4" />
+//               </svg>
+//             </div>
+//             <h3 className="text-lg font-medium text-yellow-600">Worldclass Skills Training</h3>
+//             <p className="text-sm text-gray-600 mt-2">We deliver high-quality, industry-relevant skills development programs.
+//                We offer comprehensive training solutions tailored to professionals and organizations,
+//                emphasizing practical expertise, innovative teaching methods, and accessible learning resources to empower individuals and teams for success in a competitive global market.
+//              </p>
+//             <a href="#" className="mt-2 text-sm text-purple-600">→</a>
+//           </div>
+           
+//           <div className="bg-white p-4 rounded-lg shadow flex flex-col items-center text-center">
+//             <div className="mb-2">
+//               <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+//               </svg>
+//             </div>
+//             <h3 className="text-lg font-medium text-yellow-600">All Time Support Online Sessions</h3>
+//             <p className="text-sm text-gray-600 mt-2">Online Sessions offers round-the-clock access to live, expert-led training and assistance, ensuring learners receive continuous guidance and support. 
+//               Available anytime, these sessions provide interactive problem-solving, personalized feedback, and real-time collaboration, making skill development seamless and accessible worldwide.
+// </p>
+//             <a href="#" className="mt-2 text-sm text-purple-600">→</a>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Learning Section with Carousel */}
+//       {/* <Carousel courses={[...coursesInProgress, ...completedCourses]} /> */}
+
+//       {/* Banner Section */}
+//       <div className="grid grid-cols-1 gap-4">
+//         <div className="relative">
+//           <div className="flex items-center justify-between p-6 bg-white shadow rounded-lg">
+//             <div>
+//               <h2 className="text-2xl font-semibold">Go Further Into Our Current And Upcoming New Courses</h2>
+//               <p className="mt-2 text-gray-600">
+//                 Subscribe to a collection of our top courses in various fields, and more with Personal Plan.
+//               </p>
+//               <button className="mt-4 px-4 py-2 bg-purple-600 text-white rounded">
+//                 <a href="/search">Try it</a>
+//               </button>
+//             </div>
+//             <div className="flex-shrink-0">
+//               <img src="./imgu.jpg" alt="Student with laptop" className="w-48 h-auto rounded-lg" />
+//             </div>
+//           </div>
+//           <div className="absolute inset-y-0 right-0 flex items-center">
+//             <button className="p-2 text-gray-600">
+//               <svg
+//                 xmlns="http://www.w3.org/2000/svg"
+//                 className="h-6 w-6"
+//                 fill="none"
+//                 viewBox="0 0 24 24"
+//                 stroke="currentColor"
+//               >
+//                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+//               </svg>
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+// app/(dashboard)/(routes)/(root)/page.tsx
 import { redirect } from "next/navigation";
 import { CheckCircle, Clock } from "lucide-react";
 import { getDashboardCourses } from "@/actions/get-dashboard-courses";
 import { CoursesList } from "@/components/courses-list";
-import dynamic from "next/dynamic";
 import { InfoCard } from "./_components/info-card";
 import { BannerCard } from "./_components/banner-card";
-import { getCourses } from "@/actions/get-courses";
-import { clerkClient } from "@clerk/nextjs/server";
 import { getUpcomingCourses } from "@/actions/get-upcoming-courses";
-import { Carousel } from "@/components/carousel";
+import { auth } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs/server";
+import CarouselSection from "./_components/carousel-section"; // New client component
 
+// Server-side data fetching
 async function getUserDetails() {
   const { userId } = await auth();
   if (!userId) return null;
@@ -620,6 +781,7 @@ async function getUserDetails() {
   return user;
 }
 
+// Server Component
 export default async function Dashboard() {
   const user = await getUserDetails();
 
@@ -635,12 +797,10 @@ export default async function Dashboard() {
       {/* Welcome Section */}
       <div className="space-y-4">
         <div>
-       
-        <div className="bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold">
+          <div className="bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold">
             {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
           </div>
         </div>
-       
         <div className="relative bg-green-100 p-4 rounded-lg shadow-md flex items-center justify-between">
           <div>
             <h3 className="text-xl font-semibold text-yellow-600">Welcome to a World of Continuous Learning!</h3>
@@ -653,7 +813,6 @@ export default async function Dashboard() {
               {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
             </div>
           </div>
-          {/* Chevron cutout effect using pseudo-element */}
           <div className="absolute right-0 top-0 h-full w-4 bg-green-100 clip-path-polygon(100% 0, 75% 50%, 100% 100%)"></div>
         </div>
       </div>
@@ -667,54 +826,8 @@ export default async function Dashboard() {
       {/* Courses List */}
       <CoursesList items={[...coursesInProgress, ...completedCourses]} />
 
-      {/* Integrating and Running Multiple Learning Solutions Section */}
-      <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-      <h2 className="text-2xl font-bold text-gray-600 text-center mb-6">From rookie to expert
-Onboard your new joiners to success in no time.</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-4 rounded-lg shadow flex flex-col items-center text-center">
-            <div className="mb-2">
-              <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-yellow-600">100% Pratical Courses</h3>
-            <p className="text-sm text-gray-600 mt-2">100% Practical Courses is a dynamic learning initiative focused on hands-on, real-world training that equips learners with actionable skills.
-               Designed for immediate application, these courses emphasize practical exercises, simulations, and projects over theoretical content, ensuring participants gain confidence and competence in their chosen fields.
-</p>
-            <a href="#" className="mt-2 text-sm text-purple-600">→</a>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow flex flex-col items-center text-center">
-            <div className="mb-2">
-              <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10m-5 4h4m-4 4h4m-4-8h4" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-yellow-600">Worldclass Skills Training</h3>
-            <p className="text-sm text-gray-600 mt-2">We deliver high-quality, industry-relevant skills development programs.
-               We offer comprehensive training solutions tailored to professionals and organizations,
-               emphasizing practical expertise, innovative teaching methods, and accessible learning resources to empower individuals and teams for success in a competitive global market.
-             </p>
-            <a href="#" className="mt-2 text-sm text-purple-600">→</a>
-          </div>
-           
-          <div className="bg-white p-4 rounded-lg shadow flex flex-col items-center text-center">
-            <div className="mb-2">
-              <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-yellow-600">All Time Support Online Sessions</h3>
-            <p className="text-sm text-gray-600 mt-2">Online Sessions offers round-the-clock access to live, expert-led training and assistance, ensuring learners receive continuous guidance and support. 
-              Available anytime, these sessions provide interactive problem-solving, personalized feedback, and real-time collaboration, making skill development seamless and accessible worldwide.
-</p>
-            <a href="#" className="mt-2 text-sm text-purple-600">→</a>
-          </div>
-        </div>
-      </div>
-
-      {/* Learning Section with Carousel */}
-      {/* <Carousel courses={[...coursesInProgress, ...completedCourses]} /> */}
+      {/* Carousel Section */}
+      <CarouselSection />
 
       {/* Banner Section */}
       <div className="grid grid-cols-1 gap-4">
@@ -751,10 +864,6 @@ Onboard your new joiners to success in no time.</h2>
     </div>
   );
 }
-
-
-
-
 
 
 

@@ -82,9 +82,9 @@ const SignInPage: React.FC = () => {
       {/* Logo at the Bottom */}
       <div className="absolute top-5 left-1/2 transform -translate-x-1/2 z-20">
        <img
-            src="/lgg.png"
+            src="/bgi.png"
             alt="Logo"
-            className="h-12 w-auto"
+            className="h-50 w-5500"
            />
                </div>
 

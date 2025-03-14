@@ -51,3 +51,24 @@ const SearchPage = async ({
 }
 
 export default SearchPage;
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 

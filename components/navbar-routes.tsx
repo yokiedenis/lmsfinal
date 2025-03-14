@@ -839,10 +839,10 @@ export const NavbarRoutes: React.FC<NavbarRoutesProps> = () => {
           >
             <span 
               style={{
-                color: "#001F3F",
+                color: "#1E3A8A",
                 fontSize: "30px",
                 fontWeight: "bold",
-                textShadow: "0 0 10px #00BFFF, 0 0 20px #00BFFF, 0 0 30px #00BFFF",
+               // textShadow: "0 0 10px #00BFFF, 0 0 20px #00BFFF, 0 0 30px #00BFFF",
                 textAlign: "center"
               }}
             >

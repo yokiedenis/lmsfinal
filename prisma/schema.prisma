@@ -67,6 +67,7 @@ model Course{
   chapters Chapter[]
   attachments Attachment[]
   purchases Purchase[]
+  projectsubmission ProjectSubmission[]
 
   quizzes Quiz[] // Add this line
   chapterQuizzes ChapterQuiz[]
@@ -103,7 +104,7 @@ model Attachment{
   courseId String
   Course Course @relation(fields: [courseId], references: [id], onDelete:Cascade)
 
-  //chapterId String
+  chapterId String?
   //Chapter Chapter @relation(fields: [chapterId], references: [id], onDelete:Cascade)
 
 
@@ -141,6 +142,8 @@ model Recording {
   uploadedAt DateTime @default(now()) // When the recording was uploaded
   isActive  Boolean  @default(true)   // Whether the recording is active
 
+  courseId  String?
+
   chapterId String   // Foreign key to link to Chapter
   chapter   Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 
@@ -176,6 +179,7 @@ model Chapter{
   quizzes      Quiz[]       // Add this line to establish a reverse relation to Quiz
 
   chapterquizzes   ChapterQuiz[] // This defines the reverse relation to ChapterQuiz
+  
 
 
 
@@ -200,6 +204,8 @@ model  muxData {
 model UserProgress{
   id String @id @default(uuid()) @map("_id")
   userId String
+
+  courseId  String
 
   chapterId String
   chapter Chapter @relation(fields: [chapterId], references: [id], onDelete:Cascade)
@@ -468,6 +474,7 @@ model ChapterQuizAttempt {
   studentId    String
 
   score         Int
+  chapterId     String
   totalQuestions Int
   answers       String   // Storing answers as JSON string
   chapterQuiz  ChapterQuiz      @relation(fields: [chapterQuizId], references: [id], onDelete: Cascade)
@@ -508,6 +515,7 @@ model User {
   userProgress UserProgress[] // Add this line to establish the relation
   number String? // Optional field for phone number
   transactions Transaction[]
+  projectsubmission ProjectSubmission[]
 
   profile  Profile? @relation             // Relation defined without `fields` or `references`
    
@@ -519,7 +527,7 @@ model Transaction {
   userId    String
   courseId  String
   amount    Int
-  dpoToken  String
+  dpoToken  String   @unique
   status    String   @default("PENDING")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -532,6 +540,30 @@ model Transaction {
   @@index([userId])
   @@index([courseId])
 }
+
+
+
+
+// Add this to your existing schema.prisma file
+model ProjectSubmission {
+  id        String   @id @default(uuid()) @map("_id")
+  userId    String
+  courseId  String
+  fileName  String   // Original file name
+  fileUrl   String   // URL to the stored file
+  submittedAt DateTime @default(now())
+
+  user   User    @relation(fields: [id], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([courseId])
+}
+
+
 
 
  
