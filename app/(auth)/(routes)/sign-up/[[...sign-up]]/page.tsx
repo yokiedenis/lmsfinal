@@ -85,6 +85,15 @@ export default function Page() {
         </div>
       )}
 
+      {/* Image at the bottom */}
+      <div className="absolute bottom-12 left-10 z-20 items-end mb-20">
+        <img
+          src="/bgi.png"
+          alt="Logo"
+          className="h-50 w-5500"
+        />
+      </div>
+
       {/* Carousel Styling */}
       <style jsx>{`
         .carousel-container {

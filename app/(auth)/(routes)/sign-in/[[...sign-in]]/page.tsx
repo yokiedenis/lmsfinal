@@ -72,7 +72,7 @@ const SignInPage: React.FC = () => {
            headerTitle: {
         // This might not work directly due to Clerk's internal handling
         // But let's try to set the text content
-           textContent: 'Sign-In '
+           textContent: 'Sign In '
           }
           }
              }} 
@@ -80,13 +80,14 @@ const SignInPage: React.FC = () => {
       </div>
 
       {/* Logo at the Bottom */}
-      <div className="absolute top-5 left-1/2 transform -translate-x-1/2 z-20">
-       <img
-            src="/bgi.png"
-            alt="Logo"
-            className="h-50 w-5500"
-           />
-               </div>
+      {/* Image at the bottom */}
+      <div className="absolute bottom-10 left-10 z-20 items-end mb-20">
+        <img
+          src="/bgi.png"
+          alt="Logo"
+          className="h-50 w-5500"
+        />
+      </div>
 
       {/* Carousel Styling */}
       <style jsx>{`
@@ -133,6 +134,8 @@ const SignInPage: React.FC = () => {
           }
         }
       `}</style>
+
+       
     </div>
   );
 };
