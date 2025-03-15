@@ -83,11 +83,11 @@ export default function ProgressPage() {
   ];
 
   const courses = [
-    { name: "Physics 1", chapters: "5 chapter", lectures: "30 lecture", progress: 30, score: 80, status: "In progress" },
-    { name: "Physics 2", chapters: "5 chapter", lectures: "30 lecture", progress: 30, score: 80, status: "In progress" },
-    { name: "Chemistry 1", chapters: "5 chapter", lectures: "30 lecture", progress: 30, score: 70, status: "In progress" },
-    { name: "Chemistry 2", chapters: "5 chapter", lectures: "30 lecture", progress: 30, score: 80, status: "In progress" },
-    { name: "Higher math 1", chapters: "5 chapter", lectures: "30 lecture", progress: 100, score: 90, status: "Completed" },
+    { name: "Data science", chapters: "5 chapter", lectures: "30 lecture", progress: 30, score: 80, status: "In progress" },
+    { name: "Machine Learning", chapters: "5 chapter", lectures: "30 lecture", progress: 30, score: 80, status: "In progress" },
+    { name: "Augmentative Reality", chapters: "5 chapter", lectures: "30 lecture", progress: 30, score: 70, status: "In progress" },
+    { name: "Product Design ", chapters: "5 chapter", lectures: "30 lecture", progress: 30, score: 80, status: "In progress" },
+    { name: "Product Management", chapters: "5 chapter", lectures: "30 lecture", progress: 100, score: 90, status: "Completed" },
   ];
 
   const assignments = [
