@@ -11,6 +11,8 @@ interface SelectProps<T extends string> {
   id: string;
   name: string;
   onBlur: React.FocusEventHandler<HTMLSelectElement>;
+  className?: string; // Add className as an optional prop
+
 }
 
 const Select = <T extends string>({

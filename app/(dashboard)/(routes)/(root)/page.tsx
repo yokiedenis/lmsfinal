@@ -761,17 +761,129 @@
 
 
 
+// // app/(dashboard)/(routes)/(root)/page.tsx
+// import { redirect } from "next/navigation";
+// import { CheckCircle, Clock } from "lucide-react";
+// import { getDashboardCourses } from "@/actions/get-dashboard-courses";
+// import { CoursesList } from "@/components/courses-list";
+// import { InfoCard } from "./_components/info-card";
+// import { BannerCard } from "./_components/banner-card";
+// import { getUpcomingCourses } from "@/actions/get-upcoming-courses";
+// import { auth } from "@clerk/nextjs/server";
+// import { clerkClient } from "@clerk/nextjs/server";
+// import CarouselSection from "./_components/carousel-section"; // New client component
+
+// // Server-side data fetching
+// async function getUserDetails() {
+//   const { userId } = await auth();
+//   if (!userId) return null;
+//   const user = await clerkClient.users.getUser(userId);
+//   return user;
+// }
+
+// // Server Component
+// export default async function Dashboard() {
+//   const user = await getUserDetails();
+
+//   if (!user) {
+//     return redirect("/sign-in");
+//   }
+
+//   const { completedCourses, coursesInProgress } = await getDashboardCourses(user.id);
+//   const upcomingCourses = await getUpcomingCourses();
+
+//   return (
+//     <div className="p-6 space-y-4">
+//       {/* Welcome Section */}
+//       <div className="space-y-4">
+//         <div>
+//           <div className="bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold">
+//             {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+//           </div>
+//         </div>
+//         <div className="relative bg-green-100 p-4 rounded-lg shadow-md flex items-center justify-between">
+//           <div>
+//             <h3 className="text-xl font-semibold text-yellow-600">Welcome to a World of Continuous Learning!</h3>
+//             <p className="text-sm text-gray-700 mt-1">
+//               Embark on your journey to success today with Eduskill. Stay updated with all course announcements here.
+//             </p>
+//           </div>
+//           <div className="flex-shrink-0 ml-4">
+//             <div className="bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold">
+//               {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+//             </div>
+//           </div>
+//           <div className="absolute right-0 top-0 h-full w-4 bg-green-100 clip-path-polygon(100% 0, 75% 50%, 100% 100%)"></div>
+//         </div>
+//       </div>
+
+//       {/* Info Cards */}
+//       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+//         <InfoCard icon={Clock} label="In Progress" numberOfItems={coursesInProgress.length} />
+//         <InfoCard icon={CheckCircle} label="Completed" numberOfItems={completedCourses.length} variant="success" />
+//       </div>
+
+//       {/* Courses List */}
+//       <CoursesList items={[...coursesInProgress,]} />
+//        {/* <...completedCourses/> */}
+
+//       {/* Carousel Section */}
+//       <CarouselSection />
+
+//       {/* Banner Section */}
+//       <div className="grid grid-cols-1 gap-4">
+//         <div className="relative">
+//           <div className="flex items-center justify-between p-6 bg-white shadow rounded-lg">
+//             <div>
+//               <h2 className="text-2xl font-semibold">Go Further Into Our Current And Upcoming New Courses</h2>
+//               <p className="mt-2 text-gray-600">
+//                 Subscribe to a collection of our top courses in various fields, and more with Personal Plan.
+//               </p>
+//               <button className="mt-4 px-4 py-2 bg-purple-600 text-white rounded">
+//                 <a href="/search">Try it</a>
+//               </button>
+//             </div>
+//             <div className="flex-shrink-0">
+//               <img src="./imgu.jpg" alt="Student with laptop" className="w-48 h-auto rounded-lg" />
+//             </div>
+//           </div>
+//           <div className="absolute inset-y-0 right-0 flex items-center">
+//             <button className="p-2 text-gray-600">
+//               <svg
+//                 xmlns="http://www.w3.org/2000/svg"
+//                 className="h-6 w-6"
+//                 fill="none"
+//                 viewBox="0 0 24 24"
+//                 stroke="currentColor"
+//               >
+//                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+//               </svg>
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
 // app/(dashboard)/(routes)/(root)/page.tsx
 import { redirect } from "next/navigation";
 import { CheckCircle, Clock } from "lucide-react";
 import { getDashboardCourses } from "@/actions/get-dashboard-courses";
 import { CoursesList } from "@/components/courses-list";
 import { InfoCard } from "./_components/info-card";
-import { BannerCard } from "./_components/banner-card";
-import { getUpcomingCourses } from "@/actions/get-upcoming-courses";
 import { auth } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/nextjs/server";
-import CarouselSection from "./_components/carousel-section"; // New client component
+import "./dashboard.css"; // Import the new CSS file
 
 // Server-side data fetching
 async function getUserDetails() {
@@ -790,86 +902,139 @@ export default async function Dashboard() {
   }
 
   const { completedCourses, coursesInProgress } = await getDashboardCourses(user.id);
-  const upcomingCourses = await getUpcomingCourses();
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-6 md:p-8 space-y-8">
       {/* Welcome Section */}
-      <div className="space-y-4">
-        <div>
-          <div className="bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold">
-            {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
-          </div>
-        </div>
-        <div className="relative bg-green-100 p-4 rounded-lg shadow-md flex items-center justify-between">
-          <div>
-            <h3 className="text-xl font-semibold text-yellow-600">Welcome to a World of Continuous Learning!</h3>
-            <p className="text-sm text-gray-700 mt-1">
-              Embark on your journey to success today with Eduskill. Stay updated with all course announcements here.
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 shadow-xl">
+        <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between">
+          <div className="space-y-3 z-10">
+            <div className="flex items-center space-x-4">
+              <div className="bg-white/20 backdrop-blur-sm w-14 h-14 rounded-full flex items-center justify-center text-2xl font-bold text-white">
+                {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+              </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">
+                Welcome back, {user.firstName}!
+              </h1>
+            </div>
+            <p className="text-white/90 text-sm md:text-base max-w-xl">
+              Continue your learning journey with our curated courses and track your progress effortlessly.
             </p>
           </div>
-          <div className="flex-shrink-0 ml-4">
-            <div className="bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold">
-              {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
-            </div>
+          <div className="mt-4 md:mt-0 flex-shrink-0">
+            <button className="px-6 py-2 bg-white text-indigo-600 rounded-lg font-semibold hover:bg-indigo-50 transition-all duration-300">
+              <a href="/search">Explore Courses</a>
+            </button>
           </div>
-          <div className="absolute right-0 top-0 h-full w-4 bg-green-100 clip-path-polygon(100% 0, 75% 50%, 100% 100%)"></div>
         </div>
-      </div>
+        <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mb-16" />
+      </section>
 
-      {/* Info Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <InfoCard icon={Clock} label="In Progress" numberOfItems={coursesInProgress.length} />
-        <InfoCard icon={CheckCircle} label="Completed" numberOfItems={completedCourses.length} variant="success" />
-      </div>
+      {/* Stats Section */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <InfoCard 
+          icon={Clock} 
+          label="In Progress" 
+          numberOfItems={coursesInProgress.length}
+          className="bg-white shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl border border-gray-100"
+        />
+        <InfoCard 
+          icon={CheckCircle} 
+          label="Completed" 
+          numberOfItems={completedCourses.length} 
+          variant="success"
+          className="bg-white shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl border border-gray-100"
+        />
+      </section>
 
-      {/* Courses List */}
-      <CoursesList items={[...coursesInProgress, ...completedCourses]} />
+      {/* Courses Section */}
+      <section className="space-y-4">
+       <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">
+                      Your Learning Journey
+             </h2>
+               <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 w-full max-w-[1400px] mx-auto">
+               <CoursesList 
+                     items={[...coursesInProgress]} 
+                   // className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6"
+                  />
+                       </div>
+                          </section>
 
-      {/* Carousel Section */}
-      <CarouselSection />
-
-      {/* Banner Section */}
-      <div className="grid grid-cols-1 gap-4">
+      {/* Advanced Carousel Section */}
+      <section className="space-y-6">
+        <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">
+          Featured Courses
+        </h2>
         <div className="relative">
-          <div className="flex items-center justify-between p-6 bg-white shadow rounded-lg">
-            <div>
-              <h2 className="text-2xl font-semibold">Go Further Into Our Current And Upcoming New Courses</h2>
-              <p className="mt-2 text-gray-600">
-                Subscribe to a collection of our top courses in various fields, and more with Personal Plan.
-              </p>
-              <button className="mt-4 px-4 py-2 bg-purple-600 text-white rounded">
-                <a href="/search">Try it</a>
-              </button>
-            </div>
-            <div className="flex-shrink-0">
-              <img src="./imgu.jpg" alt="Student with laptop" className="w-48 h-auto rounded-lg" />
+          <div className="overflow-hidden rounded-xl">
+            <div className="flex animate-slide gap-4 pb-4 snap-x snap-mandatory">
+              {[
+                { title: "Data Science", img: "/blockchain.webp" },
+                { title: "Cyber Security", img: "/cyber.webp" },
+                { title: "Artificial Intelligence", img: "/Ai.webp" },
+              ].map((course, index) => (
+                <div
+                  key={index}
+                  className="flex-shrink-0 w-[300px] bg-white rounded-lg shadow-lg overflow-hidden snap-start transform hover:scale-105 transition-all duration-300"
+                >
+                  <img 
+                    src={course.img} 
+                    alt={course.title}
+                    className="w-full h-40 object-cover"
+                  />
+                  <div className="p-4">
+                    <h3 className="font-semibold text-gray-800">{course.title}</h3>
+                    <button className="mt-2 px-4 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
+                      <a href="/search">Learn More</a>
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-          <div className="absolute inset-y-0 right-0 flex items-center">
-            <button className="p-2 text-gray-600">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
+          {/* Carousel Navigation */}
+          <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between px-4">
+            <button className="p-2 bg-white/80 rounded-full shadow-md hover:bg-white transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button className="p-2 bg-white/80 rounded-full shadow-md hover:bg-white transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Banner Section */}
+      <section className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl shadow-lg p-6 md:p-8 text-white relative overflow-hidden">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-4 z-10">
+            <h2 className="text-2xl md:text-3xl font-bold">
+              Unlock Premium Learning
+            </h2>
+            <p className="text-white/90 max-w-md">
+              Get unlimited access to all courses with our Premium Plan and accelerate your growth.
+            </p>
+            <button className="px-6 py-2 bg-white text-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition-all duration-300">
+              <a href="/search">Get Started</a>
+            </button>
+          </div>
+          <div className="flex-shrink-0">
+            <img 
+              src="./imgu.jpg" 
+              alt="Learning illustration" 
+              className="w-48 md \md:w-64 h-auto rounded-lg shadow-md"
+            />
+          </div>
+        </div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
+      </section>
     </div>
   );
 }
-
-
-
-
-
-
 
 
 

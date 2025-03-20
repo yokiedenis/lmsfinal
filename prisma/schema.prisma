@@ -205,7 +205,7 @@ model UserProgress{
   id String @id @default(uuid()) @map("_id")
   userId String
 
-  courseId  String
+  courseId  String?
 
   chapterId String
   chapter Chapter @relation(fields: [chapterId], references: [id], onDelete:Cascade)
@@ -517,6 +517,8 @@ model User {
   transactions Transaction[]
   projectsubmission ProjectSubmission[]
 
+  courseId  String?
+
   profile  Profile? @relation             // Relation defined without `fields` or `references`
    
 }
@@ -546,18 +548,21 @@ model Transaction {
 
 // Add this to your existing schema.prisma file
 model ProjectSubmission {
-  id        String   @id @default(uuid()) @map("_id")
-  userId    String
-  courseId  String
-  fileName  String   // Original file name
-  fileUrl   String   // URL to the stored file
+  id          String   @id @default(uuid()) @map("_id")
+  userId      String
+  courseId    String
+  fileName    String
+  fileUrl     String
   submittedAt DateTime @default(now())
+  marks       Int?     // Add marks field (nullable until marked)
+  comments    String?  // Optional feedback
+  isMarked    Boolean  @default(false) // Add isMarked field
 
-  user   User    @relation(fields: [id], references: [id], onDelete: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course      Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([userId])
   @@index([courseId])

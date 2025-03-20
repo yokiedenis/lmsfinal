@@ -14,6 +14,8 @@ interface CourseCardProps {
   price: number;
   progress: number | null;
   category: string;
+  className?: string; // Added this line
+   
 };
 
 export const CourseCard = ({
@@ -23,7 +25,9 @@ export const CourseCard = ({
   chaptersLength,
   price,
   progress,
-  category
+  category,
+  className,  
+
 }: CourseCardProps) => {
   return (
     <Link href={`/courses/${id}`}>
