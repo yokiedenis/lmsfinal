@@ -3504,6 +3504,564 @@
 
 
 
+// "use client";
+
+// import { useEffect, useState } from "react";
+// import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+// import { Progress } from "@/components/ui/progress";
+// import { Badge } from "@/components/ui/badge";
+// import { useUser, useAuth } from "@clerk/nextjs";
+
+// interface LeaderboardUser {
+//   id: string;
+//   name: string;
+//   level: number;
+//   points: number;
+// }
+
+// export default function ProgressPage() {
+//   const { user } = useUser();
+//   const { getToken } = useAuth();
+//   const [progressData, setProgressData] = useState<{
+//     completionPercentage: number;
+//     totalChapters: number;
+//     completedChapters: number;
+//   } | null>(null);
+//   const [leaderboardData, setLeaderboardData] = useState<LeaderboardUser[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [noCoursesAlert, setNoCoursesAlert] = useState(false);
+//   const [totalCourses, setTotalCourses] = useState(0);
+//   const [coursesCompleted, setCoursesCompleted] = useState(0);
+//   const [liveClassesAttended, setLiveClassesAttended] = useState(0);
+//   const [hoursSpent, setHoursSpent] = useState(0);
+//   const [quizzesPracticed, setQuizzesPracticed] = useState(0);
+//   const [assignmentsDone, setAssignmentsDone] = useState(0);
+//   const [quizAssignments, setQuizAssignments] = useState<any[]>([]);
+//   const [pendingQuizzesData, setPendingQuizzesData] = useState<any[]>([]);
+//   const [isEnrolled, setIsEnrolled] = useState(false);
+//   const [purchases, setPurchases] = useState<any[]>([]);
+//   const [userProgress, setUserProgress] = useState<any[]>([]);
+//   const [quizResults, setQuizResults] = useState<any[]>([]);
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       if (!user?.id) return;
+
+//       try {
+//         setLoading(true);
+
+//         const token = await getToken();
+
+//         // Fetch purchases
+//         const purchaseResponse = await fetch(`/api/purchases/coursecheck?userId=${user.id}`, {
+//           headers: {
+//             "Content-Type": "application/json",
+//             Authorization: `Bearer ${token}`,
+//           },
+//         });
+//         if (!purchaseResponse.ok) throw new Error("Failed to fetch purchase data");
+//         const purchasesData = await purchaseResponse.json();
+//         setPurchases(purchasesData);
+
+//         if (purchasesData.length === 0) {
+//           setProgressData({
+//             completionPercentage: 0,
+//             totalChapters: 0,
+//             completedChapters: 0,
+//           });
+//           setTotalCourses(0);
+//           setCoursesCompleted(0);
+//           setLiveClassesAttended(0);
+//           setHoursSpent(0);
+//           setQuizzesPracticed(0);
+//           setAssignmentsDone(0);
+//           setQuizAssignments([]);
+//           setPendingQuizzesData([]);
+//           setIsEnrolled(false);
+//           setNoCoursesAlert(true);
+//           setTimeout(() => setNoCoursesAlert(false), 3000);
+//         } else {
+//           setIsEnrolled(true);
+//           setTotalCourses(purchasesData.length);
+
+//           const courseIds = purchasesData.map((p: any) => p.courseId);
+
+//           // Fetch user progress
+//           const userProgressResponse = await fetch(`/api/user-progress?userId=${user.id}`, {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           });
+//           if (!userProgressResponse.ok) throw new Error("Failed to fetch user progress");
+//           const userProgressData = await userProgressResponse.json();
+//           setUserProgress(userProgressData);
+//           const completedChapters = userProgressData.filter((p: any) => p.isCompleted).length;
+
+//           // Fetch chapters
+//           const chaptersResponse = await fetch(`/api/chapters?courseIds=${courseIds.join(",")}`, {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           });
+//           if (!chaptersResponse.ok) throw new Error("Failed to fetch chapters");
+//           const totalChapters = (await chaptersResponse.json()).length;
+
+//           // Calculate courses completed
+//           const coursesCompletedCount = courseIds.filter((courseId: string) => {
+//             const courseChapters = userProgressData.filter((p: any) => p.courseId === courseId);
+//             return courseChapters.length > 0 && courseChapters.every((c: any) => c.isCompleted);
+//           }).length;
+//           setCoursesCompleted(coursesCompletedCount);
+
+//           // Fetch quiz results
+//           const quizResultsResponse = await fetch(`/api/chapter-quiz-results?userId=${user.id}`, {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           });
+//           if (!quizResultsResponse.ok) throw new Error("Failed to fetch quiz results");
+//           const quizResultsData = await quizResultsResponse.json();
+//           setQuizResults(quizResultsData);
+
+//           // Calculate completion percentage
+//           let completionPercentage = 0;
+//           if (quizResultsData.length > 0) {
+//             const totalScore = quizResultsData.reduce(
+//               (sum: number, result: { score: number; total: number }) =>
+//                 sum + (result.score / result.total) * 100,
+//               0
+//             );
+//             completionPercentage = Math.round(totalScore / quizResultsData.length);
+//           }
+//           setProgressData({
+//             completionPercentage,
+//             totalChapters,
+//             completedChapters,
+//           });
+
+//           // Fetch recordings
+//           const recordingsResponse = await fetch(`/api/recordings?courseIds=${courseIds.join(",")}`, {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           });
+//           if (!recordingsResponse.ok) throw new Error("Failed to fetch recordings");
+//           const recordings = await recordingsResponse.json();
+//           const totalRecordings = recordings.length;
+//           const watchedRecordings = userProgressData.filter((p: any) =>
+//             recordings.some((r: any) => r.chapterId === p.chapterId && p.isCompleted)
+//           ).length;
+//           setLiveClassesAttended(totalRecordings > 0 ? Math.round((watchedRecordings / totalRecordings) * 100) : 0);
+//           setHoursSpent(
+//             recordings
+//               .filter((r: any) => userProgressData.some((p: any) => p.chapterId === r.chapterId && p.isCompleted))
+//               .reduce((sum: number, r: any) => sum + (r.duration || 0) / 60, 0)
+//           );
+
+//           // Fetch quiz attempts
+//           const quizAttemptsResponse = await fetch(`/api/chapter-quiz-attempts?userId=${user.id}`, {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           });
+//           if (!quizAttemptsResponse.ok) throw new Error("Failed to fetch quiz attempts");
+//           const quizAttempts = await quizAttemptsResponse.json();
+//           setQuizzesPracticed(quizAttempts.length);
+
+//           // Fetch project submissions
+//           const submissionsResponse = await fetch(`/api/project-submissions?userId=${user.id}`, {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           });
+//           if (!submissionsResponse.ok) throw new Error("Failed to fetch project submissions");
+//           const submissions = await submissionsResponse.json();
+//           setAssignmentsDone(submissions.length);
+
+//           // Fetch quizzes
+//           const quizzesResponse = await fetch(`/api/chapter-quizzes?courseIds=${courseIds.join(",")}`, {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           });
+//           if (!quizzesResponse.ok) throw new Error("Failed to fetch quizzes");
+//           const quizzes = await quizzesResponse.json();
+//           setQuizAssignments(
+//             quizzes.map((quiz: any) => ({
+//               title: quiz.title,
+//               subject: quiz.course?.title || "Unknown Course",
+//               type: `Quiz - Chapter ${quiz.chapter?.position || "N/A"}`,
+//               dueDate: new Date(quiz.createdAt).toLocaleDateString("en-US", {
+//                 day: "numeric",
+//                 month: "short",
+//                 year: "numeric",
+//               }),
+//               dueTime: new Date(quiz.createdAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+//             }))
+//           );
+
+//           // Fetch pending quizzes
+//           const pendingQuizzesResponse = await fetch(`/api/chapter-quizzes/pending?userId=${user.id}&courseIds=${courseIds.join(",")}`, {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           });
+//           if (!pendingQuizzesResponse.ok) throw new Error("Failed to fetch pending quizzes");
+//           const pendingQuizzes = await pendingQuizzesResponse.json();
+//           setPendingQuizzesData(
+//             pendingQuizzes.map((quiz: any) => ({
+//               title: quiz.title,
+//               subject: quiz.course?.title || "Unknown Course",
+//               time: quiz.duration || 15,
+//             }))
+//           );
+//         }
+
+//         // Fetch leaderboard data
+//         const leaderboardResponse = await fetch("/api/leaderboard", {
+//           headers: {
+//             "Content-Type": "application/json",
+//             Authorization: `Bearer ${token}`,
+//           },
+//         });
+//         if (!leaderboardResponse.ok) throw new Error("Failed to fetch leaderboard data");
+//         const leaderboard = await leaderboardResponse.json();
+//         setLeaderboardData(leaderboard);
+//       } catch (error) {
+//         console.error("[FETCH_PROGRESS]", error);
+//         setProgressData({ completionPercentage: 0, totalChapters: 0, completedChapters: 0 });
+//         setTotalCourses(0);
+//         setCoursesCompleted(0);
+//         setLiveClassesAttended(0);
+//         setHoursSpent(0);
+//         setQuizzesPracticed(0);
+//         setAssignmentsDone(0);
+//         setQuizAssignments([]);
+//         setPendingQuizzesData([]);
+//         setIsEnrolled(false);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchData();
+//   }, [user?.id]); // Removed 'purchases' from dependency array to prevent refresh loop
+
+//   if (loading) return <div className="flex justify-center items-center h-screen text-gray-600">Loading...</div>;
+
+//   if (!progressData || !user?.id) return <div className="text-center text-red-500">Error loading progress</div>;
+
+//   const achievements = ["Top Learner", "Course Master"];
+
+//   const upcomingClasses = [
+//     { title: "Data Analytics - Class 5", subject: "Python", date: "15th June, 2025", time: "12:00PM", timeLeft: "2 min left", instructor: "Rayek Ahmed" },
+//     { title: "Machine Learning And AI", subject: "Class 2", date: "16th June, 2025", time: "12:00PM", timeLeft: "4 hr left", instructor: "Khyl Khan" },
+//   ];
+
+//   return (
+//     <div className="min-h-screen bg-[#F5F7FA] p-6">
+//       {/* Notification Banner */}
+//       <div className="bg-[#E6F7E5] text-[#1F2A44] p-4 rounded-xl mb-6 flex justify-between items-center">
+//         <p className="text-sm">
+//           Great effort so far Hustler! Keep up the hard work, and with a bit more focus on your attendance, you’re sure to reach your full potential! 😊
+//         </p>
+//         <button className="text-[#6B7280] hover:text-[#1F2A44]">×</button>
+//       </div>
+
+//       {/* Alert for No Courses Enrolled */}
+//       {noCoursesAlert && (
+//         <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded mb-6 animate-fade-out">
+//           <p className="text-sm">No courses enrolled yet!</p>
+//         </div>
+//       )}
+
+//       {/* Stats Section */}
+//       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+//         {/* Overall Performance */}
+//         <Card className="bg-white rounded-xl shadow-sm">
+//           <CardHeader className="p-4">
+//             <CardTitle className="text-sm font-medium text-[#6B7280] mb-2">Overall performance</CardTitle>
+//           </CardHeader>
+//           <CardContent className="p-4 flex flex-col items-center">
+//             <div className="relative w-32 h-32">
+//               <svg className="w-full h-full" viewBox="0 0 100 100">
+//                 <circle cx="50" cy="50" r="45" fill="none" stroke="#E5E7EB" strokeWidth="10" />
+//                 <circle
+//                   cx="50"
+//                   cy="50"
+//                   r="45"
+//                   fill="none"
+//                   stroke="#34C759"
+//                   strokeWidth="10"
+//                   strokeDasharray={`${progressData.completionPercentage * 2.83} 283`}
+//                   transform="rotate(-90 50 50)"
+//                 />
+//               </svg>
+//               <div className="absolute inset-0 flex items-center justify-center">
+//                 <p className="text-2xl font-bold text-[#1F2A44]">{progressData.completionPercentage}%</p>
+//               </div>
+//             </div>
+//             <p className="text-sm font-semibold text-[#1F2A44] mt-2">Pro learner</p>
+//           </CardContent>
+//         </Card>
+
+//         {/* Total Enroll Courses */}
+//         <Card className="bg-white rounded-xl shadow-sm">
+//           <CardHeader className="p-4">
+//             <CardTitle className="text-sm font-medium text-[#6B7280] mb-2">Total enroll courses</CardTitle>
+//           </CardHeader>
+//           <CardContent className="p-4 flex items-center justify-between">
+//             <div className="relative w-16 h-16">
+//               <svg className="w-full h-full" viewBox="0 0 100 100">
+//                 <circle cx="50" cy="50" r="45" fill="none" stroke="#E5E7EB" strokeWidth="10" />
+//                 <circle
+//                   cx="50"
+//                   cy="50"
+//                   r="45"
+//                   fill="none"
+//                   stroke="#34C759"
+//                   strokeWidth="10"
+//                   strokeDasharray="283 283"
+//                   transform="rotate(-90 50 50)"
+//                 />
+//               </svg>
+//               <div className="absolute inset-0 flex items-center justify-center">
+//                 <p className="text-xl font-bold text-[#1F2A44]">{totalCourses}</p>
+//               </div>
+//             </div>
+//             <p className="text-sm text-[#6B7280]">Course completed: {coursesCompleted}</p>
+//           </CardContent>
+//         </Card>
+
+//         {/* Live Class Attended */}
+//         <Card className="bg-white rounded-xl shadow-sm">
+//           <CardHeader className="p-4">
+//             <CardTitle className="text-sm font-medium text-[#6B7280] mb-2">Live class attended</CardTitle>
+//           </CardHeader>
+//           <CardContent className="p-4 flex items-center justify-between">
+//             <div className="relative w-16 h-16">
+//               <svg className="w-full h-full" viewBox="0 0 100 100">
+//                 <circle cx="50" cy="50" r="45" fill="none" stroke="#E5E7EB" strokeWidth="10" />
+//                 <circle
+//                   cx="50"
+//                   cy="50"
+//                   r="45"
+//                   fill="none"
+//                   stroke="#A5B4FC"
+//                   strokeWidth="10"
+//                   strokeDasharray={`${liveClassesAttended * 2.83} 283`}
+//                   transform="rotate(-90 50 50)"
+//                 />
+//               </svg>
+//               <div className="absolute inset-0 flex items-center justify-center">
+//                 <p className="text-xl font-bold text-[#1F2A44]">{liveClassesAttended}%</p>
+//               </div>
+//             </div>
+//             <p className="text-sm text-[#6B7280]">Hours spent: {hoursSpent.toFixed(1)}h</p>
+//           </CardContent>
+//         </Card>
+
+//         {/* Quizzes Practiced */}
+//         <Card className="bg-white rounded-xl shadow-sm">
+//           <CardHeader className="p-4">
+//             <CardTitle className="text-sm font-medium text-[#6B7280] mb-2">Quiz practiced</CardTitle>
+//           </CardHeader>
+//           <CardContent className="p-4 flex items-center justify-between">
+//             <div className="relative w-16 h-16">
+//               <svg className="w-full h-full" viewBox="0 0 100 100">
+//                 <circle cx="50" cy="50" r="45" fill="none" stroke="#E5E7EB" strokeWidth="10" />
+//                 <circle
+//                   cx="50"
+//                   cy="50"
+//                   r="45"
+//                   fill="none"
+//                   stroke="#FECACA"
+//                   strokeWidth="10"
+//                   strokeDasharray={`${(quizzesPracticed / (quizzesPracticed + 5)) * 283} 283`}
+//                   transform="rotate(-90 50 50)"
+//                 />
+//               </svg>
+//               <div className="absolute inset-0 flex items-center justify-center">
+//                 <p className="text-xl font-bold text-[#1F2A44]">{quizzesPracticed}</p>
+//               </div>
+//             </div>
+//             <p className="text-sm text-[#6B7280]">Assignment done: {assignmentsDone}</p>
+//           </CardContent>
+//         </Card>
+//       </div>
+
+//       {/* Main Content */}
+//       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+//         {/* Left Section: Upcoming Classes and Total Courses */}
+//         <div className="lg:col-span-3 space-y-6">
+//           {/* Upcoming Classes */}
+//           <Card className="bg-white rounded-xl shadow-sm">
+//             <CardHeader className="p-4">
+//               <CardTitle className="text-lg font-semibold text-[#1F2A44]">Upcoming classes</CardTitle>
+//             </CardHeader>
+//             <CardContent className="p-4 space-y-4">
+//               {upcomingClasses.map((classItem, index) => (
+//                 <div key={index} className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-lg">
+//                   <div className="flex items-center space-x-4">
+//                     <img src="/data science.png" alt="Class" className="w-12 h-12 rounded-lg" />
+//                     <div>
+//                       <p className="text-sm font-medium text-[#1F2A44]">{classItem.title}</p>
+//                       <p className="text-xs text-[#6B7280]">{classItem.subject}</p>
+//                       <p className="text-xs text-[#6B7280]">{classItem.instructor}</p>
+//                     </div>
+//                   </div>
+//                   <div className="text-right">
+//                     <p className="text-sm text-[#1F2A44]">{classItem.date}, {classItem.time}</p>
+//                     <p className="text-xs text-[#EF4444]">{classItem.timeLeft}</p>
+//                     <button className="mt-2 px-4 py-1 bg-[#34C759] text-white text-sm rounded-lg hover:bg-[#2ea44f] transition-colors">
+//                       Join
+//                     </button>
+//                   </div>
+//                 </div>
+//               ))}
+//             </CardContent>
+//           </Card>
+
+//           {/* Total Courses - Updated Section */}
+//           <Card className="bg-white rounded-xl shadow-sm">
+//             <CardHeader className="p-4">
+//               <CardTitle className="text-lg font-semibold text-[#1F2A44]">Total courses ({totalCourses})</CardTitle>
+//             </CardHeader>
+//             <CardContent className="p-4">
+//               <table className="w-full text-left border-collapse">
+//                 <thead>
+//                   <tr className="border-b border-[#E5E7EB]">
+//                     <th className="p-3 text-sm font-medium text-[#6B7280]">Course name</th>
+//                     <th className="p-3 text-sm font-medium text-[#6B7280]">Progress</th>
+//                     <th className="p-3 text-sm font-medium text-[#6B7280]">Overall score</th>
+//                     <th className="p-3 text-sm font-medium text-[#6B7280]">Status</th>
+//                   </tr>
+//                 </thead>
+//                 <tbody>
+//                   {isEnrolled && totalCourses > 0 ? (
+//                     purchases.map((purchase, index) => {
+//                       const courseProgress = userProgress.filter((p) => p.courseId === purchase.courseId);
+//                       const completedChapters = courseProgress.filter((p) => p.isCompleted).length;
+//                       // Note: totalChaptersForCourse should ideally be fetched per course; here it's approximated
+//                       const totalChaptersForCourse = progressData?.totalChapters || 0;
+//                       const progressPercentage =
+//                         totalChaptersForCourse > 0
+//                           ? Math.round((completedChapters / totalChaptersForCourse) * 100)
+//                           : 0;
+//                       const status =
+//                         courseProgress.length > 0 && courseProgress.every((p) => p.isCompleted)
+//                           ? "Completed"
+//                           : "In progress";
+//                       const courseQuizResults = quizResults.filter((q) => q.courseId === purchase.courseId);
+//                       const overallScore =
+//                         courseQuizResults.length > 0
+//                           ? Math.round(
+//                               courseQuizResults.reduce((sum, q) => sum + (q.score / q.total) * 100, 0) /
+//                                 courseQuizResults.length
+//                             )
+//                           : 0;
+
+//                       return (
+//                         <tr key={index} className="border-b border-[#E5E7EB] hover:bg-[#F9FAFB]">
+//                           <td className="p-3 flex items-center space-x-2">
+//                             <span
+//                               className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${
+//                                 purchase.course?.title?.startsWith("Physics")
+//                                   ? "bg-[#F97316]"
+//                                   : purchase.course?.title?.startsWith("Chemistry")
+//                                   ? "bg-[#3B82F6]"
+//                                   : "bg-[#22C55E]"
+//                               }`}
+//                             >
+//                               {purchase.course?.title?.charAt(0) || "C"}
+//                             </span>
+//                             <span className="text-sm text-[#1F2A44]">{purchase.course?.title || "Unknown Course"}</span>
+//                           </td>
+//                           <td className="p-3">
+//                             <Progress value={progressPercentage} className="w-[60%]" />
+//                             <span className="ml-2 text-sm text-[#6B7280]">{progressPercentage}%</span>
+//                           </td>
+//                           <td className="p-3 text-sm text-[#1F2A44]">{overallScore}%</td>
+//                           <td className="p-3">
+//                             <Badge
+//                               variant={status === "Completed" ? "default" : "secondary"}
+//                               className={
+//                                 status === "Completed"
+//                                   ? "bg-[#34C759] text-white"
+//                                   : "bg-[#E5E7EB] text-[#6B7280]"
+//                               }
+//                             >
+//                               {status}
+//                             </Badge>
+//                           </td>
+//                         </tr>
+//                       );
+//                     })
+//                   ) : (
+//                     <tr>
+//                       <td colSpan={4} className="p-3 text-center text-[#6B7280]">
+//                         No courses enrolled yet.
+//                       </td>
+//                     </tr>
+//                   )}
+//                 </tbody>
+//               </table>
+//             </CardContent>
+//           </Card>
+//         </div>
+
+//         {/* Right Section: Leaderboard */}
+//         <div className="lg:col-span-1">
+//           <Card className="bg-white rounded-xl shadow-sm">
+//             <CardHeader className="p-4">
+//               <CardTitle className="text-lg font-semibold text-[#1F2A44]">Leaderboard</CardTitle>
+//             </CardHeader>
+//             <CardContent className="p-4">
+//               {leaderboardData.length > 0 ? (
+//                 leaderboardData.map((leader, index) => (
+//                   <div
+//                     key={leader.id}
+//                     className="flex items-center justify-between py-2 border-b border-[#E5E7EB] last:border-b-0"
+//                   >
+//                     <div className="flex items-center space-x-2">
+//                       <span className="w-6 h-6 rounded-full bg-[#34C759] flex items-center justify-center text-white text-xs">
+//                         {index + 1}
+//                       </span>
+//                       <span className="text-sm text-[#1F2A44]">{leader.name}</span>
+//                     </div>
+//                     <span className="text-sm text-[#6B7280]">{leader.points} pts</span>
+//                   </div>
+//                 ))
+//               ) : (
+//                 <p className="text-sm text-[#6B7280]">No leaderboard data available.</p>
+//               )}
+//             </CardContent>
+//           </Card>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -3753,7 +4311,7 @@ export default function ProgressPage() {
     };
 
     fetchData();
-  }, [user?.id]); // Removed 'purchases' from dependency array to prevent refresh loop
+  }, [user?.id]);
 
   if (loading) return <div className="flex justify-center items-center h-screen text-gray-600">Loading...</div>;
 
@@ -3950,7 +4508,6 @@ export default function ProgressPage() {
                     purchases.map((purchase, index) => {
                       const courseProgress = userProgress.filter((p) => p.courseId === purchase.courseId);
                       const completedChapters = courseProgress.filter((p) => p.isCompleted).length;
-                      // Note: totalChaptersForCourse should ideally be fetched per course; here it's approximated
                       const totalChaptersForCourse = progressData?.totalChapters || 0;
                       const progressPercentage =
                         totalChaptersForCourse > 0

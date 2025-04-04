@@ -494,6 +494,163 @@
 
 
 
+// import { auth } from "@clerk/nextjs/server";
+// import { redirect } from "next/navigation";
+// import { File } from "lucide-react";
+// import axios from "axios";
+
+// import { getChapter } from "@/actions/get-chapter";
+// import { Banner } from "@/components/banner";
+// import { Separator } from "@/components/ui/separator";
+// import { Preview } from "@/components/preview";
+
+// import { VideoPlayer } from "./_components/video-player";
+// import { CourseEnrollButton } from "./_components/course-enroll-button";
+// import { CourseProgressButton } from "./_components/course-progress-button";
+
+// const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
+// const ChapterIdPage = async ({
+//   params,
+// }: {
+//   params: { courseId: string; chapterId: string };
+// }) => {
+//   const { userId, getToken } = auth();
+
+//   // Redirect if user is not authenticated
+//   if (!userId) {
+//     return redirect("/");
+//   }
+
+//   // Fetch chapter data
+//   const {
+//     chapter,
+//     course,
+//     muxData,
+//     attachments,
+//     nextChapter,
+//     userProgress,
+//     purchase,
+//   } = await getChapter({
+//     userId,
+//     chapterId: params.chapterId,
+//     courseId: params.courseId,
+//   });
+
+//   // Redirect if chapter or course is not found
+//   if (!chapter || !course) {
+//     return redirect("/");
+//   }
+
+//   const isLocked = !chapter.isFree && !purchase;
+//   const completeOnEnd = !!purchase && !userProgress?.isCompleted;
+
+//   // Fetch quiz pass status for the current chapter
+//   const token = await getToken();
+//   let isQuizPassed = false;
+//   try {
+//     const resultsResponse = await axios.get(
+//       `${BASE_URL}/api/courses/${params.courseId}/chapters/${params.chapterId}/chapterquizzes/results`,
+//       {
+//         headers: {
+//           "user-id": userId,
+//           Authorization: token ? `Bearer ${token}` : undefined,
+//         },
+//       }
+//     );
+//     const { score, totalQuestions } = resultsResponse.data;
+//     const scorePercentage = (score / totalQuestions) * 100;
+//     isQuizPassed = scorePercentage >= 60; // Pass threshold matches CourseSidebar
+//   } catch (error: any) {
+//     if (error.response?.status === 404) {
+//       // 404 means no quiz results exist (quiz not taken), treat as not passed
+//       isQuizPassed = false; // No need to log this as an error
+//     } else {
+//       // Log unexpected errors (e.g., 500, network issues)
+//       console.error(`Failed to fetch quiz results for chapter ${params.chapterId}:`, error);
+//       isQuizPassed = false;
+//     }
+//   }
+
+//   // Define serviceType based on your business logic or configuration
+//   const serviceType = 3854; // Example: Assuming this is the correct service type for this course
+
+//   return (
+//     <div>
+//       {userProgress?.isCompleted && (
+//         <Banner variant="success" label="You already completed this chapter." />
+//       )}
+//       {isLocked && (
+//         <Banner
+//           variant="warning"
+//           label="You need to purchase this course to watch this chapter."
+//         />
+//       )}
+//       <div
+//         className="flex flex-col max-w-4xl mx-auto pb-20"
+//         style={{ paddingTop: "20px" }}
+//       >
+//         <div className="p-2">
+//           <VideoPlayer
+//             chapterId={params.chapterId}
+//             title={chapter.title}
+//             courseId={params.courseId}
+//             nextChapterId={nextChapter?.id}
+//             playbackId={muxData?.playbackId!}
+//             isLocked={isLocked}
+//             completeOnEnd={completeOnEnd}
+//           />
+//         </div>
+//         <div>
+//           <div className="px-6 py-2 flex flex-col md:flex-row items-center justify-end bg-white dark:bg-gray-800 rounded-lg shadow-md">
+//             {purchase ? (
+//               <CourseProgressButton
+//                 chapterId={params.chapterId}
+//                 courseId={params.courseId}
+//                 nextChapterId={nextChapter?.id}
+//                 isCompleted={!!userProgress?.isCompleted}
+//                 isQuizPassed={isQuizPassed} // Pass quiz status to CourseProgressButton
+//               />
+//             ) : (
+//               <CourseEnrollButton
+//                 courseId={params.courseId}
+//                 price={course.price!}
+//                 serviceType={serviceType} // Pass serviceType to CourseEnrollButton
+//               />
+//             )}
+//           </div>
+//           <Separator />
+//           {!!attachments.length && (
+//             <>
+//               <Separator />
+//               <div className="p-4">
+//               </div>
+//             </>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default ChapterIdPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { File } from "lucide-react";
@@ -554,7 +711,7 @@ const ChapterIdPage = async ({
       {
         headers: {
           "user-id": userId,
-          Authorization: token ? `Bearer ${token}` : undefined,
+          Authorization: token ? `Bearer ${token}` : "",
         },
       }
     );
@@ -614,6 +771,7 @@ const ChapterIdPage = async ({
             ) : (
               <CourseEnrollButton
                 courseId={params.courseId}
+                chapterId={params.chapterId} // Pass chapterId to CourseEnrollButton
                 price={course.price!}
                 serviceType={serviceType} // Pass serviceType to CourseEnrollButton
               />
