@@ -1,3 +1,5 @@
+"use client"; // Add this directive to mark the component as a Client Component
+
 import { useSearchParams } from 'next/navigation';
 
 const PaymentResult = () => {
