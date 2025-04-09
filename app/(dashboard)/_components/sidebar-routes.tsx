@@ -161,7 +161,7 @@
 
 "use client";
 
-import { Layout, Compass, List, BarChart, Users, CircleHelp, MessageCircle, Trophy, Video, User,FileText, TrendingUp } from "lucide-react";
+import { Layout, Compass, List, BarChart, Users, CircleHelp, MessageCircle, Trophy, Video, User,FileText, TrendingUp, Brain  } from "lucide-react";
 import SidebarItem from "./sidebar-item";
 import { usePathname } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
@@ -184,6 +184,7 @@ const studentRoutes = [
   { icon: FileText, label: "Recordings", href: "/recordings" }, // New Recordings route
   { icon: FileText, label: "Attachments", href: "/attachments" }, // New Attachments route
   { icon: TrendingUp, label: "Progress Tracker", href: "/progress" }, // New Progress Tracker item
+  { icon: Brain , label: "ChatBot AI", href: "/chatbot" },
   { icon: User, label: "User Profile", href: "/profile" },
 ];
 

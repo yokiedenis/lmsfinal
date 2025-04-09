@@ -484,7 +484,7 @@ export async function GET(req: Request) {
           dpoToken: token,
         },
         data: {
-          status: 'SUCCESS',
+          status: 'COMPLETED',
         },
       });
 

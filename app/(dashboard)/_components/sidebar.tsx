@@ -28,7 +28,7 @@ interface SidebarProps {
 
 export const Sidebar = ({ courseId }: SidebarProps) => {
   return (
-    <div className="h-full border-r flex flex-col overflow-y-auto bg-[#3b2f85] shadow-sm">
+    <div className="h-full border-r flex flex-col overflow-y-auto bg-gradient-to-r from-indigo-600 to-purple-600 shadow-xl">
       <div className="p-6 bg-white">
         <div className="">
           <Logo />

@@ -321,6 +321,182 @@
 
 
 // app/api/leaderboard/route.ts
+// import { NextResponse } from 'next/server';
+// import { PrismaClient } from '@prisma/client';
+
+// const prisma = new PrismaClient();
+
+// export async function GET() {
+//   try {
+//     // Fetch all users with relevant fields
+//     const users = await prisma.user.findMany({
+//       select: {
+//         id: true,
+//         name: true,
+//         points: true,
+//         level: true,
+//         purchases: {
+//           select: {
+//             course: {
+//               select: {
+//                 id: true,
+//                 title: true,
+//               },
+//             },
+//           },
+//         },
+//       },
+//       orderBy: {
+//         points: 'desc',
+//       },
+//     });
+
+//     console.log('Fetched users:', users); // Debugging log
+
+//     if (!users || users.length === 0) {
+//       return NextResponse.json(
+//         { message: 'No users found in the database' },
+//         { status: 404 }
+//       );
+//     }
+
+//     // Transform the data
+//     const leaderboardData = users.map((user) => ({
+//       id: user.id,
+//       name: user.name || 'Anonymous', // Fallback if name is null
+//       points: user.points ?? 0, // Fallback if points is null
+//       level: user.level ?? 1, // Fallback if level is null
+//       enrolledCourses: user.purchases.length,
+//       courseTitles: user.purchases.map((p) => p.course.title),
+//     }));
+
+//     return NextResponse.json(leaderboardData, { status: 200 });
+//   } catch (error: unknown) {
+//     // Type the error as unknown and narrow it
+//     console.error('Error fetching leaderboard:', error);
+
+//     // Safely handle the error message
+//     let errorMessage = 'Unknown error occurred';
+//     if (error instanceof Error) {
+//       errorMessage = error.message;
+//     }
+
+//     return NextResponse.json(
+//       { message: 'Internal server error', error: errorMessage },
+//       { status: 500 }
+//     );
+//   } finally {
+//     await prisma.$disconnect();
+//   }
+// }
+
+
+
+
+
+
+
+// import { NextResponse } from 'next/server';
+// import { PrismaClient } from '@prisma/client';
+
+// const prisma = new PrismaClient();
+
+// export async function GET() {
+//   try {
+//     // Fetch all users with relevant fields
+//     const users = await prisma.user.findMany({
+//       select: {
+//         id: true,
+//         name: true,
+//         points: true,
+//         level: true,
+//         purchases: {
+//           select: {
+//             course: {
+//               select: {
+//                 id: true,
+//                 title: true,
+//               },
+//             },
+//           },
+//         },
+//       },
+//       orderBy: {
+//         points: 'desc',
+//       },
+//     });
+
+//     console.log('Fetched users:', users); // Debugging log
+
+//     if (!users || users.length === 0) {
+//       return NextResponse.json(
+//         { message: 'No users found in the database' },
+//         { status: 404 }
+//       );
+//     }
+
+//     // For each user, fetch scores from ChapterQuizAttempt, QuizAttempt, and QuizResult
+//     const leaderboardData = await Promise.all(
+//       users.map(async (user) => {
+//         const chapterQuizAttempts = await prisma.chapterQuizAttempt.findMany({
+//           where: { studentId: user.id },
+//           select: { score: true },
+//         });
+
+//         const quizAttempts = await prisma.quizAttempt.findMany({
+//           where: { studentId: user.id },
+//           select: { score: true },
+//         });
+
+//         const quizResults = await prisma.quizResult.findMany({
+//           where: { studentId: user.id },
+//           select: { score: true },
+//         });
+
+//         // Sum up all scores
+//         const totalChapterQuizScore = chapterQuizAttempts.reduce((acc, cur) => acc + cur.score, 0);
+//         const totalQuizAttemptScore = quizAttempts.reduce((acc, cur) => acc + cur.score, 0);
+//         const totalQuizResultScore = quizResults.reduce((acc, cur) => acc + cur.score, 0);
+
+//         const totalScore =
+//           (user.points ?? 0) + totalChapterQuizScore + totalQuizAttemptScore + totalQuizResultScore;
+
+//         return {
+//           id: user.id,
+//           name: user.name || 'Anonymous',
+//           points: user.points ?? 0,
+//           level: user.level ?? 1,
+//           enrolledCourses: user.purchases.length,
+//           courseTitles: user.purchases.map((p) => p.course.title),
+//           totalScore, // Add total score to leaderboard
+//         };
+//       })
+//     );
+
+//     return NextResponse.json(leaderboardData, { status: 200 });
+//   } catch (error: unknown) {
+//     console.error('Error fetching leaderboard:', error);
+
+//     let errorMessage = 'Unknown error occurred';
+//     if (error instanceof Error) {
+//       errorMessage = error.message;
+//     }
+
+//     return NextResponse.json(
+//       { message: 'Internal server error', error: errorMessage },
+//       { status: 500 }
+//     );
+//   } finally {
+//     await prisma.$disconnect();
+//   }
+// }
+
+
+
+
+
+
+
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
@@ -328,12 +504,14 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
+    console.log('Starting leaderboard fetch');
+    
     // Fetch all users with relevant fields
     const users = await prisma.user.findMany({
       select: {
         id: true,
         name: true,
-        points: true,
+        points: true, // Keep this for reference, but we'll override with totalScore
         level: true,
         purchases: {
           select: {
@@ -347,11 +525,11 @@ export async function GET() {
         },
       },
       orderBy: {
-        points: 'desc',
+        points: 'desc', // Optional: you might want to order by totalScore later
       },
     });
 
-    console.log('Fetched users:', users); // Debugging log
+    console.log('Fetched raw users:', users);
 
     if (!users || users.length === 0) {
       return NextResponse.json(
@@ -360,29 +538,67 @@ export async function GET() {
       );
     }
 
-    // Transform the data
-    const leaderboardData = users.map((user) => ({
-      id: user.id,
-      name: user.name || 'Anonymous', // Fallback if name is null
-      points: user.points ?? 0, // Fallback if points is null
-      level: user.level ?? 1, // Fallback if level is null
-      enrolledCourses: user.purchases.length,
-      courseTitles: user.purchases.map((p) => p.course.title),
-    }));
+    // Calculate total scores for each user
+    const leaderboardData = await Promise.all(
+      users.map(async (user) => {
+        const chapterQuizAttempts = await prisma.chapterQuizAttempt.findMany({
+          where: { studentId: user.id },
+          select: { score: true },
+        });
 
+        const quizAttempts = await prisma.quizAttempt.findMany({
+          where: { studentId: user.id },
+          select: { score: true },
+        });
+
+        const quizResults = await prisma.quizResult.findMany({
+          where: { studentId: user.id },
+          select: { score: true },
+        });
+
+        // Sum up all scores
+        const totalChapterQuizScore = chapterQuizAttempts.reduce((acc, cur) => acc + (cur.score || 0), 0);
+        const totalQuizAttemptScore = quizAttempts.reduce((acc, cur) => acc + (cur.score || 0), 0);
+        const totalQuizResultScore = quizResults.reduce((acc, cur) => acc + (cur.score || 0), 0);
+
+        const totalScore = (user.points || 0) + totalChapterQuizScore + totalQuizAttemptScore + totalQuizResultScore;
+
+        console.log('Calculated scores for user', user.id, {
+          chapter: totalChapterQuizScore,
+          quiz: totalQuizAttemptScore,
+          result: totalQuizResultScore,
+          total: totalScore,
+        });
+
+        return {
+          id: user.id,
+          name: user.name || 'Anonymous',
+          totalScore: totalScore, // Use totalScore instead of points
+          level: user.level ?? 1,
+          enrolledCourses: user.purchases.length,
+          courseTitles: user.purchases.map((p) => p.course.title),
+        };
+      })
+    );
+
+    // Sort by totalScore for final ordering
+    leaderboardData.sort((a, b) => b.totalScore - a.totalScore);
+
+    console.log('Final leaderboard data:', leaderboardData);
     return NextResponse.json(leaderboardData, { status: 200 });
   } catch (error: unknown) {
-    // Type the error as unknown and narrow it
-    console.error('Error fetching leaderboard:', error);
+    console.error('Error fetching leaderboard:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
 
-    // Safely handle the error message
-    let errorMessage = 'Unknown error occurred';
+    let errorMessage = 'Internal server error';
     if (error instanceof Error) {
       errorMessage = error.message;
     }
 
     return NextResponse.json(
-      { message: 'Internal server error', error: errorMessage },
+      { message: errorMessage },
       { status: 500 }
     );
   } finally {
