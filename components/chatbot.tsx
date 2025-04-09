@@ -75,7 +75,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ apiKey, apiEndpoint }) => {
 
   return (
     <div className="bg-gray-900 rounded-xl shadow-lg p-6 max-w-4xl mx-auto border border-gray-800">
-      <h2 className="text-xl font-semibold text-white mb-4">AI Chatbot</h2>
+      
       <div className="h-96 overflow-y-auto bg-gray-800 rounded-lg p-4 mb-4 border border-gray-700 space-y-3 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-700">
         {messages.map((message) => (
           <div

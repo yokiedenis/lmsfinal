@@ -121,7 +121,7 @@ const SidebarItem = ({
         />
         <span
           className={cn(
-            isActive ? "text-white" : "text-[#fcb61a]",
+            isActive ?   "text-[#fcb61a]":"text-white",
             disabled && "opacity-50" // Apply opacity to text when disabled
           )}
         >
