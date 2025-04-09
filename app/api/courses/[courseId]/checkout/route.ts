@@ -4235,7 +4235,7 @@ export async function GET(req: Request) {
     // STEP 6: Update transaction to SUCCESS
     const transaction = await db.transaction.update({
       where: { dpoToken: token },
-      data: { status: 'SUCCESS' },
+      data: { status: 'COMPLETED' },
     });
 
     console.log('Transaction marked SUCCESS:', transaction);
