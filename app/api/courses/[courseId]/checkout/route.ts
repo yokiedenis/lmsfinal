@@ -3802,28 +3802,297 @@
 
 
 
-import { NextRequest, NextResponse } from 'next/server';
-import axios, { AxiosError } from 'axios'; // Import AxiosError
+// import { NextResponse } from 'next/server';
+// import axios from 'axios';
+// import { XMLParser } from 'fast-xml-parser';
+// import { currentUser } from "@clerk/nextjs/server";
+// import { db } from "@/lib/db";
+
+// const DPO_API_URL = 'https://secure.3gdirectpay.com/API/v6/';
+// const COMPANY_TOKEN = '8D3DA73D-9D7F-4E09-96D4-3D44E7A83EA3';
+// const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://eduskill-mu.vercel.app/';
+
+// const createToken = async (
+//   amount: number | null,
+//   serviceType: number,
+//   params: { courseId: string; chapterId: string }
+// ) => {
+//   if (amount == null) {
+//     throw new Error('Payment amount is not provided');
+//   }
+
+//   const formattedAmount = amount.toFixed(2);
+//   const serviceDate = new Date().toISOString().split('T')[0];
+//   const redirectUrl = `${baseURL}/api/payment-success?courseId=${params.courseId}&chapterId=${params.chapterId}`;
+
+//   const xmlPayload = `<?xml version="1.0" encoding="UTF-8"?>
+//     <API3G>
+//       <CompanyToken>${COMPANY_TOKEN}</CompanyToken>
+//       <Request>createToken</Request>
+//       <Transaction>
+//         <PaymentAmount>${formattedAmount}</PaymentAmount>
+//         <PaymentCurrency>USD</PaymentCurrency>
+//         <RedirectURL>${redirectUrl}</RedirectURL>
+//         <BackURL>${redirectUrl}</BackURL>
+//         <CompanyRefUnique>0</CompanyRefUnique>
+//       </Transaction>
+//       <Services>
+//         <Service>
+//           <ServiceType>${serviceType}</ServiceType>
+//           <ServiceDescription>Test Service</ServiceDescription>
+//           <ServiceDate>${serviceDate}</ServiceDate>
+//         </Service>
+//       </Services>
+//     </API3G>`;
+
+//   try {
+//     const response = await axios.post(DPO_API_URL, xmlPayload, {
+//       headers: {
+//         'Content-Type': 'application/xml',
+//       },
+//     });
+
+//     const parsedResponse = new XMLParser().parse(response.data);
+
+//     if (parsedResponse.API3G.Result === '000' || parsedResponse.API3G.ResultExplanation === "Transaction created") {
+//       return parsedResponse.API3G.TransToken;
+//     } else {
+//       throw new Error(`DPO API Error: ${parsedResponse.API3G.ResultExplanation}`);
+//     }
+//   } catch (error: unknown) {
+//     if (axios.isAxiosError(error)) {
+//       console.error('DPO API Error:', error.response?.data || error.message);
+//     } else {
+//       console.error('DPO API Error:', error);
+//     }
+//     throw new Error('Failed to create payment token');
+//   }
+// };
+
+// const verifyToken = async (token: string) => {
+//   const xmlPayload = `<?xml version="1.0" encoding="UTF-8"?>
+//     <API3G>
+//       <CompanyToken>${COMPANY_TOKEN}</CompanyToken>
+//       <Request>verifyToken</Request>
+//       <TransactionToken>${token}</TransactionToken>
+//     </API3G>`;
+
+//   try {
+//     const response = await axios.post(DPO_API_URL, xmlPayload, {
+//       headers: {
+//         'Content-Type': 'application/xml',
+//       },
+//     });
+
+//     const parsedResponse = new XMLParser().parse(response.data);
+
+//     if (parsedResponse.API3G.Result === '000') {
+//       return true;
+//     } else {
+//       throw new Error(`DPO API Error: ${parsedResponse.API3G.ResultExplanation}`);
+//     }
+//   } catch (error: unknown) {
+//     if (axios.isAxiosError(error)) {
+//       console.error('DPO API Error:', error.response?.data || error.message);
+//     } else {
+//       console.error('DPO API Error:', error);
+//     }
+//     throw new Error('Failed to verify payment token');
+//   }
+// };
+
+// export async function POST(req: Request, { params }: { params: { courseId: string; chapterId: string } }) {
+//   const { price, serviceType } = await req.json();
+
+//   try {
+//     if (price == null) {
+//       throw new Error('Price is not provided');
+//     }
+
+//     const amount = price;
+
+//     const token = await createTokenWithRetry(amount, serviceType, params, 3);
+
+//     const user = await currentUser();
+//     if (!user || !user.id) {
+//       return new NextResponse("Unauthorized", { status: 401 });
+//     }
+
+//     const course = await db.course.findUnique({
+//       where: {
+//         id: params.courseId,
+//         isPublished: true,
+//       },
+//     });
+
+//     if (!course) {
+//       return new NextResponse("Course not found", { status: 404 });
+//     }
+
+//     const existingPurchase = await db.purchase.findUnique({
+//       where: {
+//         userId_courseId: {
+//           userId: user.id,
+//           courseId: params.courseId,
+//         },
+//       },
+//     });
+
+//     if (existingPurchase) {
+//       return new NextResponse("Already Purchased", { status: 400 });
+//     }
+
+//     const transaction = await db.transaction.create({
+//       data: {
+//         userId: user.id,
+//         courseId: params.courseId,
+//         amount: amount,
+//         dpoToken: token,
+//         status: 'PENDING',
+//       },
+//     }).catch((error: unknown) => {
+//       console.error('Failed to create transaction:', error);
+//       throw error;
+//     });
+
+//     console.log('Transaction created:', transaction);
+
+//     return NextResponse.json({
+//       url: `https://secure.3gdirectpay.com/payv3.php?ID=${token}`,
+//     });
+//   } catch (error: unknown) {
+//     if (error instanceof Error) {
+//       console.error('Error in payment processing:', error);
+//       return NextResponse.json({ error: error.message }, { status: 500 });
+//     } else {
+//       console.error('Unexpected error:', error);
+//       return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
+//     }
+//   }
+// }
+
+// export async function GET(req: Request) {
+//   const url = new URL(req.url);
+//   const token = url.searchParams.get('token');
+//   const courseId = url.searchParams.get('courseId');
+//   const chapterId = url.searchParams.get('chapterId');
+
+//   if (!token || !courseId || !chapterId) {
+//     return new NextResponse("Missing parameters", { status: 400 });
+//   }
+
+//   try {
+//     const isVerified = await verifyToken(token);
+
+//     if (isVerified) {
+//       const transaction = await db.transaction.update({
+//         where: {
+//           dpoToken: token,
+//         },
+//         data: {
+//           status: 'SUCCESS',
+//         },
+//       });
+
+//       console.log('Transaction updated to SUCCESS:', transaction);
+
+//       const user = await currentUser();
+//       if (!user || !user.id) {
+//         return new NextResponse("Unauthorized", { status: 401 });
+//       }
+
+//       const existingPurchase = await db.purchase.findUnique({
+//         where: {
+//           userId_courseId: {
+//             userId: user.id,
+//             courseId: courseId,
+//           },
+//         },
+//       });
+
+//       if (existingPurchase) {
+//         return new NextResponse("Already Purchased", { status: 400 });
+//       }
+
+//       const purchase = await db.purchase.create({
+//         data: {
+//           userId: user.id,
+//           courseId: courseId,
+//           transactionId: transaction.id,
+//         },
+//       }).catch((error: unknown) => {
+//         console.error('Failed to create purchase:', error);
+//         throw error;
+//       });
+
+//       console.log('Purchase created:', purchase);
+
+//       // Update transaction status to COMPLETED
+//       await db.transaction.update({
+//         where: {
+//           id: transaction.id,
+//         },
+//         data: {
+//           status: 'COMPLETED',
+//         },
+//       });
+//       console.log('Transaction status updated to COMPLETED');
+
+//       return NextResponse.redirect(`${baseURL}/payment-success?courseId=${courseId}&chapterId=${chapterId}`);
+//     } else {
+//       return new NextResponse("Payment verification failed", { status: 400 });
+//     }
+//   } catch (error: unknown) {
+//     if (error instanceof Error) {
+//       console.error('Error in payment verification:', error);
+//       return NextResponse.json({ error: error.message }, { status: 500 });
+//     } else {
+//       console.error('Unexpected error:', error);
+//       return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
+//     }
+//   }
+// }
+
+// async function createTokenWithRetry(amount: number, serviceType: number, params: { courseId: string; chapterId: string }, retries: number): Promise<string> {
+//   for (let i = 0; i < retries; i++) {
+//     try {
+//       return await createToken(amount, serviceType, params);
+//     } catch (error: unknown) {
+//       if (i < retries - 1) {
+//         console.warn(`Attempt ${i + 1} failed. Retrying...`);
+//       } else {
+//         throw error;
+//       }
+//     }
+//   }
+//   throw new Error('Failed to create payment token after multiple attempts');
+// }
+
+
+
+
+
+
+
+
+import { NextResponse } from 'next/server';
+import axios from 'axios';
 import { XMLParser } from 'fast-xml-parser';
-import { db } from '@/lib/db';
-import { v4 as uuidv4 } from 'uuid';
+import { currentUser } from "@clerk/nextjs/server";
+import { db } from "@/lib/db";
 
 const DPO_API_URL = 'https://secure.3gdirectpay.com/API/v6/';
 const COMPANY_TOKEN = '8D3DA73D-9D7F-4E09-96D4-3D44E7A83EA3';
-const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://eduskill-mu.vercel.app';
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://eduskill-mu.vercel.app/';
 
 const createToken = async (
   amount: number,
   serviceType: number,
-  params: { courseId: string; chapterId: string },
-  retries: number = 3 // Number of retries
+  params: { courseId: string; chapterId: string }
 ) => {
   const formattedAmount = amount.toFixed(2);
   const serviceDate = new Date().toISOString().split('T')[0];
-  const redirectUrl = `${baseURL}/api/courses/${params.courseId}/checkout`;
-
-  // Set CompanyRefUnique to '1' or '0' based on your logic
-  const companyRefUnique = '1'; // Change this to '0' if needed
+  const redirectUrl = `${baseURL}/api/payment-success?courseId=${params.courseId}&chapterId=${params.chapterId}&token={{token}}`;
 
   const xmlPayload = `<?xml version="1.0" encoding="UTF-8"?>
     <API3G>
@@ -3834,46 +4103,27 @@ const createToken = async (
         <PaymentCurrency>USD</PaymentCurrency>
         <RedirectURL>${redirectUrl}</RedirectURL>
         <BackURL>${redirectUrl}</BackURL>
-        <CompanyRefUnique>${companyRefUnique}</CompanyRefUnique>
+        <CompanyRefUnique>0</CompanyRefUnique>
       </Transaction>
       <Services>
         <Service>
           <ServiceType>${serviceType}</ServiceType>
-          <ServiceDescription>Course Payment</ServiceDescription>
+          <ServiceDescription>Test Service</ServiceDescription>
           <ServiceDate>${serviceDate}</ServiceDate>
         </Service>
       </Services>
     </API3G>`;
 
-  try {
-    const response = await axios.post(DPO_API_URL, xmlPayload, {
-      headers: { 'Content-Type': 'application/xml' },
-    });
+  const response = await axios.post(DPO_API_URL, xmlPayload, {
+    headers: { 'Content-Type': 'application/xml' },
+  });
 
-    const parsed = new XMLParser().parse(response.data);
+  const parsedResponse = new XMLParser().parse(response.data);
 
-    // Check if the response indicates success (handle both string and number)
-    if (parsed.API3G?.Result === 0 || parsed.API3G?.Result === '000' || parsed.API3G?.Result === '0') {
-      return {
-        token: parsed.API3G.TransToken,
-        courseId: params.courseId,
-        chapterId: params.chapterId,
-      };
-    } else {
-      // Log the response for debugging
-      console.error('API Response:', parsed);
-      throw new Error(parsed.API3G?.ResultExplanation || 'DPO token creation failed');
-    }
-  } catch (error) {
-    const axiosError = error as AxiosError; // Type assertion
-    if (axiosError.response && axiosError.response.status === 429 && retries > 0) {
-      // Wait for a bit before retrying
-      const waitTime = Math.pow(2, 3 - retries) * 1000; // Exponential backoff
-      console.warn(`Rate limit hit, retrying in ${waitTime / 1000} seconds...`);
-      await new Promise(resolve => setTimeout(resolve, waitTime));
-      return createToken(amount, serviceType, params, retries - 1); // Retry
-    }
-    throw error; // Rethrow if not a 429 error or no retries left
+  if (parsedResponse.API3G.Result === '000' || parsedResponse.API3G.ResultExplanation === "Transaction created") {
+    return parsedResponse.API3G.TransToken;
+  } else {
+    throw new Error(`DPO API Error: ${parsedResponse.API3G.ResultExplanation}`);
   }
 };
 
@@ -3889,113 +4139,165 @@ const verifyToken = async (token: string) => {
     headers: { 'Content-Type': 'application/xml' },
   });
 
-  const parsed = new XMLParser().parse(response.data);
+  const parsedResponse = new XMLParser().parse(response.data);
 
-  if (parsed.API3G?.Result === '000' && parsed.API3G?.Status === 'CAPTURED') {
+  if (parsedResponse.API3G.Result === '000') {
     return true;
   } else {
-    throw new Error(parsed.API3G?.ResultExplanation || 'Payment not captured');
+    throw new Error(`DPO API Error: ${parsedResponse.API3G.ResultExplanation}`);
   }
 };
 
-export async function POST(req: Request, { params }: { params: { courseId: string } }) {
-  try {
-    const { price, serviceType, chapterId } = await req.json();
+// STEP 1: Handle POST (create payment + transaction)
+export async function POST(req: Request, { params }: { params: { courseId: string; chapterId: string } }) {
+  const { price, serviceType } = await req.json();
 
-    if (!price || !chapterId) {
-      return NextResponse.json({ error: 'Missing price or chapterId' }, { status: 400 });
+  try {
+    const user = await currentUser();
+    if (!user || !user.id) {
+      return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { token, courseId, chapterId: cid } = await createToken(price, serviceType, {
-      courseId: params.courseId,
-      chapterId,
+    if (price == null) {
+      throw new Error('Price is not provided');
+    }
+
+    const course = await db.course.findUnique({
+      where: { id: params.courseId, isPublished: true },
     });
 
-    const existing = await db.pendingTransaction.findFirst({
+    if (!course) {
+      return new NextResponse("Course not found", { status: 404 });
+    }
+
+    const existingPurchase = await db.purchase.findUnique({
       where: {
-        dpoToken: token,
-        courseId,
-        chapterId: cid,
+        userId_courseId: {
+          userId: user.id,
+          courseId: params.courseId,
+        },
       },
     });
 
-    if (existing) {
-      return NextResponse.json({
-        message: 'Transaction already exists',
-        url: `https://secure.3gdirectpay.com/payv3.php?ID=${token}`,
-      });
+    if (existingPurchase) {
+      return new NextResponse("Already Purchased", { status: 400 });
     }
 
-    await db.pendingTransaction.create({
+    // STEP 1.1: Create payment token (with retry)
+    const token = await createTokenWithRetry(price, serviceType, params, 3);
+
+    // STEP 2: Create transaction with PENDING status
+    const transaction = await db.transaction.create({
       data: {
-        dpoToken: token,
-        courseId,
-        chapterId: cid,
+        userId: user.id,
+        courseId: params.courseId,
         amount: price,
-        serviceType,
+        dpoToken: token,
         status: 'PENDING',
       },
     });
 
+    console.log('Transaction created:', transaction);
+
+    // STEP 3: Redirect to payment URL
     return NextResponse.json({
-      message: 'Transaction initiated',
       url: `https://secure.3gdirectpay.com/payv3.php?ID=${token}`,
     });
-  } catch (error) {
-    const axiosError = error as AxiosError; // Type assertion
-    console.error('POST Error (Payment Init):', axiosError);
-    return NextResponse.json(
-      { error: 'Failed to initiate payment', details: axiosError.message },
-      { status: 500 }
-    );
+  } catch (error: any) {
+    console.error('Error in POST /checkout:', error);
+    return NextResponse.json({ error: error.message || 'Payment error' }, { status: 500 });
   }
 }
 
-export async function GET(req: NextRequest, { params }: { params: { courseId: string } }) {
+// STEP 4+: Handle GET (verification after redirect)
+export async function GET(req: Request) {
   const url = new URL(req.url);
+  const token = url.searchParams.get('token');
+  const courseId = url.searchParams.get('courseId');
+  const chapterId = url.searchParams.get('chapterId');
 
-  const transId = url.searchParams.get('TransID');
-  const transactionToken = url.searchParams.get('TransactionToken');
-  const approval = url.searchParams.get('CCDapproval');
-
-  const isEmpty = (val: string | null) => !val || val.trim() === '';
-
-  if (isEmpty(transId) || isEmpty(transactionToken) || isEmpty(approval)) {
-    console.warn('Missing DPO redirect parameters:', {
-      transId,
-      transactionToken,
-      approval,
-    });
-    return NextResponse.json({ error: 'Missing parameters from DPO redirect' }, { status: 400 });
+  if (!token || !courseId || !chapterId) {
+    return new NextResponse("Missing parameters", { status: 400 });
   }
 
   try {
-    const isVerified = await verifyToken(transactionToken!);
-
-    if (isVerified) {
-      await db.pendingTransaction.updateMany({
-        where: { dpoToken: transactionToken! },
-        data: { status: 'COMPLETED', transId },
-      });
-
-      return NextResponse.redirect(`${baseURL}/courses/${params.courseId}?payment=success`);
-    } else {
-      await db.pendingTransaction.updateMany({
-        where: { dpoToken: transactionToken! },
-        data: { status: 'FAILED' },
-      });
-
-      return NextResponse.redirect(`${baseURL}/courses/${params.courseId}?payment=failed`);
+    const user = await currentUser();
+    if (!user || !user.id) {
+      return new NextResponse("Unauthorized", { status: 401 });
     }
-  } catch (error) {
-    const axiosError = error as AxiosError; // Type assertion
-    console.error('GET Error (DPO Verification):', axiosError);
 
-    await db.pendingTransaction.updateMany({
-      where: { dpoToken: transactionToken! },
-      data: { status: 'FAILED' },
+    // STEP 5: Verify payment
+    const isVerified = await verifyToken(token);
+    if (!isVerified) {
+      return new NextResponse("Payment verification failed", { status: 400 });
+    }
+
+    // STEP 6: Update transaction to SUCCESS
+    const transaction = await db.transaction.update({
+      where: { dpoToken: token },
+      data: { status: 'SUCCESS' },
     });
 
-    return NextResponse.redirect(`${baseURL}/courses/${params.courseId}?payment=failed`);
+    console.log('Transaction marked SUCCESS:', transaction);
+
+    // STEP 7: Check if already purchased
+    const existingPurchase = await db.purchase.findUnique({
+      where: {
+        userId_courseId: {
+          userId: user.id,
+          courseId,
+        },
+      },
+    });
+
+    if (existingPurchase) {
+      return new NextResponse("Already Purchased", { status: 400 });
+    }
+
+    // STEP 8: Create purchase record
+    const purchase = await db.purchase.create({
+      data: {
+        userId: user.id,
+        courseId,
+        transactionId: transaction.id,
+      },
+    });
+
+    console.log('Purchase created:', purchase);
+
+    // STEP 9: Update transaction to COMPLETED
+    await db.transaction.update({
+      where: { id: transaction.id },
+      data: { status: 'COMPLETED' },
+    });
+
+    console.log('Transaction marked COMPLETED');
+
+    // Final: Redirect to frontend
+    return NextResponse.redirect(`${baseURL}/payment-success?courseId=${courseId}&chapterId=${chapterId}`);
+  } catch (error: any) {
+    console.error('Error in GET /payment-success:', error);
+    return NextResponse.json({ error: error.message || 'Verification error' }, { status: 500 });
   }
+}
+
+// Retry logic (unchanged)
+async function createTokenWithRetry(
+  amount: number,
+  serviceType: number,
+  params: { courseId: string; chapterId: string },
+  retries: number
+): Promise<string> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await createToken(amount, serviceType, params);
+    } catch (error) {
+      if (i < retries - 1) {
+        console.warn(`Token attempt ${i + 1} failed. Retrying...`);
+      } else {
+        throw error;
+      }
+    }
+  }
+  throw new Error('Failed to create token after multiple attempts');
 }

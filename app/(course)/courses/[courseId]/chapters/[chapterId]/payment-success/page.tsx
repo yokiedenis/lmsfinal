@@ -10,10 +10,61 @@ import { motion } from "framer-motion"; // For animations
 export default function PaymentSuccessPage() {
   const searchParams = useSearchParams();
   const [isMounted, setIsMounted] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);  // State to track verification status
+  const [errorMessage, setErrorMessage] = useState(""); // To show errors if any
 
   const courseId = searchParams.get("courseId");
   const chapterId = searchParams.get("chapterId");
   const token = searchParams.get("token");
+
+
+  const handleContinue = async () => {
+    try {
+      const res = await fetch('/api/payment/confirm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token, courseId }),
+      });
+  
+      const data = await res.json();
+  
+      if (data.success) {
+        // Redirect after confirming
+        window.location.href = `/course/${courseId}/chapters/${chapterId}`;
+      } else {
+        alert("Something went wrong confirming your transaction.");
+      }
+    } catch (err) {
+      alert("An error occurred. Please try again.");
+    }
+  };
+  
+
+  useEffect(() => {
+    setIsMounted(true);
+
+    if (token && courseId && chapterId) {
+      // Call the API to verify the token and update the database
+      const verifyPayment = async () => {
+        try {
+          const response = await fetch(`/api/payment/success?token=${token}&courseId=${courseId}&chapterId=${chapterId}`);
+          const data = await response.json();
+
+          if (data.success) {
+            setIsVerified(true);  // Payment verified successfully
+          } else {
+            setErrorMessage("Payment verification failed. Please try again.");
+          }
+        } catch (error) {
+          setErrorMessage("An error occurred while verifying the payment.");
+        }
+      };
+
+      verifyPayment();
+    }
+  }, [token, courseId, chapterId]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -44,30 +95,33 @@ export default function PaymentSuccessPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6 space-y-4">
-            <div className="space-y-2">
-              <p className="text-sm text-gray-600">Transaction ID:</p>
-              <p className="text-lg font-semibold text-gray-800">{token}</p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-sm text-gray-600">Course ID:</p>
-              <p className="text-lg font-semibold text-gray-800">{courseId}</p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-sm text-gray-600">Chapter ID:</p>
-              <p className="text-lg font-semibold text-gray-800">{chapterId}</p>
-            </div>
+            {isVerified ? (
+              <>
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600">Transaction ID:</p>
+                  <p className="text-lg font-semibold text-gray-800">{token}</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600">Course ID:</p>
+                  <p className="text-lg font-semibold text-gray-800">{courseId}</p>
+                </div>
+              </>
+            ) : (
+              <p className="text-red-600">{errorMessage}</p>
+            )}
           </CardContent>
           <CardFooter className="p-6 pt-0">
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Button
-                onClick={() => window.location.href = `/course/${courseId}/chapters/${chapterId}`}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-6 rounded-lg font-semibold shadow-md hover:from-blue-700 hover:to-indigo-700 transition-all duration-300"
-              >
-                Continue to Course
-              </Button>
+                <Button
+                  onClick={handleContinue}
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-6 rounded-lg font-semibold shadow-md hover:from-blue-700 hover:to-indigo-700 transition-all duration-300"
+                    >
+                    Continue to Course
+                  </Button>
+
             </motion.div>
           </CardFooter>
         </Card>
