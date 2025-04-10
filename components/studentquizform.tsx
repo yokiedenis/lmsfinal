@@ -455,6 +455,11 @@ export const StudentQuizForm = ({ quizId, courseId, chapterId }: StudentQuizForm
     return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   };
 
+  // Default values for certificate props (you can fetch these dynamically)
+  const userName = "Student Name"; // Replace with actual user name from auth or API
+  const courseName = "Finale Course"; // Replace with actual course name
+  const completionDate = currentDateTime ? formatDateTime(currentDateTime) : "N/A"; // Use current date
+
   return (
     <div className="flex h-screen">
       {/* Main Quiz Area */}
@@ -578,6 +583,9 @@ export const StudentQuizForm = ({ quizId, courseId, chapterId }: StudentQuizForm
             passingPercentage={60}
             showRevisitMessage={showRevisitMessage}
             onClose={() => setIsResultPopupVisible(false)}
+            userName={userName} // Added new prop
+            courseName={courseName} // Added new prop
+            completionDate={completionDate} // Added new prop
           />
         )}
       </div>
