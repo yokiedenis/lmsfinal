@@ -179,7 +179,7 @@ const studentRoutes = [
   { icon: Compass, label: "Browse", href: "/search" },
   { icon: CircleHelp, label: "Student Helper", href: "/help" },
   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
-  { icon: Video, label: "Class Live Stream", href: "/livestream" }, // Base path, will be dynamic
+ // { icon: Video, label: "Class Live Stream", href: "/livestream" }, // Base path, will be dynamic
  // { icon: FileText, label: "Recordings & Materials", href: "/CourseMaterials" },
   { icon: FileText, label: "Recordings", href: "/recordings" }, // New Recordings route
   { icon: FileText, label: "Attachments", href: "/attachments" }, // New Attachments route
@@ -193,7 +193,8 @@ const teacherRoutes = [
   { icon: MessageCircle, label: "Student Feedback", href: "/teacher/feedback" },
   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
   { icon: FileText, label: "Recordings & Materials", href: "/CourseMaterials" },
-  { icon: Video, label: "Class Live Stream", href: "/livestream" }, // Base path, will be dynamic
+  { icon: Brain , label: "ChatBot AI", href: "/chatbot" },
+  //{ icon: Video, label: "Class Live Stream", href: "/livestream" }, // Base path, will be dynamic
 ];
 
 const superAdminRoutes = [

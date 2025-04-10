@@ -622,8 +622,8 @@ export default function ProgressPage() {
   const achievements = ["Top Learner", "Course Master"];
 
   const upcomingClasses = [
-    { title: "Data Analytics - Class 5", subject: "Python", date: "15th June, 2025", time: "12:00PM", timeLeft: "4 hr left", instructor: "Mr Anirud" },
-    { title: "Machine Learning And AI", subject: "AI ", date: "16th June, 2025", time: "12:00PM", timeLeft: "4 hr left", instructor: "Mr Ambrose" },
+    { title: "No Upcoming Live Classes yet", subject: "Coming Soon...", date: " ", time: " ", timeLeft: " ", instructor: " " },
+    { title: "No Upcoming Live Classes yet", subject: "Coming Soon...", date: " ", time: " ", timeLeft: " ", instructor: " " },
   ];
 
   return (
