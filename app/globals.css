@@ -944,6 +944,97 @@ table.dataTable tbody tr:hover {
   
   
   
+
+  /* Add these styles to your global.css or create Certificate.module.css */
+
+/* Certificate Styles */
+.certificate-container {
+  font-family: 'Times New Roman', serif;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 20px;
+}
+
+.certificate-border {
+  border: 15px solid #1a5276;
+  padding: 40px;
+  text-align: center;
+  position: relative;
+  background-color: #f9f9f9;
+}
+
+.certificate-header {
+  margin-bottom: 30px;
+}
+
+.certificate-header h1 {
+  font-size: 48px;
+  color: #1a5276;
+  margin: 0;
+  font-weight: bold;
+}
+
+.certificate-header h2 {
+  font-size: 24px;
+  color: #1a5276;
+  margin: 5px 0 0 0;
+  font-weight: normal;
+}
+
+.certificate-body {
+  margin: 40px 0;
+}
+
+.presented-to, .has-completed {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.recipient-name {
+  font-size: 32px;
+  margin: 20px 0;
+  color: #1a5276;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.course-name {
+  font-size: 24px;
+  margin: 20px 0;
+  color: #1a5276;
+  font-style: italic;
+}
+
+.score {
+  font-size: 18px;
+  margin: 10px 0;
+  color: #1a5276;
+  font-weight: bold;
+}
+
+.signature-section, .issuer-section {
+  margin: 40px auto;
+  width: 60%;
+}
+
+.signature-line {
+  border-top: 1px solid #000;
+  margin: 10px 0;
+  height: 1px;
+}
+
+.date, .issuer-name {
+  margin: 5px 0;
+  font-size: 16px;
+}
+
+.certificate-footer {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+
   
 
 
