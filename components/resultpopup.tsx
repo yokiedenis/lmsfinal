@@ -1161,6 +1161,171 @@
 
 
 
+// "use client";
+
+// import React from 'react';
+// import { useRouter } from 'next/navigation';
+
+// interface ResultPopupProps {
+//   score: number;
+//   totalQuestions: number;
+//   passingPercentage: number;
+//   onClose: () => void;
+//   onReattempt?: () => void;
+//   onProceed?: () => void;
+//   showRevisitMessage?: boolean;
+//   userName: string;
+//   courseName: string;
+//   completionDate: string;
+//   courseId?: string;
+// }
+
+// const ResultPopup: React.FC<ResultPopupProps> = ({
+//   score,
+//   totalQuestions,
+//   passingPercentage,
+//   onClose,
+//   onReattempt = () => {},
+//   onProceed = () => {},
+//   showRevisitMessage,
+//   userName,
+//   courseName,
+//   completionDate,
+//   courseId,
+// }) => {
+//   const percentage = totalQuestions > 0 ? ((score / totalQuestions) * 100).toFixed(2) : '0';
+//   const passed = parseFloat(percentage) >= passingPercentage;
+//   const shouldShowRevisit = showRevisitMessage !== undefined ? showRevisitMessage : !passed;
+
+//   const router = useRouter();
+
+//   const handleViewCertificate = () => {
+//     if (passed) {
+//       console.log('Navigating to certificate with courseName:', courseName, 'courseId:', courseId);
+//       const queryParams = new URLSearchParams();
+//       if (courseId) queryParams.set('courseId', courseId);
+//       queryParams.set('courseTitle', encodeURIComponent(courseName));
+//       router.push(`/Graduation?${queryParams.toString()}`);
+//     } else {
+//       handleUnlockRequest();
+//     }
+//   };
+
+//   const handleDownloadCertificate = () => {
+//     console.log('Downloading certificate as PNG and PDF for', userName);
+//   };
+
+//   const handleUnlockRequest = () => {
+//     alert('Please complete the quiz with a passing score to unlock your certificate');
+//   };
+
+//   return (
+//     <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-70 backdrop-blur-sm">
+//       <div
+//         className={`relative rounded-xl shadow-2xl p-8 transform transition-all duration-700 ease-in-out ${
+//           passed ? 'bg-gradient-to-br from-green-50 via-white to-green-100 scale-105' : 'bg-white scale-100'
+//         } max-w-md w-full`}
+//       >
+//         {passed && (
+//           <>
+//             <div className="absolute -top-4 -left-4 w-12 h-12 bg-green-400 rounded-full opacity-50 animate-pulse"></div>
+//             <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-green-400 rounded-full opacity-50 animate-pulse delay-200"></div>
+//             <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+//               <span className="text-4xl animate-bounce">🎉</span>
+//             </div>
+//           </>
+//         )}
+
+//         <h3
+//           className={`text-2xl font-bold text-center mb-4 ${
+//             passed ? 'text-green-700' : 'text-gray-800'
+//           }`}
+//         >
+//           {passed ? 'Congratulations!' : 'Quiz Results'}
+//         </h3>
+
+//         <div className="text-center">
+//           <p className="text-lg font-medium text-gray-700">
+//             You scored{' '}
+//             <span className={`font-bold ${passed ? 'text-green-600' : 'text-orange-600'}`}>
+//               {score}
+//             </span>{' '}
+//             out of{' '}
+//             <span className="font-bold text-gray-800">{totalQuestions}</span>
+//           </p>
+//           <p className="text-3xl font-extrabold mt-2">
+//             <span className={passed ? 'text-green-600' : 'text-orange-600'}>{percentage}%</span>
+//           </p>
+//           <div className="mt-4 h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+//             <div
+//               className={`h-full transition-all duration-1000 ease-out ${
+//                 passed ? 'bg-green-500' : 'bg-orange-500'
+//               }`}
+//               style={{ width: `${percentage}%` }}
+//             ></div>
+//           </div>
+//         </div>
+
+//         {passed && (
+//           <p className="mt-4 text-sm text-center text-green-800 bg-green-100 p-3 rounded-lg shadow-inner">
+//             🎓 <strong>Great job!</strong> Please wait for your certificate within the next 24 hours. We will send it to your email!
+//           </p>
+//         )}
+//         {shouldShowRevisit && (
+//           <p className="mt-4 text-sm text-center text-yellow-700 bg-yellow-100 p-3 rounded-lg shadow-inner">
+//             📚 <strong>Need Improvement?</strong> You may revisit the material to boost your score.
+//           </p>
+//         )}
+
+//         <div className="mt-6 flex justify-center space-x-4">
+//           {!passed && (
+//             <button
+//               onClick={onReattempt}
+//               className="px-6 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+//             >
+//               Reattempt
+//             </button>
+//           )}
+//           {passed && (
+//             <>
+//               <button
+//                 onClick={onProceed}
+//                 className="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+//               >
+//                 Proceed
+//               </button>
+//               <button
+//                 onClick={handleViewCertificate}
+//                 className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+//               >
+//                 View Certificate
+//               </button>
+//               <button
+//                 onClick={handleDownloadCertificate}
+//                 className="px-6 py-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+//               >
+//                 Download Certificate
+//               </button>
+//             </>
+//           )}
+//           <button
+//             onClick={onClose}
+//             className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+//           >
+//             Close
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default ResultPopup;
+
+
+
+
+
 "use client";
 
 import React from 'react';
@@ -1176,7 +1341,7 @@ interface ResultPopupProps {
   showRevisitMessage?: boolean;
   userName: string;
   courseName: string;
-  completionDate: string;
+  completionDate: string; // Ensure this is a string
   courseId?: string;
 }
 

@@ -232,6 +232,17 @@ interface ChapterQuizFormProps {
   chapterId: string;
 }
 
+interface ResultPopupProps {
+  userName: string;
+  courseName: string;
+  score: number;
+  totalQuestions: number;
+  passingPercentage: number;
+  completionDate: string; // Changed from Date to string
+  showRevisitMessage: boolean;
+  onClose: () => void;
+}
+
 export const ChapterQuizForm = ({ quizId, courseId, chapterId }: ChapterQuizFormProps) => {
   const [quiz, setQuiz] = useState<QuizQuestion[]>([]);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
@@ -242,29 +253,44 @@ export const ChapterQuizForm = ({ quizId, courseId, chapterId }: ChapterQuizForm
   const [showFireworks, setShowFireworks] = useState(false);
   const [showRevisitMessage, setShowRevisitMessage] = useState(false);
   const [showCongratsBanner, setShowCongratsBanner] = useState(false);
+  const [courseName, setCourseName] = useState<string>(""); // New state for course name
+  const [userName, setUserName] = useState<string>(""); // New state for user name
+  const [completionDate, setCompletionDate] = useState<string>(new Date().toISOString()); // Changed to string
 
   const { userId } = useAuth();
 
   useEffect(() => {
-    const fetchQuiz = async () => {
+    const fetchQuizAndDetails = async () => {
       setIsLoading(true);
       try {
+        // Fetch quiz questions
         const response = await axios.get(`/api/courses/${courseId}/quizzes/${quizId}/chapterquiz`);
         if (response.data && response.data.questions) {
           setQuiz(response.data.questions);
         } else {
           toast.error("No questions found for this quiz.");
         }
+
+        // Fetch course name (assuming this endpoint exists)
+        const courseResponse = await axios.get(`/api/courses/${courseId}`);
+        setCourseName(courseResponse.data.name || "Unknown Course");
+
+        // Fetch user name (assuming this is available via Clerk or another API)
+        if (userId) {
+          const userResponse = await axios.get(`/api/users/${userId}`);
+          setUserName(userResponse.data.name || "User");
+        }
+
       } catch (error) {
-        toast.error("Failed to load quiz.");
-        console.error("Error fetching quiz:", error);
+        toast.error("Failed to load quiz or details.");
+        console.error("Error fetching quiz or details:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchQuiz();
-  }, [quizId, courseId]);
+    fetchQuizAndDetails();
+  }, [quizId, courseId, userId]);
 
   const fetchResults = async () => {
     try {
@@ -299,6 +325,10 @@ export const ChapterQuizForm = ({ quizId, courseId, chapterId }: ChapterQuizForm
 
         setTimeout(() => setShowFireworks(false), 120000);
       }
+
+      // Update completion date as string
+      setCompletionDate(new Date().toISOString());
+
     } catch (error) {
       toast.error("Failed to fetch results.");
       console.error("Error fetching results:", error);
@@ -354,11 +384,14 @@ export const ChapterQuizForm = ({ quizId, courseId, chapterId }: ChapterQuizForm
     <div className="p-6">
       {showCongratsBanner && <Banner variant="success" label="Congratulations! You passed the quiz." />}
       {showFireworks && <Confetti />}
-      {isResultPopupVisible && result && (
+      {isResultPopupVisible && result && userName && courseName && (
         <ResultPopup
+          userName={userName}
+          courseName={courseName}
           score={result.score}
           totalQuestions={result.totalQuestions}
-          passingPercentage={60} // Added passingPercentage prop
+          passingPercentage={60}
+          completionDate={completionDate} // Now a string
           showRevisitMessage={showRevisitMessage}
           onClose={() => setIsResultPopupVisible(false)}
         />
