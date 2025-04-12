@@ -1177,7 +1177,7 @@ interface ResultPopupProps {
   userName: string;
   courseName: string;
   completionDate: string;
-  courseId?: string; // Optional courseId prop
+  courseId?: string;
 }
 
 const ResultPopup: React.FC<ResultPopupProps> = ({

@@ -665,8 +665,7 @@ import { useReactToPrint } from 'react-to-print';
 import { useUser } from '@clerk/clerk-react';
 import { useSearchParams } from 'next/navigation';
 import styles from '@/styles/Certificate.module.css';
-import { getCourses } from '@/actions/get-courses'; // Import getCourses
-import { CourseWithProgressWithCategory } from '@/types';
+import { getCourses } from '@/actions/get-courses';
 
 interface CertificateProps {
   courseTitle: string;
@@ -738,7 +737,6 @@ const Certificate: React.FC<CertificateProps> = ({
         )}
         
         <div className={styles.certificateBorder}>
-          {/* Logo and Seal aligned horizontally and centered */}
           <div className={styles.headerAlignment}>
             <img 
               src="/logon.png" 
@@ -813,7 +811,6 @@ const Certificate: React.FC<CertificateProps> = ({
           </div>
 
           <div className={styles.verification}>
-            {/* <QRCode value={qrData} size={100} className={styles.qrCode} /> */}
             <p>Scan to verify authenticity</p>
           </div>
         </div>
@@ -822,7 +819,6 @@ const Certificate: React.FC<CertificateProps> = ({
   );
 };
 
-// Wrapper to handle routing and fetch courseTitle
 const GraduationPage: React.FC = () => {
   const searchParams = useSearchParams();
   const { user } = useUser();
@@ -843,34 +839,37 @@ const GraduationPage: React.FC = () => {
 
         if (!user?.id) {
           console.warn('No user ID available, using default course title.');
+          setCourseTitle('Default Course Title');
           setIsLoading(false);
           return;
         }
 
-        // Fetch courses for the user
         const courses = await getCourses({ userId: user.id });
 
         console.log('Fetched courses:', courses);
 
         if (courseId) {
-          // Find course by ID
           const course = courses.find((c) => c.id === courseId);
           if (course) {
             setCourseTitle(course.title);
             console.log('Set courseTitle from courseId:', course.title);
           } else {
             console.warn('Course not found for courseId:', courseId);
+            if (courseTitleParam) {
+              setCourseTitle(decodeURIComponent(courseTitleParam));
+              console.log('Fallback to courseTitle from query param:', decodeURIComponent(courseTitleParam));
+            }
           }
         } else if (courseTitleParam) {
-          // Fallback to courseTitle from query param
-          const decodedTitle = decodeURIComponent(courseTitleParam);
-          setCourseTitle(decodedTitle);
-          console.log('Set courseTitle from query param:', decodedTitle);
+          setCourseTitle(decodeURIComponent(courseTitleParam));
+          console.log('Set courseTitle from query param:', decodeURIComponent(courseTitleParam));
         } else {
           console.warn('No courseId or courseTitle provided in query params.');
+          setCourseTitle('Default Course Title');
         }
       } catch (error) {
         console.error('Error fetching course title:', error);
+        setCourseTitle('Default Course Title');
       } finally {
         setIsLoading(false);
       }
