@@ -305,7 +305,178 @@
 
 
 
-'use client';
+// 'use client';
+
+// import React, { useRef } from 'react';
+// import { useReactToPrint } from 'react-to-print';
+// import { useUser } from '@clerk/clerk-react';
+// import styles from '@/styles/Certificate.module.css';
+
+// interface CertificateProps {
+//   courseName: string;
+//   date: string;
+//   issuerName?: string;
+//   score?: number;
+//   certificateId?: string;
+//   locked?: boolean;
+//   onUnlockRequest?: () => void;
+// }
+
+// const Certificate: React.FC<CertificateProps> = ({
+//   courseName,
+//   date,
+//   issuerName = "EDUSKILL ONLINE LEARNING",
+//   score,
+//   certificateId = Math.random().toString(36).substring(2, 10).toUpperCase(),
+//   locked = false,
+//   onUnlockRequest
+// }) => {
+//   const { user } = useUser();
+//   const certificateRef = useRef<HTMLDivElement>(null);
+
+//   // const handleDownloadPDF = useReactToPrint({
+//   //   content: () => certificateRef.current,
+//   //   pageStyle: `
+//   //     @page {
+//   //       size: A4 landscape;
+//   //       margin: 0;
+//   //     }
+//   //     @media print {
+//   //       body, html {
+//   //         width: 297mm;
+//   //         height: 210mm;
+//   //       }
+//   //     }
+//   //   `,
+//   //   documentTitle: `${user?.fullName}_${courseName}_Certificate`,
+//   //   removeAfterPrint: true
+//   // });
+
+//   const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+//     e.preventDefault();
+//     if (locked) {
+//       onUnlockRequest?.();
+//     } else {
+//      // handleDownloadPDF();
+//     }
+//   };
+
+//   if (!user) {
+//     return <div className={styles.container}>Please sign in to view your certificate.</div>;
+//   }
+
+//   return (
+//     <div className={styles.container}>
+//       <div className={styles.downloadContainer}>
+//         <button 
+//           onClick={handleButtonClick} 
+//           className={`${styles.downloadButton} ${locked ? styles.lockedButton : ''}`}
+//         >
+//           {locked ? 'Unlock Certificate' : 'Download PDF Certificate'}
+//         </button>
+//         {locked && (
+//           <p className={styles.lockedMessage}>
+//             Complete the quiz with a passing score to unlock your certificate
+//           </p>
+//         )}
+//       </div>
+      
+//       <div 
+//         className={`${styles.certificateContainer} ${locked ? styles.lockedCertificate : ''}`} 
+//         ref={certificateRef}
+//       >
+//         {locked && (
+//           <div className={styles.lockOverlay}>
+//             <div className={styles.lockIcon}>🔒</div>
+//             <p>Certificate Locked</p>
+//             <p>Complete the quiz to unlock</p>
+//           </div>
+//         )}
+        
+//         <div className={styles.certificateBorder}>
+//           <div className={styles.cornerDecorationTopLeft}></div>
+//           <div className={styles.cornerDecorationTopRight}></div>
+//           <div className={styles.cornerDecorationBottomLeft}></div>
+//           <div className={styles.cornerDecorationBottomRight}></div>
+          
+//           <div className={styles.watermark}>EDUSKILL ONLINE LEARNING</div>
+          
+//           <div className={styles.certificateHeader}>
+//             <div className={styles.seal}>
+//               <div className={styles.sealInner}>
+//                 <span>Skill Today, Lead Tomorrow</span>
+//               </div>
+//             </div>
+//             <h2
+//               className={styles.certificateTitle}
+//               style={{
+//                 backgroundColor: 'white',
+//                 display: 'inline-block',
+//                 padding: '4rem 2rem',
+//                 borderRadius: '6px',
+//                 fontSize:'40px',
+//               }}
+//             >
+//               <div>CERTIFICATE OF COMPLETION</div>
+//             </h2>
+//           </div>
+
+//           <div className={styles.certificateBody}>
+//             <p className={styles.presentedTo}>This is to certify that</p>
+//             <h3 className={styles.recipientName}>{user.fullName}</h3>
+//             <p className={styles.presentedTo}>has successfully completed</p>
+//             <div className={styles.courseName}>{courseName}</div>
+            
+//             {score !== undefined && (
+//               <div className={styles.scoreContainer}>
+//                 <p>Achieving an outstanding score of</p>
+//                 <div className={styles.scoreBadge}>{score}%</div>
+//               </div>
+//             )}
+
+//             <div className={styles.detailsContainer}>
+//               <div className={styles.detailBox}>
+//                 <p className={styles.detailLabel}>Date of Completion</p>
+//                 <p className={styles.detailValue}>{date}</p>
+//               </div>
+//             </div>
+//           </div>
+
+//           <div className={styles.signatureSection}>
+//             <div className={styles.signatureBlock}>
+//               <div className={styles.signatureLine}></div>
+//               <p className={styles.signatureLabel}>Authorized Signature</p>
+//             </div>
+//             <div className={styles.signatureBlock}>
+//               <div className={styles.signatureLine}></div>
+//               <p className={styles.signatureLabel}>Date</p>
+//             </div>
+//           </div>
+
+//           <div className={styles.issuerSection}>
+//             <p className={styles.issuerName}>{issuerName}</p>
+//             <p className={styles.issuerTagline}>Skill Today, Lead Tomorrow</p>
+//           </div>
+
+//           <div className={styles.verification}>
+//             <div className={styles.qrPlaceholder}></div>
+//             <p>Scan to verify authenticity</p>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Certificate;
+
+
+
+
+
+
+
+"use client";
 
 import React, { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
@@ -313,6 +484,7 @@ import { useUser } from '@clerk/clerk-react';
 import styles from '@/styles/Certificate.module.css';
 
 interface CertificateProps {
+  recipientName: string; // Add this prop
   courseName: string;
   date: string;
   issuerName?: string;
@@ -323,6 +495,7 @@ interface CertificateProps {
 }
 
 const Certificate: React.FC<CertificateProps> = ({
+  recipientName, // Use this instead of user.fullName
   courseName,
   date,
   issuerName = "EDUSKILL ONLINE LEARNING",
@@ -348,7 +521,7 @@ const Certificate: React.FC<CertificateProps> = ({
   //       }
   //     }
   //   `,
-  //   documentTitle: `${user?.fullName}_${courseName}_Certificate`,
+  //   documentTitle: `${recipientName}_${courseName}_Certificate`, // Use recipientName here
   //   removeAfterPrint: true
   // });
 
@@ -357,7 +530,7 @@ const Certificate: React.FC<CertificateProps> = ({
     if (locked) {
       onUnlockRequest?.();
     } else {
-     // handleDownloadPDF();
+    //  handleDownloadPDF();
     }
   };
 
@@ -423,7 +596,7 @@ const Certificate: React.FC<CertificateProps> = ({
 
           <div className={styles.certificateBody}>
             <p className={styles.presentedTo}>This is to certify that</p>
-            <h3 className={styles.recipientName}>{user.fullName}</h3>
+            <h3 className={styles.recipientName}>{recipientName}</h3> {/* Use recipientName here */}
             <p className={styles.presentedTo}>has successfully completed</p>
             <div className={styles.courseName}>{courseName}</div>
             

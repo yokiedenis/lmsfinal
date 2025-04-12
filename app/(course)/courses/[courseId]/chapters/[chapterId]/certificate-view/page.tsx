@@ -1,5 +1,4 @@
-// pages/certificate-view.tsx (or app/certificate-view/page.tsx with appropriate routing)
-'use client'; // Only for app dir in Next.js
+"use client"; // Only for app dir in Next.js
 import { useSearchParams } from 'next/navigation'; // for app dir
 // import { useRouter } from 'next/router'; // for pages dir
 import Certificate from '@/components/certificate'; // adjust import based on your project
