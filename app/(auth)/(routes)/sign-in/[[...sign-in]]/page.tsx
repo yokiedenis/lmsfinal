@@ -23,7 +23,7 @@ const SignInPage: React.FC = () => {
             <div className="carousel-container">
               <div className="carousel-slide">
                 <img
-                  src="/pppp.jpg"
+                  src="/ppp.jpg"
                   alt="Carousel Image 1"
                   className="object-cover w-full h-full"
                 />
@@ -37,7 +37,7 @@ const SignInPage: React.FC = () => {
               </div>
               <div className="carousel-slide">
                 <img
-                  src="/ccc.jpg"
+                  src="/ppp.jpg"
                   alt="Carousel Image 3"
                   className="object-cover w-full h-full"
                 />
