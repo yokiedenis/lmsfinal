@@ -186,7 +186,7 @@ const studentRoutes = [
   { icon: TrendingUp, label: "Progress Tracker", href: "/progress" }, // New Progress Tracker item
   { icon: Brain , label: "ChatBot AI", href: "/chatbot" },
   { icon: User, label: "User Profile", href: "/profile" },
-  { icon: GraduationCap, label: "Certificate", href: "/Graduation" },
+ // { icon: GraduationCap, label: "Certificate", href: "/Graduation" },
 ];
 
 const teacherRoutes = [
