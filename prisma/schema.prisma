@@ -397,6 +397,8 @@ model Message {
   userType  String   // "student" or "teacher"
   content   String
   userName  String?
+  fileUrl   String?  // Add this
+  fileType  String?  // Add this
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

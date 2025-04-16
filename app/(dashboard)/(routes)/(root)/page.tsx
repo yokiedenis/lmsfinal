@@ -913,7 +913,7 @@ export default async function Dashboard() {
               <div className="bg-white/20 backdrop-blur-sm w-14 h-14 rounded-full flex items-center justify-center text-2xl font-bold text-white">
                 {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">
+              <h1 className="text-2xl md:text-2xl font-bold text-white">
                 Welcome back, {user.firstName}!
               </h1>
             </div>
@@ -1026,7 +1026,7 @@ export default async function Dashboard() {
             <img 
               src="./imgu.jpg" 
               alt="Learning illustration" 
-              className="w-48 md \md:w-64 h-auto rounded-lg shadow-md"
+              className="w-96 md \md:w-128 h-auto rounded-lg shadow-md"
             />
           </div>
         </div>

@@ -378,4 +378,107 @@
     margin-bottom: 1rem;
   }
   
+  .linkedinButton {
+    background-color: #0077b5;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 10px;
+    transition: background-color 0.3s;
+  }
+  
+  .linkedinButton:hover {
+    background-color: #005582;
+  }
+
+
+  .linkedinButton {
+  padding: 12px 24px; /* Increased padding for a larger, more clickable area */
+  background: linear-gradient(45deg, #0077B5, #0A66C2); /* LinkedIn blue gradient */
+  border: none;
+  border-radius: 8px; /* Rounded corners for a modern look */
+  color: white;
+  font-size: 16px;
+  font-weight: 600; /* Bold text for emphasis */
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  transition: all 0.3s ease; /* Smooth transitions for hover and active states */
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Space between icon and text */
+}
+
+.linkedinButton:hover {
+  background: linear-gradient(45deg, #0066A8, #0057A3); /* Darker shade on hover */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Slightly larger shadow on hover */
+  transform: translateY(-2px); /* Lift effect on hover */
+}
+
+.linkedinButton:active {
+  transform: translateY(0); /* Reset lift on click */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Smaller shadow when clicked */
+}
+
+.linkedinButton::before {
+  content: ''; /* Optional: Add a subtle glow or overlay effect */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2); /* Slight white overlay for depth */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.linkedinButton:hover::before {
+  opacity: 1;
+}
+
+/* Optional: Add a LinkedIn icon (using FontAwesome or a custom SVG) */
+.linkedinButton::after {
+  content: 'in'; /* Simplified LinkedIn "in" logo, or use an icon */
+  font-family: 'Arial', sans-serif; /* Adjust font if needed */
+  font-weight: bold;
+  font-size: 18px;
+  margin-right: 8px; /* Space before text */
+  color: white;
+}
+
+/* Ensure the button fits well with other elements */
+.downloadContainer {
+  display: flex;
+  gap: 16px; /* Space between buttons */
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.linkedinButton svg {
+  margin-right: 8px;
+}
+
+
+.headerAlignment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* or space-around, depending on design */
+  padding: 40px;
+}
+
+.logoPadding {
+  max-width: 200px; /* Adjust as needed */
+}
+
+.seal {
+  margin-left: auto; /* Pushes seal to the right */
+}
+
+
 }

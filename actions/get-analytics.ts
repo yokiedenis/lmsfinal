@@ -135,6 +135,157 @@
 
 
 
+// import { db } from "@/lib/db";
+// import { Course, Purchase, Profile, UserProgress, Transaction, Logging } from "@prisma/client";
+
+// type PurchaseWithCourseAndTransaction = Purchase & {
+//   course: Course;
+//   transaction: Transaction | null;
+// };
+
+// type UserDetails = {
+//   name: string;
+//   imageUrl: string;
+//   coursesEnrolled: number;
+//   lastLogin: Date;
+//   dateOfEnrollment: Date;
+//   studentLevel: number;
+//   certificatesEarned: number;
+//   enrolledCourses: {
+//     courseTitle: string;
+//     amountPaid: number;
+//   }[];
+//   timeSpent: number; // In seconds
+// };
+
+// // Define the return type for getAnalytics
+// type AnalyticsData = {
+//   data: { name: string; total: number }[];
+//   totalRevenue: number;
+//   totalSales: number;
+//   totalUsers: number;
+//   totalEnrolledCourses: number; // Add the new field to the type
+//   userDetails: UserDetails[];
+// };
+
+// const groupByCourse = (purchases: PurchaseWithCourseAndTransaction[]) => {
+//   const grouped: { [courseTitle: string]: number } = {};
+  
+//   purchases.forEach((purchase) => {
+//     const courseTitle = purchase.course.title;
+//     if (!grouped[courseTitle]) {
+//       grouped[courseTitle] = 0;
+//     }
+//     grouped[courseTitle] += purchase.transaction?.amount || 0; 
+//   });
+
+//   return grouped;
+// };
+
+// // Explicitly type the return value of the function
+// export const getAnalytics = async (userId: string): Promise<AnalyticsData> => {
+//   try {
+//     const purchases = await db.purchase.findMany({
+//       where: {
+//         course: {
+//           userId: userId
+//         }
+//       },
+//       include: {
+//         course: true,
+//         transaction: true 
+//       }
+//     });
+
+//     const users = await db.user.findMany({
+//       include: {
+//         profile: true,
+//         purchases: {
+//           include: {
+//             course: true,
+//             transaction: true
+//           }
+//         },
+//         userProgress: true,
+//       }
+//     });
+
+//     const groupedEarnings = groupByCourse(purchases as PurchaseWithCourseAndTransaction[]);
+//     const data = Object.entries(groupedEarnings).map(([courseTitle, total]) => ({
+//       name: courseTitle,
+//       total: total,
+//     }));
+
+//     const totalRevenue = data.reduce((acc, curr) => acc + curr.total, 0);
+//     const totalSales = purchases.length;
+//     const totalUsers = users.length;
+
+//     // Calculate total enrolled courses (unique courseIds from purchases)
+//     const uniqueCourseIds = new Set(purchases.map((purchase) => purchase.courseId));
+//     const totalEnrolledCourses = uniqueCourseIds.size;
+
+//     const userDetails: UserDetails[] = await Promise.all(users.map(async (user) => {
+//       const userLogs = await db.logging.findMany({
+//         where: {
+//           userId: user.id,
+//           url: { in: ["/login", "/logout"] }
+//         },
+//         orderBy: { createdAt: 'asc' }
+//       });
+
+//       let totalTimeSpent = 0;
+//       let lastLogin: Date | null = null;
+
+//       for (let i = 0; i < userLogs.length; i++) {
+//         if (userLogs[i].url === "/login") {
+//           lastLogin = userLogs[i].createdAt;
+//         } else if (lastLogin && userLogs[i].url === "/logout") {
+//           totalTimeSpent += (userLogs[i].createdAt.getTime() - lastLogin.getTime()) / 1000;
+//           lastLogin = null;
+//         }
+//       }
+
+//       return {
+//         name: user.name,
+//         imageUrl: user.profile?.imageUrl || '',
+//         coursesEnrolled: user.purchases.length,
+//         lastLogin: user.profile?.updatedAt || new Date(),
+//         dateOfEnrollment: user.profile?.createdAt || new Date(),
+//         studentLevel: user.userProgress[0]?.level || 1,
+//         certificatesEarned: user.profile?.certificatesEarned || 0,
+//         enrolledCourses: user.purchases.map(purchase => ({
+//           courseTitle: purchase.course.title,
+//           amountPaid: purchase.transaction?.amount || 0
+//         })),
+//         timeSpent: totalTimeSpent
+//       };
+//     }));
+
+//     return {
+//       data,
+//       totalRevenue,
+//       totalSales,
+//       totalUsers,
+//       totalEnrolledCourses, // Now properly declared and initialized
+//       userDetails,
+//     };
+//   } catch (error) {
+//     console.log("[GET_ANALYTICS]", error);
+//     return {
+//       data: [],
+//       totalRevenue: 0,
+//       totalSales: 0,
+//       totalUsers: 0,
+//       totalEnrolledCourses: 0, // Default value in case of error
+//       userDetails: [],
+//     };
+//   }
+// };
+
+
+
+
+
 import { db } from "@/lib/db";
 import { Course, Purchase, Profile, UserProgress, Transaction, Logging } from "@prisma/client";
 
@@ -158,43 +309,48 @@ type UserDetails = {
   timeSpent: number; // In seconds
 };
 
-// Define the return type for getAnalytics
 type AnalyticsData = {
   data: { name: string; total: number }[];
   totalRevenue: number;
   totalSales: number;
   totalUsers: number;
-  totalEnrolledCourses: number; // Add the new field to the type
+  totalEnrolledCourses: number;
   userDetails: UserDetails[];
 };
 
 const groupByCourse = (purchases: PurchaseWithCourseAndTransaction[]) => {
   const grouped: { [courseTitle: string]: number } = {};
-  
+
   purchases.forEach((purchase) => {
     const courseTitle = purchase.course.title;
+    // Initialize the course in grouped if not already present
     if (!grouped[courseTitle]) {
       grouped[courseTitle] = 0;
     }
-    grouped[courseTitle] += purchase.transaction?.amount || 0; 
+    // Only include transactions that exist and have a valid amount
+    if (purchase.transaction && typeof purchase.transaction.amount === 'number' && purchase.transaction.amount > 0) {
+      grouped[courseTitle] += purchase.transaction.amount;
+    } else {
+      // Log cases where transaction is missing or amount is invalid
+      console.log(`[GROUP_BY_COURSE] Skipping purchase for course "${courseTitle}": transaction is ${purchase.transaction ? 'present but invalid amount' : 'null'}`);
+    }
   });
 
   return grouped;
 };
 
-// Explicitly type the return value of the function
 export const getAnalytics = async (userId: string): Promise<AnalyticsData> => {
   try {
     const purchases = await db.purchase.findMany({
       where: {
         course: {
-          userId: userId
-        }
+          userId: userId,
+        },
       },
       include: {
         course: true,
-        transaction: true 
-      }
+        transaction: true,
+      },
     });
 
     const users = await db.user.findMany({
@@ -203,11 +359,11 @@ export const getAnalytics = async (userId: string): Promise<AnalyticsData> => {
         purchases: {
           include: {
             course: true,
-            transaction: true
-          }
+            transaction: true,
+          },
         },
         userProgress: true,
-      }
+      },
     });
 
     const groupedEarnings = groupByCourse(purchases as PurchaseWithCourseAndTransaction[]);
@@ -216,6 +372,7 @@ export const getAnalytics = async (userId: string): Promise<AnalyticsData> => {
       total: total,
     }));
 
+    // Calculate totalRevenue from valid transactions
     const totalRevenue = data.reduce((acc, curr) => acc + curr.total, 0);
     const totalSales = purchases.length;
     const totalUsers = users.length;
@@ -224,64 +381,74 @@ export const getAnalytics = async (userId: string): Promise<AnalyticsData> => {
     const uniqueCourseIds = new Set(purchases.map((purchase) => purchase.courseId));
     const totalEnrolledCourses = uniqueCourseIds.size;
 
-    const userDetails: UserDetails[] = await Promise.all(users.map(async (user) => {
-      const userLogs = await db.logging.findMany({
-        where: {
-          userId: user.id,
-          url: { in: ["/login", "/logout"] }
-        },
-        orderBy: { createdAt: 'asc' }
-      });
+    const userDetails: UserDetails[] = await Promise.all(
+      users.map(async (user) => {
+        const userLogs = await db.logging.findMany({
+          where: {
+            userId: user.id,
+            url: { in: ["/login", "/logout"] },
+          },
+          orderBy: { createdAt: "asc" },
+        });
 
-      let totalTimeSpent = 0;
-      let lastLogin: Date | null = null;
+        let totalTimeSpent = 0;
+        let lastLogin: Date | null = null;
 
-      for (let i = 0; i < userLogs.length; i++) {
-        if (userLogs[i].url === "/login") {
-          lastLogin = userLogs[i].createdAt;
-        } else if (lastLogin && userLogs[i].url === "/logout") {
-          totalTimeSpent += (userLogs[i].createdAt.getTime() - lastLogin.getTime()) / 1000;
-          lastLogin = null;
+        for (let i = 0; i < userLogs.length; i++) {
+          if (userLogs[i].url === "/login") {
+            lastLogin = userLogs[i].createdAt;
+          } else if (lastLogin && userLogs[i].url === "/logout") {
+            totalTimeSpent += (userLogs[i].createdAt.getTime() - lastLogin.getTime()) / 1000;
+            lastLogin = null;
+          }
         }
-      }
 
-      return {
-        name: user.name,
-        imageUrl: user.profile?.imageUrl || '',
-        coursesEnrolled: user.purchases.length,
-        lastLogin: user.profile?.updatedAt || new Date(),
-        dateOfEnrollment: user.profile?.createdAt || new Date(),
-        studentLevel: user.userProgress[0]?.level || 1,
-        certificatesEarned: user.profile?.certificatesEarned || 0,
-        enrolledCourses: user.purchases.map(purchase => ({
-          courseTitle: purchase.course.title,
-          amountPaid: purchase.transaction?.amount || 0
-        })),
-        timeSpent: totalTimeSpent
-      };
-    }));
+        return {
+          name: user.name || "Unknown User",
+          imageUrl: user.profile?.imageUrl || "",
+          coursesEnrolled: user.purchases.length,
+          lastLogin: user.profile?.updatedAt || new Date(),
+          dateOfEnrollment: user.profile?.createdAt || new Date(),
+          studentLevel: user.userProgress[0]?.level || 1,
+          certificatesEarned: user.profile?.certificatesEarned || 0,
+          enrolledCourses: user.purchases.map((purchase) => ({
+            courseTitle: purchase.course.title,
+            amountPaid: purchase.transaction?.amount || 0,
+          })),
+          timeSpent: totalTimeSpent,
+        };
+      })
+    );
+
+    // Log the final analytics data for debugging
+    console.log("[GET_ANALYTICS] Analytics data:", {
+      totalRevenue,
+      totalSales,
+      totalUsers,
+      totalEnrolledCourses,
+      data,
+    });
 
     return {
       data,
       totalRevenue,
       totalSales,
       totalUsers,
-      totalEnrolledCourses, // Now properly declared and initialized
+      totalEnrolledCourses,
       userDetails,
     };
   } catch (error) {
-    console.log("[GET_ANALYTICS]", error);
+    console.log("[GET_ANALYTICS] Error:", error);
     return {
       data: [],
       totalRevenue: 0,
       totalSales: 0,
       totalUsers: 0,
-      totalEnrolledCourses: 0, // Default value in case of error
+      totalEnrolledCourses: 0,
       userDetails: [],
     };
   }
 };
-
 
 
 
