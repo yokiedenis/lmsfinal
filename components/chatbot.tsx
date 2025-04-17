@@ -434,9 +434,9 @@ const Chatbot: React.FC<ChatbotProps> = ({ apiKey, apiEndpoint }) => {
     },
     partnership: {
       types: [
-        "Educational institutions - Integrate Eduskill into your curriculum",
-        "Content creators - Partner to create and monetize courses",
-        "Corporate partners - Upskill your workforce with our platform"
+        "Bank institutions -  Stanbic Bank,Interswitch, Centenary Bank,Equity Bank,EcoBank",
+        "Other institutions - Picfare, Visa, Nina Interiors,Brighter Monday,Sanlam,",
+        "Other - Clinic Pesa,MU,Pivot Pay"
       ],
       benefits: [
         "Revenue sharing opportunities",
@@ -444,7 +444,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ apiKey, apiEndpoint }) => {
         "Access to our user base",
         "Technical integration support"
       ],
-      contact: "Visit https://eduskill.me/partnerships or email partnerships@eduskill.me"
+      contact: "Visit https://eduskill.me/About-us.aspx"
     }
   };
 
