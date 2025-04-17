@@ -429,7 +429,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ apiKey, apiEndpoint }) => {
     ],
     costStructure: {
       basic: "Free - Access to basic courses and limited AI assistance",
-      pro: "Our course fees are from UGX 1 Millon to UGX 6.5 Million with a get financing option, or you can pay upfront from UGX 1 Millon to UGX 5.5 Millon.",
+      price: "Our course fees are from UGX 1 Millon to UGX 6.5 Million with a get financing option, or you can pay upfront from UGX 1 Millon to UGX 5.5 Millon.",
       enterprise: "Custom pricing - For organizations with team management and analytics"
     },
     partnership: {
@@ -520,7 +520,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ apiKey, apiEndpoint }) => {
       if (lowerInput.includes('cost') || lowerInput.includes('price') || lowerInput.includes('pricing')) {
         const costResponse = `Eduskill offers these pricing options:\n\n` +
           `Basic: ${eduskillInfo.costStructure.basic}\n\n` +
-          `Pro: ${eduskillInfo.costStructure.pro}\n\n` +
+          `Pro: ${eduskillInfo.costStructure.price}\n\n` +
           `Enterprise: ${eduskillInfo.costStructure.enterprise}\n\n` +
           `Visit https://eduskill.me/pricing for more details.`;
         const botMessage: Message = {
