@@ -548,7 +548,7 @@ model Transaction {
 
 
 
-// Add this to your existing schema.prisma file
+ 
 model ProjectSubmission {
   id          String   @id @default(uuid()) @map("_id")
   userId      String

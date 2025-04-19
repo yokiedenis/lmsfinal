@@ -91,87 +91,159 @@
 
 
 
+// "use client";
+
+// import {
+//     BarChart,
+//     Bar,
+//     XAxis,
+//     YAxis,
+//     CartesianGrid,
+//     Tooltip,
+//     Legend,
+//     ResponsiveContainer,
+//     Cell,
+// } from "recharts";
+
+// import { Card } from "@/components/ui/card";
+
+// interface ChartProps {
+//     data: {
+//         name: string;
+//         total: number;
+//     }[];
+// }
+
+// export const Chart = ({
+//     data
+// }: ChartProps) => {
+//     // Define a color palette for the bar chart
+//     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF4560'];
+
+//     return (
+//         <Card>
+//             <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg">
+//                 <h2 className="text-xl font-semibold text-white mb-4">Course Progress Distribution</h2>
+//                 <ResponsiveContainer width="100%" height={350}>
+//                     <BarChart
+//                         data={data}
+//                         margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+//                     >
+//                         <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" />
+//                         <XAxis 
+//                             dataKey="name" 
+//                             stroke="#ffffff" 
+//                             tick={{ fill: '#ffffff' }} 
+//                         />
+//                         <YAxis 
+//                             stroke="#ffffff" 
+//                             tick={{ fill: '#ffffff' }} 
+//                         />
+//                         <Tooltip 
+//                             contentStyle={{
+//                                 backgroundColor: '#1e293b',
+//                                 border: 'none',
+//                                 borderRadius: '8px',
+//                                 color: '#ffffff',
+//                             }}
+//                         />
+//                         <Legend 
+//                             iconType="circle"
+//                             wrapperStyle={{
+//                                 paddingTop: '20px',
+//                                 color: '#ffffff',
+//                             }}
+//                         />
+//                         <Bar 
+//                             dataKey="total"
+//                             animationDuration={1000} // Smooth animation
+//                             animationEasing="ease-in-out" // Advanced animation
+//                         >
+//                             {data.map((entry, index) => (
+//                                 <Cell 
+//                                     key={`cell-${index}`} 
+//                                     fill={COLORS[index % COLORS.length]} 
+//                                 />
+//                             ))}
+//                         </Bar>
+//                     </BarChart>
+//                 </ResponsiveContainer>
+//             </div>
+//         </Card>
+//     );
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 "use client";
 
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend,
-    ResponsiveContainer,
-    Cell,
-} from "recharts";
-
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from "recharts";
 import { Card } from "@/components/ui/card";
 
 interface ChartProps {
-    data: {
-        name: string;
-        total: number;
-    }[];
+  data: {
+    name: string;
+    total: number;
+  }[];
+  title?: string;
+  className?:string;
 }
 
-export const Chart = ({
-    data
-}: ChartProps) => {
-    // Define a color palette for the bar chart
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF4560'];
-
-    return (
-        <Card>
-            <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg">
-                <h2 className="text-xl font-semibold text-white mb-4">Course Progress Distribution</h2>
-                <ResponsiveContainer width="100%" height={350}>
-                    <BarChart
-                        data={data}
-                        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                    >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" />
-                        <XAxis 
-                            dataKey="name" 
-                            stroke="#ffffff" 
-                            tick={{ fill: '#ffffff' }} 
-                        />
-                        <YAxis 
-                            stroke="#ffffff" 
-                            tick={{ fill: '#ffffff' }} 
-                        />
-                        <Tooltip 
-                            contentStyle={{
-                                backgroundColor: '#1e293b',
-                                border: 'none',
-                                borderRadius: '8px',
-                                color: '#ffffff',
-                            }}
-                        />
-                        <Legend 
-                            iconType="circle"
-                            wrapperStyle={{
-                                paddingTop: '20px',
-                                color: '#ffffff',
-                            }}
-                        />
-                        <Bar 
-                            dataKey="total"
-                            animationDuration={1000} // Smooth animation
-                            animationEasing="ease-in-out" // Advanced animation
-                        >
-                            {data.map((entry, index) => (
-                                <Cell 
-                                    key={`cell-${index}`} 
-                                    fill={COLORS[index % COLORS.length]} 
-                                />
-                            ))}
-                        </Bar>
-                    </BarChart>
-                </ResponsiveContainer>
-            </div>
-        </Card>
-    );
+export const Chart = ({ data, title, className }: ChartProps) => {
+  return (
+    <Card className="p-4">
+      <h3 className="text-lg font-semibold mb-4">{title || "Overview"}</h3>
+      <div className="h-[300px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="name"
+              stroke="#888888"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              stroke="#888888"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => `$${value}`}
+            />
+            <Tooltip 
+              formatter={(value) => [`$${value}`, "Revenue"]}
+              cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
+            />
+            <Legend />
+            <Bar
+              dataKey="total"
+              name="Revenue"
+              fill="#8884d8"
+              radius={[4, 4, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </Card>
+  );
 };
+
+
 
 
 

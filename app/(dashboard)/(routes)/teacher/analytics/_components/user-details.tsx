@@ -1,104 +1,315 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Image from 'next/image';
-import { Book, Calendar, User, Award, LogIn, Clock } from 'lucide-react';
+// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+// import Image from 'next/image';
+// import { Book, Calendar, User, Award, LogIn, Clock } from 'lucide-react';
 
-interface UserDetailsProps {
-  userDetails: {
-    name: string;
-    imageUrl: string;
-    coursesEnrolled: number;
-    lastLogin: Date;
-    dateOfEnrollment: Date;
-    studentLevel: number;
-    certificatesEarned: number;
-    enrolledCourses: {
-      courseTitle: string;
-      amountPaid: number;
-    }[];
-    timeSpent: number;
-  }[];
+// interface UserDetailsProps {
+//   userDetails: {
+//     name: string;
+//     imageUrl: string;
+//     coursesEnrolled: number;
+//     lastLogin: Date;
+//     dateOfEnrollment: Date;
+//     studentLevel: number;
+//     certificatesEarned: number;
+//     enrolledCourses: {
+//       courseTitle: string;
+//       amountPaid: number;
+//     }[];
+//     timeSpent: number;
+//   }[];
+// }
+
+// export const UserDetails = ({ userDetails }: UserDetailsProps) => {
+//   const formatTime = (seconds: number) => {
+//     const hours = Math.floor(seconds / 3600);
+//     const minutes = Math.floor((seconds % 3600) / 60);
+//     const secs = seconds % 60;
+//     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+//   };
+
+//   return (
+//     <Card className="mt-6 shadow-lg border border-gray-700 bg-[#1e3a8a]">
+//       <CardHeader>
+//         <CardTitle className="text-xl font-bold text-white">User Details</CardTitle>
+//       </CardHeader>
+//       <CardContent>
+//         <div className="space-y-6">
+//           {userDetails.map((user, index) => (
+//             <div
+//               key={index}
+//               className="flex items-center space-x-6 p-4 hover:bg-gray-700 rounded-lg transition-all duration-200"
+//             >
+//               <Image
+//                 src={user.imageUrl || '/avv.webp'}
+//                 alt={user.name}
+//                 width={60}
+//                 height={60}
+//                 className="rounded-full border-2 border-gray-600"
+//               />
+//               <div className="grid grid-cols-2 gap-4 flex-1">
+//                 <div className="space-y-2">
+//                   <p className="font-bold text-white flex items-center">
+//                     <User className="w-4 h-4 mr-2 text-white " />
+//                     {user.name}
+//                   </p>
+//                   <p className="text-sm text-white flex items-center">
+//                     <Book className="w-4 h-4 mr-2 text-white " />
+//                     Courses Enrolled: {user.coursesEnrolled}
+//                   </p>
+//                   <p className="text-sm text-white flex items-center">
+//                     <Award className="w-4 h-4 mr-2 text-white " />
+//                     Certificates Earned: {user.certificatesEarned}
+//                   </p>
+//                   <p className="text-sm text-white flex items-center">
+//                     <Clock className="w-4 h-4 mr-2 text-white " />
+//                     Time Spent: {formatTime(user.timeSpent)}
+//                   </p>
+//                 </div>
+//                 <div className="space-y-2">
+//                   <p className="text-sm text-white flex items-center">
+//                     <LogIn className="w-4 h-4 mr-2 text-white " />
+//                     Last Login: {user.lastLogin.toLocaleDateString()}
+//                   </p>
+//                   <p className="text-sm text-white flex items-center">
+//                     <Calendar className="w-4 h-4 mr-2 text-white " />
+//                     Date of Enrollment: {user.dateOfEnrollment.toLocaleDateString()}
+//                   </p>
+//                   <p className="text-sm text-white flex items-center">
+//                     <User className="w-4 h-4 mr-2 text-white " />
+//                     Student Level: {user.studentLevel}
+//                   </p>
+//                 </div>
+//               </div>
+//               {/* Add the list of enrolled courses */}
+//               <div className="mt-4">
+//                 <h3 className="text-lg font-semibold text-white mb-2">Enrolled Courses</h3>
+//                 <ul className="list-disc list-inside text-sm text-white">
+//                   {user.enrolledCourses.map((course, courseIndex) => (
+//                     <li key={courseIndex} className="flex justify-between items-center">
+//                       <span>{course.courseTitle}</span>
+//                       <span className="text-xs text-gray-300"> - Paid: {course.amountPaid.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>
+//                     </li>
+//                   ))}
+//                 </ul>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </CardContent>
+//     </Card>
+//   );
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { format } from "date-fns";
+import { formatTime, formatCurrency, cn } from "@/lib/utils";
+
+interface EnrolledCourse {
+  courseTitle: string;
+  amountPaid: number;
+  progress: number;
 }
 
-export const UserDetails = ({ userDetails }: UserDetailsProps) => {
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+interface UserDetails {
+  id: string;
+  name: string;
+  email: string;
+  imageUrl: string;
+  coursesEnrolled: number;
+  lastLogin: Date;
+  dateOfEnrollment: Date;
+  studentLevel: number;
+  certificatesEarned: number;
+  enrolledCourses: EnrolledCourse[];
+  timeSpent: number;
+  totalSpent: number;
+}
+
+interface UserDetailsProps {
+  userDetails: UserDetails[];
+  className?:String;
+}
+
+export const UserDetails = ({ userDetails, className }: UserDetailsProps) => {
+  // Custom progress bar with indicator color
+  const CustomProgress = ({ value, className }: { value: number; className?: string }) => {
+    return (
+      <div className={cn("h-2 w-full overflow-hidden rounded-full bg-secondary", className)}>
+        <div
+          className={cn(
+            "h-full rounded-full",
+            value === 100 ? "bg-green-500" : "bg-blue-500"
+          )}
+          style={{ width: `${value}%` }}
+        />
+      </div>
+    );
   };
 
   return (
-    <Card className="mt-6 shadow-lg border border-gray-700 bg-[#1e3a8a]">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-xl font-bold text-white">User Details</CardTitle>
+        <CardTitle className="text-md font-medium text-blue-600">User Details</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
-          {userDetails.map((user, index) => (
-            <div
-              key={index}
-              className="flex items-center space-x-6 p-4 hover:bg-gray-700 rounded-lg transition-all duration-200"
-            >
-              <Image
-                src={user.imageUrl || '/avv.webp'}
-                alt={user.name}
-                width={60}
-                height={60}
-                className="rounded-full border-2 border-gray-600"
-              />
-              <div className="grid grid-cols-2 gap-4 flex-1">
-                <div className="space-y-2">
-                  <p className="font-bold text-white flex items-center">
-                    <User className="w-4 h-4 mr-2 text-white " />
-                    {user.name}
-                  </p>
-                  <p className="text-sm text-white flex items-center">
-                    <Book className="w-4 h-4 mr-2 text-white " />
-                    Courses Enrolled: {user.coursesEnrolled}
-                  </p>
-                  <p className="text-sm text-white flex items-center">
-                    <Award className="w-4 h-4 mr-2 text-white " />
-                    Certificates Earned: {user.certificatesEarned}
-                  </p>
-                  <p className="text-sm text-white flex items-center">
-                    <Clock className="w-4 h-4 mr-2 text-white " />
-                    Time Spent: {formatTime(user.timeSpent)}
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm text-white flex items-center">
-                    <LogIn className="w-4 h-4 mr-2 text-white " />
-                    Last Login: {user.lastLogin.toLocaleDateString()}
-                  </p>
-                  <p className="text-sm text-white flex items-center">
-                    <Calendar className="w-4 h-4 mr-2 text-white " />
-                    Date of Enrollment: {user.dateOfEnrollment.toLocaleDateString()}
-                  </p>
-                  <p className="text-sm text-white flex items-center">
-                    <User className="w-4 h-4 mr-2 text-white " />
-                    Student Level: {user.studentLevel}
-                  </p>
-                </div>
-              </div>
-              {/* Add the list of enrolled courses */}
-              <div className="mt-4">
-                <h3 className="text-lg font-semibold text-white mb-2">Enrolled Courses</h3>
-                <ul className="list-disc list-inside text-sm text-white">
-                  {user.enrolledCourses.map((course, courseIndex) => (
-                    <li key={courseIndex} className="flex justify-between items-center">
-                      <span>{course.courseTitle}</span>
-                      <span className="text-xs text-gray-300"> - Paid: {course.amountPaid.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ))}
-        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>User</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Enrollment Date</TableHead>
+              <TableHead>Last Login</TableHead>
+              <TableHead>Time Spent</TableHead>
+              <TableHead>Level</TableHead>
+              <TableHead>Certificates</TableHead>
+              <TableHead>Total Spent</TableHead>
+              <TableHead>Courses</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {userDetails.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-8 w-8">
+                      {user.imageUrl ? (
+                        <AvatarImage src={user.imageUrl} alt={user.name} />
+                      ) : (
+                        <AvatarFallback>
+                          {user.name.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    <span>{user.name}</span>
+                  </div>
+                </TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>
+                  {format(new Date(user.dateOfEnrollment), "MMM d, yyyy")}
+                </TableCell>
+                <TableCell>
+                  {format(new Date(user.lastLogin), "MMM d, yyyy h:mm a")}
+                </TableCell>
+                <TableCell>{formatTime(user.timeSpent)}</TableCell>
+                <TableCell>
+                  <Badge variant="outline">Level {user.studentLevel}</Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="secondary">
+                    {user.certificatesEarned} Certificates
+                  </Badge>
+                </TableCell>
+                <TableCell>{formatCurrency(user.totalSpent)}</TableCell>
+                <TableCell>
+                  <div className="space-y-2">
+                    {user.enrolledCourses.map((course) => (
+                      <div key={course.courseTitle} className="text-sm">
+                        <div className="flex justify-between mb-1">
+                          <span className="truncate max-w-[180px]">
+                            {course.courseTitle}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {formatCurrency(course.amountPaid)}
+                          </span>
+                        </div>
+                        <CustomProgress value={course.progress} />
+                      </div>
+                    ))}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // "use client";
