@@ -74,6 +74,10 @@ model Course{
 
   transactions Transaction[]
 
+  mode CourseMode @default(ONDEMAND)
+  instructors InstructorAssignment[]
+  liveSessions LiveSession[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -522,6 +526,8 @@ model User {
   courseId  String?
 
   profile  Profile? @relation             // Relation defined without `fields` or `references`
+
+  instructorAssignments InstructorAssignment[] @relation
    
 }
 
@@ -585,4 +591,41 @@ model PendingTransaction {
   transId     String?  // 👈  
  // userId      String 
   createdAt   DateTime @default(now())
+}
+
+
+
+
+enum CourseMode {
+  LIVE
+  HYBRID
+  ONDEMAND
+}
+
+model InstructorAssignment {
+  id String @id @default(uuid()) @map("_id")
+  courseId String
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignedAt DateTime @default(now())
+  
+  @@unique([courseId, userId])
+  @@index([courseId])
+  @@index([userId])
+}
+
+
+model LiveSession {
+  id String @id @default(uuid()) @map("_id")
+  courseId String
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title String
+  startTime DateTime
+  endTime DateTime
+  meetingUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([courseId])
 }
