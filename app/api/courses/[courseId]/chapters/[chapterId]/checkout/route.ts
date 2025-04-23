@@ -1168,7 +1168,7 @@ const createToken = async (
 ): Promise<string> => {
   const formattedAmount = amount.toFixed(2);
   const serviceDate = new Date().toISOString().split("T")[0];
-  const redirectUrl = `${baseURL}/api/courses/${params.courseId}/chapters/${params.chapterId}/payment-success?token=`;
+  const redirectUrl = `${baseURL}/api/courses/${params.courseId}/chapters/${params.chapterId}/payment-success`;
   const backUrl = `${baseURL}/api/courses/${params.courseId}/chapters/${params.chapterId}/payment-cancel`;
 
   const requestData: DPORequest = {
@@ -1207,6 +1207,8 @@ const createToken = async (
       },
       timeout: 10000,
     });
+
+    console.log("DPO API Response:", response.data);
 
     const parser = new XMLParser();
     const parsedResponse: DPOResponse = parser.parse(response.data);
@@ -1300,6 +1302,7 @@ export async function POST(
       data: {
         userId: user.id,
         courseId: params.courseId,
+        chapterId: params.chapterId, // Store chapterId for fallback
         amount: amount,
         status: "PENDING",
       },

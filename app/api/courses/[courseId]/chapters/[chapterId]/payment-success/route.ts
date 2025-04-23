@@ -57,9 +57,18 @@ export async function GET(
   { params }: { params: { courseId: string; chapterId: string } }
 ) {
   const url = new URL(req.url);
-  const token = url.searchParams.get("token");
+  // Try different possible token parameter names
+  const token =
+    url.searchParams.get("token") ||
+    url.searchParams.get("ID") ||
+    url.searchParams.get("TransToken");
 
-  console.log("Payment Success Request:", { token, courseId: params.courseId, chapterId: params.chapterId });
+  console.log("Payment Success Request:", {
+    url: req.url,
+    token,
+    courseId: params.courseId,
+    chapterId: params.chapterId,
+  });
 
   if (!token) {
     return NextResponse.redirect(

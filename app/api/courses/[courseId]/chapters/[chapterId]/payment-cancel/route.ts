@@ -8,7 +8,11 @@ export async function GET(
   req: Request,
   { params }: { params: { courseId: string; chapterId: string } }
 ) {
-  console.log("Payment Cancel Request:", { courseId: params.courseId, chapterId: params.chapterId });
+  console.log("Payment Cancel Request:", {
+    url: req.url,
+    courseId: params.courseId,
+    chapterId: params.chapterId,
+  });
 
   try {
     const { userId } = auth();

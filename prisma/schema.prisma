@@ -536,6 +536,7 @@ model Transaction {
   id        String   @id @default(uuid()) @map("_id")
   userId    String
   courseId  String
+  chapterId String
   amount    Int
   dpoToken  String?   @unique
   status    String   @default("PENDING")
