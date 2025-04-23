@@ -200,6 +200,7 @@ const teacherRoutes = [
 
 const superAdminRoutes = [
   { icon: BarChart, label: "Main Dashboard", href: "/teacher/analytics" },
+ // { icon: List, label: "Course Management", href: "/courses/admin" }, 
   ...teacherRoutes,
 ];
 

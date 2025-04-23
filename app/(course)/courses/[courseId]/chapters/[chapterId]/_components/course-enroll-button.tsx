@@ -503,6 +503,65 @@
 
 
 
+// "use client";
+
+// import axios from "axios";
+// import { useState } from "react";
+// import { Button } from "@/components/ui/button";
+// import { formatPrice } from "@/lib/format";
+// import toast from "react-hot-toast";
+
+// interface CourseEnrollButtonProps {
+//   price: number;
+//   courseId: string;
+//   serviceType: number;
+// }
+
+// export const CourseEnrollButton = ({
+//   price,
+//   courseId,
+//   serviceType
+// }: CourseEnrollButtonProps) => {
+//   const [isLoading, setIsLoading] = useState(false);
+
+//   const onClick = async () => {
+//     try {
+//       setIsLoading(true);
+
+//       const response = await axios.post(`/api/courses/${courseId}/chapters/${chapterId}/checkout`, { 
+//         price: price, // Send the actual price here
+//         serviceType: serviceType, // Use the prop value
+//         serviceDate: new Date().toISOString().split('T')[0] // Current date
+//       });
+
+//       window.location.assign(response.data.url);
+//     } catch (error) {
+//       console.error("DPO_PAY_ERROR", error);
+//       toast.error("Something went wrong");
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   return (
+//     <Button
+//       onClick={onClick}
+//       disabled={isLoading}
+//       size="sm"
+//       className="w-full md:w-auto bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md transition-colors duration-300 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed"
+//     >
+//       Unlock Full Certified Course {formatPrice(price)}
+//     </Button>
+//   );
+// };
+
+
+
+
+
+
+
+
 "use client";
 
 import axios from "axios";
@@ -514,13 +573,15 @@ import toast from "react-hot-toast";
 interface CourseEnrollButtonProps {
   price: number;
   courseId: string;
+  chapterId: string; // Added chapterId to props
   serviceType: number;
 }
 
 export const CourseEnrollButton = ({
   price,
   courseId,
-  serviceType
+  chapterId, // Destructure chapterId
+  serviceType,
 }: CourseEnrollButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -528,11 +589,14 @@ export const CourseEnrollButton = ({
     try {
       setIsLoading(true);
 
-      const response = await axios.post(`/api/courses/${courseId}/checkout`, { 
-        price: price, // Send the actual price here
-        serviceType: serviceType, // Use the prop value
-        serviceDate: new Date().toISOString().split('T')[0] // Current date
-      });
+      const response = await axios.post(
+        `/api/courses/${courseId}/chapters/${chapterId}/checkout`,
+        {
+          price,
+          serviceType,
+          serviceDate: new Date().toISOString().split("T")[0], // Current date
+        }
+      );
 
       window.location.assign(response.data.url);
     } catch (error) {
@@ -554,8 +618,6 @@ export const CourseEnrollButton = ({
     </Button>
   );
 };
-
-
 
 
 
