@@ -1298,11 +1298,12 @@ export async function POST(
       },
     });
 
+    // Create transaction record
     const transaction = await db.transaction.create({
       data: {
         userId: user.id,
         courseId: params.courseId,
-        chapterId: params.chapterId, // Store chapterId for fallback
+        chapterId: params.chapterId, // Add chapterId
         amount: amount,
         status: "PENDING",
       },
