@@ -1303,7 +1303,7 @@ export async function POST(
       data: {
         userId: user.id,
         courseId: params.courseId,
-        chapterId: params.chapterId, // Add chapterId
+        chapterId: params.chapterId, // Fix: Add chapterId
         amount: amount,
         status: "PENDING",
       },
