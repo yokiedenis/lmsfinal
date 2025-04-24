@@ -842,6 +842,163 @@
 
 
 
+// import { NextResponse, NextRequest } from "next/server";
+// import prisma from "@/lib/prisma";
+// import { z } from "zod";
+// import { getAuth } from "@clerk/nextjs/server";
+
+// const answerSchema = z.object({
+//   answers: z
+//     .array(
+//       z.object({
+//         questionId: z.string().min(1, "Question ID is required"),
+//         answer: z.string().min(1, "Answer is required"),
+//       })
+//     )
+//     .min(1, "At least one answer is required"),
+// });
+
+// export async function POST(
+//   request: NextRequest,
+//   { params }: { params: { courseId: string; chapterId: string } }
+// ) {
+//   const { courseId, chapterId } = params;
+
+//   // Parse the request body
+//   const body = await request.json();
+
+//   // Validate the request body against the schema
+//   const result = answerSchema.safeParse(body);
+
+//   if (!result.success) {
+//     console.error("Validation errors:", result.error.errors);
+//     return NextResponse.json(
+//       { message: "Validation failed", errors: result.error.errors },
+//       { status: 400 }
+//     );
+//   }
+
+//   const { answers } = result.data;
+
+//   // Get user authentication details from the request
+//   const { userId } = getAuth(request);
+
+//   // Check if the user is authenticated and use type guard
+//   if (!userId || typeof userId !== "string") {
+//     return NextResponse.json(
+//       { message: "User not authenticated or user ID is invalid" },
+//       { status: 401 }
+//     );
+//   }
+
+//   try {
+//     // Check if user exists, if not, create the user
+//     let user = await prisma.user.findUnique({ where: { id: userId } });
+//     if (!user) {
+//       console.log(`User not found, creating user with ID: ${userId}`);
+//       user = await prisma.user.create({
+//         data: {
+//           id: userId,
+//           name: "New User",
+//           email: "user@example.com",
+//         },
+//       });
+//     } else {
+//       console.log(`User found with ID: ${userId}`);
+//     }
+
+//     // Fetch quiz questions with their options for the chapter quiz
+//     const quizQuestions = await prisma.chapterQuestion.findMany({
+//       where: { chapterQuiz: { chapterId } },
+//       include: {
+//         chapterOptions: true,
+//       },
+//     });
+
+//     if (quizQuestions.length === 0) {
+//       return NextResponse.json(
+//         { message: "No questions found for this chapter quiz" },
+//         { status: 404 }
+//       );
+//     }
+
+//     console.log("quizQuestions:", quizQuestions);
+//     console.log("submitted answers:", answers);
+
+//     let score = 0;
+//     const totalQuestions = quizQuestions.length;
+
+//     // Create a map of correct answers with question IDs
+//     const correctAnswersMap = new Map();
+//     quizQuestions.forEach((question) => {
+//       const correctOption = question.chapterOptions.find((option) => option.isCorrect);
+//       if (correctOption) {
+//         correctAnswersMap.set(question.id, correctOption.text);
+//       }
+//     });
+
+//     // Compare submitted answers with correct answers
+//     answers.forEach((submittedAnswer) => {
+//       const correctAnswer = correctAnswersMap.get(submittedAnswer.questionId);
+//       console.log(
+//         `Checking: Question ID: ${submittedAnswer.questionId}, Submitted Answer: ${submittedAnswer.answer}, Correct Answer: ${correctAnswer}`
+//       );
+
+//       if (correctAnswer && correctAnswer === submittedAnswer.answer) {
+//         score++;
+//       }
+//     });
+
+//     // Fetch the chapter quiz to get its ID
+//     const chapterQuiz = await prisma.chapterQuiz.findFirst({
+//       where: { chapterId },
+//     });
+
+//     if (!chapterQuiz) {
+//       return NextResponse.json({ message: "Chapter quiz not found" }, { status: 404 });
+//     }
+
+//     // Create the quiz attempt with all required fields
+//     const quizAttempt = await prisma.chapterQuizAttempt.create({
+//       data: {
+//         chapterQuiz: {
+//           connect: { id: chapterQuiz.id },
+//         },
+//         student: {
+//           connect: { id: userId },
+//         },
+//         score,
+//         totalQuestions,
+//         chapterId,
+//         answers: JSON.stringify(answers),
+//       },
+//     });
+
+//     return NextResponse.json(
+//       {
+//         score,
+//         totalQuestions,
+//         attemptId: quizAttempt.id,
+//       },
+//       { status: 201 }
+//     );
+//   } catch (error) {
+//     console.error("Failed to submit answers:", error);
+//     const errorMessage =
+//       error instanceof Error ? error.message : "Failed to submit answers";
+
+//     return NextResponse.json(
+//       { message: errorMessage },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+
+
+
+
+
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
@@ -864,10 +1021,8 @@ export async function POST(
 ) {
   const { courseId, chapterId } = params;
 
-  // Parse the request body
+  // Parse and validate the request body
   const body = await request.json();
-
-  // Validate the request body against the schema
   const result = answerSchema.safeParse(body);
 
   if (!result.success) {
@@ -880,10 +1035,9 @@ export async function POST(
 
   const { answers } = result.data;
 
-  // Get user authentication details from the request
+  // Get user authentication details
   const { userId } = getAuth(request);
 
-  // Check if the user is authenticated and use type guard
   if (!userId || typeof userId !== "string") {
     return NextResponse.json(
       { message: "User not authenticated or user ID is invalid" },
@@ -892,7 +1046,7 @@ export async function POST(
   }
 
   try {
-    // Check if user exists, if not, create the user
+    // Ensure user exists, create if not
     let user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       console.log(`User not found, creating user with ID: ${userId}`);
@@ -907,7 +1061,7 @@ export async function POST(
       console.log(`User found with ID: ${userId}`);
     }
 
-    // Fetch quiz questions with their options for the chapter quiz
+    // Fetch quiz questions for the chapter quiz
     const quizQuestions = await prisma.chapterQuestion.findMany({
       where: { chapterQuiz: { chapterId } },
       include: {
@@ -928,23 +1082,24 @@ export async function POST(
     let score = 0;
     const totalQuestions = quizQuestions.length;
 
-    // Create a map of correct answers with question IDs
+    // Create a map of correct answers using the correctAnswer field
     const correctAnswersMap = new Map();
     quizQuestions.forEach((question) => {
-      const correctOption = question.chapterOptions.find((option) => option.isCorrect);
-      if (correctOption) {
-        correctAnswersMap.set(question.id, correctOption.text);
+      if (question.correctAnswer) {
+        correctAnswersMap.set(question.id, question.correctAnswer);
       }
     });
 
     // Compare submitted answers with correct answers
     answers.forEach((submittedAnswer) => {
       const correctAnswer = correctAnswersMap.get(submittedAnswer.questionId);
+      // Extract the answer identifier (e.g., "A", "B", "C") from the submitted answer
+      const submittedAnswerId = submittedAnswer.answer.split(".")[0];
       console.log(
-        `Checking: Question ID: ${submittedAnswer.questionId}, Submitted Answer: ${submittedAnswer.answer}, Correct Answer: ${correctAnswer}`
+        `Checking: Question ID: ${submittedAnswer.questionId}, Submitted Answer: ${submittedAnswer.answer} (ID: ${submittedAnswerId}), Correct Answer: ${correctAnswer}`
       );
 
-      if (correctAnswer && correctAnswer === submittedAnswer.answer) {
+      if (correctAnswer && correctAnswer === submittedAnswerId) {
         score++;
       }
     });
@@ -958,7 +1113,7 @@ export async function POST(
       return NextResponse.json({ message: "Chapter quiz not found" }, { status: 404 });
     }
 
-    // Create the quiz attempt with all required fields
+    // Create the quiz attempt
     const quizAttempt = await prisma.chapterQuizAttempt.create({
       data: {
         chapterQuiz: {
@@ -993,3 +1148,7 @@ export async function POST(
     );
   }
 }
+
+// Ensure the route is not treated as a page for static generation
+export const dynamic = "force-dynamic";
+
