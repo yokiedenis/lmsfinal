@@ -4,288 +4,289 @@
 
 
 
-// import { NextResponse } from 'next/server';
-// import axios from 'axios';
-// import { XMLParser } from 'fast-xml-parser';
-// import { currentUser } from "@clerk/nextjs/server";
-// import { db } from "@/lib/db";
-// import { revalidatePath } from 'next/cache';
+import { NextResponse } from 'next/server';
+import axios from 'axios';
+import { XMLParser } from 'fast-xml-parser';
+import { currentUser } from "@clerk/nextjs/server";
+import { db } from "@/lib/db";
+import { revalidatePath } from 'next/cache';
 
-// const DPO_API_URL = 'https://secure.3gdirectpay.com/API/v6/';
-// const COMPANY_TOKEN = process.env.COMPANY_TOKEN || '8D3DA73D-9D7F-4E09-96D4-3D44E7A83EA3';
-// const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://eduskill-mu.vercel.app/';
+const DPO_API_URL = 'https://secure.3gdirectpay.com/API/v6/';
+const COMPANY_TOKEN = process.env.COMPANY_TOKEN || '8D3DA73D-9D7F-4E09-96D4-3D44E7A83EA3';
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://eduskill-mu.vercel.app/';
 
-// interface PaymentParams {
-//   courseId: string;
-//   chapterId: string;
-// }
+interface PaymentParams {
+  courseId: string;
+  chapterId: string;
+}
 
-// // Token Creation Function
-// const createToken = async (
-//   amount: number | null,
-//   serviceType: number,
-//   params: PaymentParams
-// ) => {
-//   if (amount == null) {
-//     throw new Error('Payment amount is not provided');
-//   }
+// Token Creation Function
+const createToken = async (
+  amount: number | null,
+  serviceType: number,
+  params: PaymentParams
+) => {
+  if (amount == null) {
+    throw new Error('Payment amount is not provided');
+  }
 
-//   const formattedAmount = amount.toFixed(2);
-//   const serviceDate = new Date().toISOString().split('T')[0];
-//   const redirectUrl = `${baseURL}/courses/${params.courseId}/chapters/${params.chapterId}`; // Updated to point to GET endpoint
+  const formattedAmount = amount.toFixed(2);
+  const serviceDate = new Date().toISOString().split('T')[0];
+  const redirectUrl = `${baseURL}/courses/${params.courseId}/chapters/${params.chapterId}`; // Updated to point to GET endpoint
 
-//   const xmlPayload = `<?xml version="1.0" encoding="UTF-8"?>
-//     <API3G>
-//       <CompanyToken>${COMPANY_TOKEN}</CompanyToken>
-//       <Request>createToken</Request>
-//       <Transaction>
-//         <PaymentAmount>${formattedAmount}</PaymentAmount>
-//         <PaymentCurrency>USD</PaymentCurrency>
-//         <RedirectURL>${redirectUrl}</RedirectURL>
-//         <BackURL>${redirectUrl}</BackURL>
-//         <CompanyRefUnique>0</CompanyRefUnique>
-//       </Transaction>
-//       <Services>
-//         <Service>
-//           <ServiceType>${serviceType}</ServiceType>
-//           <ServiceDescription>Test Service</ServiceDescription>
-//           <ServiceDate>${serviceDate}</ServiceDate>
-//         </Service>
-//       </Services>
-//     </API3G>`;
+  const xmlPayload = `<?xml version="1.0" encoding="UTF-8"?>
+    <API3G>
+      <CompanyToken>${COMPANY_TOKEN}</CompanyToken>
+      <Request>createToken</Request>
+      <Transaction>
+        <PaymentAmount>${formattedAmount}</PaymentAmount>
+        <PaymentCurrency>USD</PaymentCurrency>
+        <RedirectURL>${redirectUrl}</RedirectURL>
+        <BackURL>${redirectUrl}</BackURL>
+        <CompanyRefUnique>0</CompanyRefUnique>
+      </Transaction>
+      <Services>
+        <Service>
+          <ServiceType>${serviceType}</ServiceType>
+          <ServiceDescription>Test Service</ServiceDescription>
+          <ServiceDate>${serviceDate}</ServiceDate>
+        </Service>
+      </Services>
+    </API3G>`;
 
-//   try {
-//     const response = await axios.post(DPO_API_URL, xmlPayload, {
-//       headers: {
-//         'Content-Type': 'application/xml',
-//       },
-//     });
+  try {
+    const response = await axios.post(DPO_API_URL, xmlPayload, {
+      headers: {
+        'Content-Type': 'application/xml',
+      },
+    });
 
-//     const parsedResponse = new XMLParser().parse(response.data);
+    const parsedResponse = new XMLParser().parse(response.data);
 
-//     if (parsedResponse.API3G.Result === '000' || parsedResponse.API3G.ResultExplanation === "Transaction created") {
-//       return parsedResponse.API3G.TransToken;
-//     } else {
-//       throw new Error(`DPO API Error: ${parsedResponse.API3G.ResultExplanation}`);
-//     }
+    if (parsedResponse.API3G.Result === '000' || parsedResponse.API3G.ResultExplanation === "Transaction created") {
+      return parsedResponse.API3G.TransToken;
+    } else {
+      throw new Error(`DPO API Error: ${parsedResponse.API3G.ResultExplanation}`);
+    }
 
-//   } catch (error) {
-//     if (axios.isAxiosError(error)) {
-//       console.error('DPO API Error:', error.response?.data || error.message);
-//     } else {
-//       console.error('DPO API Error:', error);
-//     }
-//     throw new Error('Failed to create payment token');
-//   }
-// };
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('DPO API Error:', error.response?.data || error.message);
+    } else {
+      console.error('DPO API Error:', error);
+    }
+    throw new Error('Failed to create payment token');
+  }
+};
 
-// // Token Verification Function
-// const verifyToken = async (token: string) => {
-//   const xmlPayload = `<?xml version="1.0" encoding="UTF-8"?>
-//     <API3G>
-//       <CompanyToken>${COMPANY_TOKEN}</CompanyToken>
-//       <Request>verifyToken</Request>
-//       <TransactionToken>${token}</TransactionToken>
-//     </API3G>`;
+// Token Verification Function
+const verifyToken = async (token: string) => {
+  const xmlPayload = `<?xml version="1.0" encoding="UTF-8"?>
+    <API3G>
+      <CompanyToken>${COMPANY_TOKEN}</CompanyToken>
+      <Request>verifyToken</Request>
+      <TransactionToken>${token}</TransactionToken>
+    </API3G>`;
 
-//   try {
-//     const response = await axios.post(DPO_API_URL, xmlPayload, {
-//       headers: {
-//         'Content-Type': 'application/xml',
-//       },
-//     });
+  try {
+    const response = await axios.post(DPO_API_URL, xmlPayload, {
+      headers: {
+        'Content-Type': 'application/xml',
+      },
+    });
 
-//     const parsedResponse = new XMLParser().parse(response.data);
+    const parsedResponse = new XMLParser().parse(response.data);
 
-//     if (parsedResponse.API3G.Result === '000') {
-//       return true;
-//     } else {
-//       throw new Error(`DPO API Error: ${parsedResponse.API3G.ResultExplanation}`);
-//     }
+    if (parsedResponse.API3G.Result === '000') {
+      return true;
+    } else {
+      throw new Error(`DPO API Error: ${parsedResponse.API3G.ResultExplanation}`);
+    }
 
-//   } catch (error) {
-//     if (axios.isAxiosError(error)) {
-//       console.error('DPO API Error:', error.response?.data || error.message);
-//     } else {
-//       console.error('DPO API Error:', error);
-//     }
-//     throw new Error('Failed to verify payment token');
-//   }
-// };
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('DPO API Error:', error.response?.data || error.message);
+    } else {
+      console.error('DPO API Error:', error);
+    }
+    throw new Error('Failed to verify payment token');
+  }
+};
 
-// async function createTokenWithRetry(amount: number, serviceType: number, params: { courseId: string; chapterId: string }, retries: number): Promise<string> {
-//   for (let i = 0; i < retries; i++) {
-//     try {
-//       return await createToken(amount, serviceType, params);
-//     } catch (error) {
-//       if (i < retries - 1) {
-//         console.warn(`Attempt ${i + 1} failed. Retrying...`);
-//       } else {
-//         throw error;
-//       }
-//     }
-//   }
-//   throw new Error('Failed to create payment token after multiple attempts');
-// }
+async function createTokenWithRetry(amount: number, serviceType: number, params: { courseId: string; chapterId: string }, retries: number): Promise<string> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await createToken(amount, serviceType, params);
+    } catch (error) {
+      if (i < retries - 1) {
+        console.warn(`Attempt ${i + 1} failed. Retrying...`);
+      } else {
+        throw error;
+      }
+    }
+  }
+  throw new Error('Failed to create payment token after multiple attempts');
+}
 
-// export async function POST(req: Request, { params }: { params: { courseId: string; chapterId: string } }) {
-//   const { price, serviceType } = await req.json();
+export async function POST(req: Request, { params }: { params: { courseId: string; chapterId: string } }) {
+  const { price, serviceType } = await req.json();
 
-//   try {
-//     if (price == null) {
-//       throw new Error('Price is not provided');
-//     }
+  try {
+    if (price == null) {
+      throw new Error('Price is not provided');
+    }
 
-//     const amount = price;
+    const amount = price;
 
-//     // User Authentication
-//     const user = await currentUser();
-//     if (!user || !user.id) {
-//       return new NextResponse("Unauthorized", { status: 401 });
-//     }
+    // User Authentication
+    const user = await currentUser();
+    if (!user || !user.id) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
 
-//     // Check if course exists and is published
-//     const course = await db.course.findUnique({
-//       where: {
-//         id: params.courseId,
-//         isPublished: true,
-//       },
-//     });
+    // Check if course exists and is published
+    const course = await db.course.findUnique({
+      where: {
+        id: params.courseId,
+        isPublished: true,
+      },
+    });
 
-//     if (!course) {
-//       return new NextResponse("Course not found", { status: 404 });
-//     }
+    if (!course) {
+      return new NextResponse("Course not found", { status: 404 });
+    }
 
-//     // Check if the user has already purchased this course
-//     const existingPurchase = await db.purchase.findUnique({
-//       where: {
-//         userId_courseId: {
-//           userId: user.id,
-//           courseId: params.courseId,
-//         },
-//       },
-//     });
+    // Check if the user has already purchased this course
+    const existingPurchase = await db.purchase.findUnique({
+      where: {
+        userId_courseId: {
+          userId: user.id,
+          courseId: params.courseId,
+        },
+      },
+    });
 
-//     if (existingPurchase) {
-//       return new NextResponse("Already Purchased", { status: 400 });
-//     }
+    if (existingPurchase) {
+      return new NextResponse("Already Purchased", { status: 400 });
+    }
 
-//     // Create transaction with PENDING status before payment
-//     const transaction = await db.transaction.create({
-//       data: {
-//         userId: user.id,
-//         courseId: params.courseId,
-//         amount: amount,
-//         dpoToken: null, // Will be updated later
-//         status: 'PENDING',
-//       },
-//     });
+    // Create transaction with PENDING status before payment
+    const transaction = await db.transaction.create({
+      data: {
+        userId: user.id,
+        courseId: params.courseId,
+        chapterId: params.chapterId,
+        amount: amount,
+        dpoToken: null, // Will be updated later
+        status: 'PENDING',
+      },
+    });
 
-//     // DPO Payment Token Creation with Retry
-//     const token = await createTokenWithRetry(amount, serviceType, params, 3);
+    // DPO Payment Token Creation with Retry
+    const token = await createTokenWithRetry(amount, serviceType, params, 3);
 
-//     // Update the transaction with the DPO token
-//     await db.transaction.update({
-//       where: { id: transaction.id },
-//       data: { dpoToken: token },
-//     });
+    // Update the transaction with the DPO token
+    await db.transaction.update({
+      where: { id: transaction.id },
+      data: { dpoToken: token },
+    });
 
-//     // Redirect to DPO payment page
-//     return NextResponse.json({
-//       url: `https://secure.3gdirectpay.com/payv3.php?ID=${token}&transactionId=${transaction.id}`,
-//     });
+    // Redirect to DPO payment page
+    return NextResponse.json({
+      url: `https://secure.3gdirectpay.com/payv3.php?ID=${token}&transactionId=${transaction.id}`,
+    });
 
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       console.error('Error in payment processing:', error);
-//       return NextResponse.json({ error: error.message }, { status: 500 });
-//     } else {
-//       console.error('Unexpected error:', error);
-//       return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
-//     }
-//   }
-// }
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('Error in payment processing:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    } else {
+      console.error('Unexpected error:', error);
+      return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
+    }
+  }
+}
 
-// export async function GET(req: Request) {
-//   const url = new URL(req.url);
-//   const token = url.searchParams.get('token');
-//   const courseId = url.searchParams.get('courseId');
-//   const chapterId = url.searchParams.get('chapterId');
-//   const transactionId = url.searchParams.get('transactionId');
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const token = url.searchParams.get('token');
+  const courseId = url.searchParams.get('courseId');
+  const chapterId = url.searchParams.get('chapterId');
+  const transactionId = url.searchParams.get('transactionId');
 
-//   if (!token || !courseId || !chapterId || !transactionId) {
-//     return new NextResponse("Missing parameters", { status: 400 });
-//   }
+  if (!token || !courseId || !chapterId || !transactionId) {
+    return new NextResponse("Missing parameters", { status: 400 });
+  }
 
-//   try {
-//     // Verify the token (ensure payment was successful)
-//     const isVerified = await verifyToken(token);
+  try {
+    // Verify the token (ensure payment was successful)
+    const isVerified = await verifyToken(token);
 
-//     if (!isVerified) {
-//       // Update transaction status to FAILED if verification fails
-//       await db.transaction.update({
-//         where: { id: transactionId },
-//         data: { status: 'FAILED' },
-//       });
-//       return new NextResponse("Payment verification failed", { status: 400 });
-//     }
+    if (!isVerified) {
+      // Update transaction status to FAILED if verification fails
+      await db.transaction.update({
+        where: { id: transactionId },
+        data: { status: 'FAILED' },
+      });
+      return new NextResponse("Payment verification failed", { status: 400 });
+    }
 
-//     // Get the current user
-//     const user = await currentUser();
-//     if (!user || !user.id) {
-//       return new NextResponse("Unauthorized", { status: 401 });
-//     }
+    // Get the current user
+    const user = await currentUser();
+    if (!user || !user.id) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
 
-//     // Check if course exists and is published
-//     const course = await db.course.findUnique({
-//       where: {
-//         id: courseId,
-//         isPublished: true,
-//       },
-//     });
+    // Check if course exists and is published
+    const course = await db.course.findUnique({
+      where: {
+        id: courseId,
+        isPublished: true,
+      },
+    });
 
-//     if (!course) {
-//       return new NextResponse("Course not found", { status: 404 });
-//     }
+    if (!course) {
+      return new NextResponse("Course not found", { status: 404 });
+    }
 
-//     // Update transaction status to COMPLETED
-//     const updatedTransaction = await db.transaction.update({
-//       where: { id: transactionId },
-//       data: {
-//         status: 'COMPLETED',
-//         dpoToken: token, // Ensure DPO token is stored
-//       },
-//     });
+    // Update transaction status to COMPLETED
+    const updatedTransaction = await db.transaction.update({
+      where: { id: transactionId },
+      data: {
+        status: 'COMPLETED',
+        dpoToken: token, // Ensure DPO token is stored
+      },
+    });
 
-//     // Create purchase after successful payment
-//     const purchase = await db.purchase.create({
-//       data: {
-//         userId: user.id,
-//         courseId: courseId,
-//         transactionId: updatedTransaction.id,
-//       },
-//     });
+    // Create purchase after successful payment
+    const purchase = await db.purchase.create({
+      data: {
+        userId: user.id,
+        courseId: courseId,
+        transactionId: updatedTransaction.id,
+      },
+    });
 
-//     console.log('Transaction updated and Purchase created after successful DPO payment:', { transaction: updatedTransaction, purchase });
+    console.log('Transaction updated and Purchase created after successful DPO payment:', { transaction: updatedTransaction, purchase });
 
-//     // Revalidate the chapter page to ensure UI updates
-//     revalidatePath(`/courses/${courseId}/chapters/${chapterId}`);
+    // Revalidate the chapter page to ensure UI updates
+    revalidatePath(`/courses/${courseId}/chapters/${chapterId}`);
 
-//     // Redirect to the payment success page
-//     return NextResponse.redirect(
-//       `${baseURL}/courses/${courseId}/chapters/${chapterId}/payment-success`
-//     );
+    // Redirect to the payment success page
+    return NextResponse.redirect(
+      `${baseURL}/courses/${courseId}/chapters/${chapterId}/payment-success`
+    );
 
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       console.error('Error in payment verification:', error);
-//       return NextResponse.json({ error: error.message }, { status: 500 });
-//     } else {
-//       console.error('Unexpected error:', error);
-//       return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
-//     }
-//   }
-// }
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('Error in payment verification:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    } else {
+      console.error('Unexpected error:', error);
+      return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
+    }
+  }
+}
 
 
 
@@ -1120,226 +1121,467 @@
 
 
 
-import { NextResponse } from "next/server";
-import axios from "axios";
-import { XMLParser, XMLBuilder } from "fast-xml-parser";
-import { currentUser } from "@clerk/nextjs/server";
-import { db } from "@/lib/db";
+// import { NextResponse } from "next/server";
+// import axios from "axios";
+// import { XMLParser, XMLBuilder } from "fast-xml-parser";
+// import { currentUser } from "@clerk/nextjs/server";
+// import { db } from "@/lib/db";
 
-const DPO_API_URL = "https://secure.3gdirectpay.com/API/v6/";
-const COMPANY_TOKEN = "8D3DA73D-9D7F-4E09-96D4-3D44E7A83EA3";
-const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://eduskill-mu.vercel.app/";
+// const DPO_API_URL = "https://secure.3gdirectpay.com/API/v6/";
+// const COMPANY_TOKEN = "8D3DA73D-9D7F-4E09-96D4-3D44E7A83EA3";
+// const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://eduskill-mu.vercel.app/";
 
-interface DPORequest {
-  CompanyToken: string;
-  Request: string;
-  Transaction: {
-    PaymentAmount: string;
-    PaymentCurrency: string;
-    RedirectURL: string;
-    BackURL: string;
-    CompanyRefUnique: string;
-    PTL?: string;
-  };
-  Services: {
-    Service: {
-      ServiceType: number;
-      ServiceDescription: string;
-      ServiceDate: string;
-    };
-  };
-  CustomerEmail?: string;
-}
+// interface DPORequest {
+//   CompanyToken: string;
+//   Request: string;
+//   Transaction: {
+//     PaymentAmount: string;
+//     PaymentCurrency: string;
+//     RedirectURL: string;
+//     BackURL: string;
+//     CompanyRefUnique: string;
+//     PTL?: string;
+//   };
+//   Services: {
+//     Service: {
+//       ServiceType: number;
+//       ServiceDescription: string;
+//       ServiceDate: string;
+//     };
+//   };
+//   CustomerEmail?: string;
+// }
 
-interface DPOResponse {
-  API3G: {
-    Result: string;
-    ResultExplanation: string;
-    TransToken?: string;
-    TransactionStatus?: string;
-  };
-}
+// interface DPOResponse {
+//   API3G: {
+//     Result: string;
+//     ResultExplanation: string;
+//     TransToken?: string;
+//     TransactionStatus?: string;
+//   };
+// }
 
-const createToken = async (
-  amount: number,
-  serviceType: number,
-  params: { courseId: string; chapterId: string },
-  userEmail: string
-): Promise<string> => {
-  const formattedAmount = amount.toFixed(2);
-  const serviceDate = new Date().toISOString().split("T")[0];
-  const redirectUrl = `${baseURL}/api/courses/${params.courseId}/chapters/${params.chapterId}/payment-success`;
-  const backUrl = `${baseURL}/api/courses/${params.courseId}/chapters/${params.chapterId}/payment-cancel`;
+// const createToken = async (
+//   amount: number,
+//   serviceType: number,
+//   params: { courseId: string; chapterId: string },
+//   userEmail: string
+// ): Promise<string> => {
+//   const formattedAmount = amount.toFixed(2);
+//   const serviceDate = new Date().toISOString().split("T")[0];
+//   const redirectUrl = `${baseURL}/api/courses/${params.courseId}/chapters/${params.chapterId}/payment-success`;
+//   const backUrl = `${baseURL}/api/courses/${params.courseId}/chapters/${params.chapterId}/payment-cancel`;
 
-  const requestData: DPORequest = {
-    CompanyToken: COMPANY_TOKEN,
-    Request: "createToken",
-    Transaction: {
-      PaymentAmount: formattedAmount,
-      PaymentCurrency: "USD",
-      RedirectURL: redirectUrl,
-      BackURL: backUrl,
-      CompanyRefUnique: "0",
-      PTL: "5",
-    },
-    Services: {
-      Service: {
-        ServiceType: serviceType,
-        ServiceDescription: `Course Purchase - ${params.courseId}`,
-        ServiceDate: serviceDate,
-      },
-    },
-    CustomerEmail: userEmail,
-  };
+//   const requestData: DPORequest = {
+//     CompanyToken: COMPANY_TOKEN,
+//     Request: "createToken",
+//     Transaction: {
+//       PaymentAmount: formattedAmount,
+//       PaymentCurrency: "USD",
+//       RedirectURL: redirectUrl,
+//       BackURL: backUrl,
+//       CompanyRefUnique: "0",
+//       PTL: "5",
+//     },
+//     Services: {
+//       Service: {
+//         ServiceType: serviceType,
+//         ServiceDescription: `Course Purchase - ${params.courseId}`,
+//         ServiceDate: serviceDate,
+//       },
+//     },
+//     CustomerEmail: userEmail,
+//   };
 
-  const builder = new XMLBuilder({
-    format: true,
-    ignoreAttributes: false,
-    suppressEmptyNode: true,
-  });
+//   const builder = new XMLBuilder({
+//     format: true,
+//     ignoreAttributes: false,
+//     suppressEmptyNode: true,
+//   });
 
-  const xmlPayload = builder.build({ API3G: requestData });
+//   const xmlPayload = builder.build({ API3G: requestData });
 
-  try {
-    console.log("DPO API Request Payload:", xmlPayload); // Log request payload
-    const response = await axios.post(DPO_API_URL, xmlPayload, {
-      headers: {
-        "Content-Type": "application/xml",
-      },
-      timeout: 10000,
-    });
+//   try {
+//     console.log("DPO API Request Payload:", xmlPayload); // Log request payload
+//     const response = await axios.post(DPO_API_URL, xmlPayload, {
+//       headers: {
+//         "Content-Type": "application/xml",
+//       },
+//       timeout: 10000,
+//     });
 
-    console.log("DPO API Response:", response.data);
+//     console.log("DPO API Response:", response.data);
 
-    const parser = new XMLParser();
-    const parsedResponse: DPOResponse = parser.parse(response.data);
+//     const parser = new XMLParser();
+//     const parsedResponse: DPOResponse = parser.parse(response.data);
 
-    if (
-      parsedResponse.API3G.Result === "000" ||
-      parsedResponse.API3G.ResultExplanation.includes("Transaction created")
-    ) {
-      if (!parsedResponse.API3G.TransToken) {
-        throw new Error("Transaction token not received");
-      }
-      return parsedResponse.API3G.TransToken;
-    } else {
-      throw new Error(`DPO API Error: ${parsedResponse.API3G.ResultExplanation}`);
-    }
-  } catch (error) {
-    console.error("DPO API Error:", error);
-    throw new Error("Failed to create payment token");
-  }
-};
+//     if (
+//       parsedResponse.API3G.Result === "000" ||
+//       parsedResponse.API3G.ResultExplanation.includes("Transaction created")
+//     ) {
+//       if (!parsedResponse.API3G.TransToken) {
+//         throw new Error("Transaction token not received");
+//       }
+//       return parsedResponse.API3G.TransToken;
+//     } else {
+//       throw new Error(`DPO API Error: ${parsedResponse.API3G.ResultExplanation}`);
+//     }
+//   } catch (error) {
+//     console.error("DPO API Error:", error);
+//     throw new Error("Failed to create payment token");
+//   }
+// };
 
-export async function POST(
-  req: Request,
-  { params }: { params: { courseId: string; chapterId: string } }
-) {
-  try {
-    const { price, serviceType } = await req.json();
+// export async function POST(
+//   req: Request,
+//   { params }: { params: { courseId: string; chapterId: string } }
+// ) {
+//   try {
+//     const { price, serviceType } = await req.json();
 
-    if (price === undefined || price === null || isNaN(Number(price))) {
-      return NextResponse.json(
-        { error: "Valid price is required" },
-        { status: 400 }
-      );
-    }
+//     if (price === undefined || price === null || isNaN(Number(price))) {
+//       return NextResponse.json(
+//         { error: "Valid price is required" },
+//         { status: 400 }
+//       );
+//     }
 
-    if (!serviceType || isNaN(Number(serviceType))) {
-      return NextResponse.json(
-        { error: "Valid service type is required" },
-        { status: 400 }
-      );
-    }
+//     if (!serviceType || isNaN(Number(serviceType))) {
+//       return NextResponse.json(
+//         { error: "Valid service type is required" },
+//         { status: 400 }
+//       );
+//     }
 
-    const amount = Number(price);
-    const numericServiceType = Number(serviceType);
+//     const amount = Number(price);
+//     const numericServiceType = Number(serviceType);
 
-    const user = await currentUser();
-    if (!user?.id || !user.emailAddresses?.[0]?.emailAddress) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
+//     const user = await currentUser();
+//     if (!user?.id || !user.emailAddresses?.[0]?.emailAddress) {
+//       return new NextResponse("Unauthorized", { status: 401 });
+//     }
 
-    const course = await db.course.findUnique({
-      where: {
-        id: params.courseId,
-        isPublished: true,
-      },
-    });
+//     const course = await db.course.findUnique({
+//       where: {
+//         id: params.courseId,
+//         isPublished: true,
+//       },
+//     });
 
-    if (!course) {
-      return new NextResponse("Course not found or not published", { status: 404 });
-    }
+//     if (!course) {
+//       return new NextResponse("Course not found or not published", { status: 404 });
+//     }
 
-    const existingPurchase = await db.purchase.findUnique({
-      where: {
-        userId_courseId: {
-          userId: user.id,
-          courseId: params.courseId,
-        },
-      },
-    });
+//     const existingPurchase = await db.purchase.findUnique({
+//       where: {
+//         userId_courseId: {
+//           userId: user.id,
+//           courseId: params.courseId,
+//         },
+//       },
+//     });
 
-    if (existingPurchase) {
-      return new NextResponse("Already purchased this course", { status: 409 });
-    }
+//     if (existingPurchase) {
+//       return new NextResponse("Already purchased this course", { status: 409 });
+//     }
 
-    // Clean up old pending transactions
-    await db.transaction.updateMany({
-      where: {
-        userId: user.id,
-        courseId: params.courseId,
-        status: "PENDING",
-        createdAt: {
-          lte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Expire after 24 hours
-        },
-      },
-      data: {
-        status: "CANCELLED",
-      },
-    });
+//     // Clean up old pending transactions
+//     await db.transaction.updateMany({
+//       where: {
+//         userId: user.id,
+//         courseId: params.courseId,
+//         status: "PENDING",
+//         createdAt: {
+//           lte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Expire after 24 hours
+//         },
+//       },
+//       data: {
+//         status: "CANCELLED",
+//       },
+//     });
 
-    // Create transaction record
-    const transaction = await db.transaction.create({
-      data: {
-        userId: user.id,
-        courseId: params.courseId,
-        chapterId: params.chapterId,
-        amount: amount,
-        status: "PENDING",
-      },
-    });
+//     // Create transaction record
+//     const transaction = await db.transaction.create({
+//       data: {
+//         userId: user.id,
+//         courseId: params.courseId,
+//         chapterId: params.chapterId,
+//         amount: amount,
+//         status: "PENDING",
+//       },
+//     });
 
-    const token = await createToken(amount, numericServiceType, params, user.emailAddresses[0].emailAddress);
+//     const token = await createToken(amount, numericServiceType, params, user.emailAddresses[0].emailAddress);
 
-    await db.transaction.update({
-      where: { id: transaction.id },
-      data: { dpoToken: token },
-    });
+//     await db.transaction.update({
+//       where: { id: transaction.id },
+//       data: { dpoToken: token },
+//     });
 
-    return NextResponse.json({
-      url: `https://secure.3gdirectpay.com/payv3.php?ID=${token}`,
-      transactionId: transaction.id,
-    });
-  } catch (error) {
-    console.error("Checkout Error:", {
-      error: error instanceof Error ? error.message : "Unknown error",
-      stack: error instanceof Error ? error.stack : undefined,
-      courseId: params.courseId,
-      chapterId: params.chapterId,
-      userId: (await currentUser())?.id,
-    });
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Checkout failed",
-        details:
-          process.env.NODE_ENV === "development"
-            ? error instanceof Error
-              ? error.stack
-              : undefined
-            : undefined,
-      },
-      { status: 500 }
-    );
-  }
-}
+//     return NextResponse.json({
+//       url: `https://secure.3gdirectpay.com/payv3.php?ID=${token}`,
+//       transactionId: transaction.id,
+//     });
+//   } catch (error) {
+//     console.error("Checkout Error:", {
+//       error: error instanceof Error ? error.message : "Unknown error",
+//       stack: error instanceof Error ? error.stack : undefined,
+//       courseId: params.courseId,
+//       chapterId: params.chapterId,
+//       userId: (await currentUser())?.id,
+//     });
+//     return NextResponse.json(
+//       {
+//         error: error instanceof Error ? error.message : "Checkout failed",
+//         details:
+//           process.env.NODE_ENV === "development"
+//             ? error instanceof Error
+//               ? error.stack
+//               : undefined
+//             : undefined,
+//       },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+
+
+
+
+
+
+
+
+
+
+// import { NextResponse } from "next/server";
+// import axios from "axios";
+// import { XMLParser, XMLBuilder } from "fast-xml-parser";
+// import { currentUser } from "@clerk/nextjs/server";
+// import { db } from "@/lib/db";
+
+// const DPO_API_URL = "https://secure.3gdirectpay.com/API/v6/";
+// const COMPANY_TOKEN = "8D3DA73D-9D7F-4E09-96D4-3D44E7A83EA3";
+// const baseURL = process.env.NEXT_PUBLIC_APP_URL || "https://eduskill-mu.vercel.app/";
+
+// interface DPORequest {
+//   CompanyToken: string;
+//   Request: string;
+//   Transaction: {
+//     PaymentAmount: string;
+//     PaymentCurrency: string;
+//     RedirectURL: string;
+//     BackURL: string;
+//     CompanyRefUnique: string;
+//     PTL?: string;
+//   };
+//   Services: {
+//     Service: {
+//       ServiceType: number;
+//       ServiceDescription: string;
+//       ServiceDate: string;
+//     };
+//   };
+//   CustomerEmail?: string;
+// }
+
+// interface DPOResponse {
+//   API3G: {
+//     Result: string;
+//     ResultExplanation: string;
+//     TransToken?: string;
+//     TransactionStatus?: string;
+//   };
+// }
+
+// const createToken = async (
+//   amount: number,
+//   serviceType: number,
+//   params: { courseId: string; chapterId: string },
+//   userEmail: string,
+//   userId: string
+// ): Promise<string> => {
+//   const formattedAmount = amount.toFixed(2);
+//   const serviceDate = new Date().toISOString().split("T")[0];
+//   const redirectUrl = `${baseURL}/api/courses/${params.courseId}/chapters/${params.chapterId}/payment-success`;
+//   const backUrl = `${baseURL}/api/courses/${params.courseId}/chapters/${params.chapterId}/payment-cancel`;
+
+//   const requestData: DPORequest = {
+//     CompanyToken: COMPANY_TOKEN,
+//     Request: "createToken",
+//     Transaction: {
+//       PaymentAmount: formattedAmount,
+//       PaymentCurrency: "USD",
+//       RedirectURL: redirectUrl,
+//       BackURL: backUrl,
+//       CompanyRefUnique: userId, // Using user ID as unique reference
+//       PTL: "5",
+//     },
+//     Services: {
+//       Service: {
+//         ServiceType: serviceType,
+//         ServiceDescription: `Course Purchase - ${params.courseId}`,
+//         ServiceDate: serviceDate,
+//       },
+//     },
+//     CustomerEmail: userEmail,
+//   };
+
+//   const builder = new XMLBuilder({
+//     format: true,
+//     ignoreAttributes: false,
+//     suppressEmptyNode: true,
+//   });
+
+//   const xmlPayload = builder.build({ API3G: requestData });
+
+//   try {
+//     console.log("DPO API Request Payload:", xmlPayload);
+//     const response = await axios.post(DPO_API_URL, xmlPayload, {
+//       headers: {
+//         "Content-Type": "application/xml",
+//       },
+//       timeout: 10000,
+//     });
+
+//     console.log("DPO API Response:", response.data);
+
+//     const parser = new XMLParser();
+//     const parsedResponse: DPOResponse = parser.parse(response.data);
+
+//     if (
+//       parsedResponse.API3G.Result === "000" ||
+//       parsedResponse.API3G.ResultExplanation.includes("Transaction created")
+//     ) {
+//       if (!parsedResponse.API3G.TransToken) {
+//         throw new Error("Transaction token not received");
+//       }
+//       return parsedResponse.API3G.TransToken;
+//     } else {
+//       throw new Error(`DPO API Error: ${parsedResponse.API3G.ResultExplanation}`);
+//     }
+//   } catch (error) {
+//     console.error("DPO API Error:", error);
+//     throw new Error("Failed to create payment token");
+//   }
+// };
+
+// export async function POST(
+//   req: Request,
+//   { params }: { params: { courseId: string; chapterId: string } }
+// ) {
+//   try {
+//     const { price, serviceType } = await req.json();
+
+//     if (price === undefined || price === null || isNaN(Number(price))) {
+//       return NextResponse.json(
+//         { error: "Valid price is required" },
+//         { status: 400 }
+//       );
+//     }
+
+//     if (!serviceType || isNaN(Number(serviceType))) {
+//       return NextResponse.json(
+//         { error: "Valid service type is required" },
+//         { status: 400 }
+//       );
+//     }
+
+//     const amount = Number(price);
+//     const numericServiceType = Number(serviceType);
+
+//     const user = await currentUser();
+//     if (!user?.id || !user.emailAddresses?.[0]?.emailAddress) {
+//       return new NextResponse("Unauthorized", { status: 401 });
+//     }
+
+//     const course = await db.course.findUnique({
+//       where: {
+//         id: params.courseId,
+//         isPublished: true,
+//       },
+//     });
+
+//     if (!course) {
+//       return new NextResponse("Course not found or not published", { status: 404 });
+//     }
+
+//     const existingPurchase = await db.purchase.findUnique({
+//       where: {
+//         userId_courseId: {
+//           userId: user.id,
+//           courseId: params.courseId,
+//         },
+//       },
+//     });
+
+//     if (existingPurchase) {
+//       return new NextResponse("Already purchased this course", { status: 409 });
+//     }
+
+//     // Clean up old pending transactions
+//     await db.transaction.updateMany({
+//       where: {
+//         userId: user.id,
+//         courseId: params.courseId,
+//         status: "PENDING",
+//         createdAt: {
+//           lte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Expire after 24 hours
+//         },
+//       },
+//       data: {
+//         status: "CANCELLED",
+//       },
+//     });
+
+//     // Create transaction record
+//     const transaction = await db.transaction.create({
+//       data: {
+//         userId: user.id,
+//         courseId: params.courseId,
+//         chapterId: params.chapterId,
+//         amount: amount,
+//         status: "PENDING",
+//       },
+//     });
+
+//     const token = await createToken(
+//       amount,
+//       numericServiceType,
+//       params,
+//       user.emailAddresses[0].emailAddress,
+//       user.id
+//     );
+
+//     await db.transaction.update({
+//       where: { id: transaction.id },
+//       data: { dpoToken: token },
+//     });
+
+//     return NextResponse.json({
+//       url: `https://secure.3gdirectpay.com/payv3.php?ID=${token}`,
+//       transactionId: transaction.id,
+//     });
+//   } catch (error) {
+//     console.error("Checkout Error:", {
+//       error: error instanceof Error ? error.message : "Unknown error",
+//       stack: error instanceof Error ? error.stack : undefined,
+//       courseId: params.courseId,
+//       chapterId: params.chapterId,
+//       userId: (await currentUser())?.id,
+//     });
+//     return NextResponse.json(
+//       {
+//         error: error instanceof Error ? error.message : "Checkout failed",
+//         details:
+//           process.env.NODE_ENV === "development"
+//             ? error instanceof Error
+//               ? error.stack
+//               : undefined
+//             : undefined,
+//       },
+//       { status: 500 }
+//     );
+//   }
+// }

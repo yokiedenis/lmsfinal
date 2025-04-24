@@ -55,5 +55,19 @@
     "content": "A new Project has come up ",
     "replies": [],
     "isPinned": true
+  },
+  {
+    "id": "1745417015953",
+    "author": {
+      "name": "teachereduskill2",
+      "role": "Student",
+      "avatar": "https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18ydGV1cDgzZk41NGtCdW8xUWFWNVhuQm93dDcifQ"
+    },
+    "createdAt": 1745417015953,
+    "date": "Apr 23, 2025",
+    "timeSince": "Just now",
+    "title": "amazing stories",
+    "content": "hello everyone",
+    "replies": []
   }
 ]
