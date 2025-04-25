@@ -1021,8 +1021,10 @@ export async function POST(
 ) {
   const { courseId, chapterId } = params;
 
-  // Parse and validate the request body
+  // Parse the request body
   const body = await request.json();
+
+  // Validate the request body against the schema
   const result = answerSchema.safeParse(body);
 
   if (!result.success) {
@@ -1035,9 +1037,10 @@ export async function POST(
 
   const { answers } = result.data;
 
-  // Get user authentication details
+  // Get user authentication details from the request
   const { userId } = getAuth(request);
 
+  // Check if the user is authenticated and use type guard
   if (!userId || typeof userId !== "string") {
     return NextResponse.json(
       { message: "User not authenticated or user ID is invalid" },
@@ -1046,27 +1049,25 @@ export async function POST(
   }
 
   try {
-    // Ensure user exists, create if not
+    // Check if user exists, if not, create the user
     let user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       console.log(`User not found, creating user with ID: ${userId}`);
       user = await prisma.user.create({
         data: {
-          id: userId,
-          name: "New User",
-          email: "user@example.com",
+          id: userId, // Assuming userId from Clerk matches your database ID format
+          name: "New User", // You might want to fetch this from Clerk or default it
+          email: "user@example.com", // Similarly, default or fetch from Clerk
         },
       });
     } else {
       console.log(`User found with ID: ${userId}`);
     }
 
-    // Fetch quiz questions for the chapter quiz
+    // Fetch quiz questions for the chapter quiz associated with this chapterId
     const quizQuestions = await prisma.chapterQuestion.findMany({
       where: { chapterQuiz: { chapterId } },
-      include: {
-        chapterOptions: true,
-      },
+      select: { id: true, correctAnswer: true },
     });
 
     if (quizQuestions.length === 0) {
@@ -1082,24 +1083,23 @@ export async function POST(
     let score = 0;
     const totalQuestions = quizQuestions.length;
 
-    // Create a map of correct answers using the correctAnswer field
-    const correctAnswersMap = new Map();
-    quizQuestions.forEach((question) => {
-      if (question.correctAnswer) {
-        correctAnswersMap.set(question.id, question.correctAnswer);
-      }
-    });
+    const correctAnswersMap = Object.fromEntries(
+      quizQuestions.map((question) => [question.id, question.correctAnswer.trim()])
+    );
 
-    // Compare submitted answers with correct answers
-    answers.forEach((submittedAnswer) => {
-      const correctAnswer = correctAnswersMap.get(submittedAnswer.questionId);
-      // Extract the answer identifier (e.g., "A", "B", "C") from the submitted answer
-      const submittedAnswerId = submittedAnswer.answer.split(".")[0];
+    answers.forEach((answer) => {
+      // Extract the letter (e.g., "A", "B", "C", "D") from the submitted answer
+      const submittedAnswerMatch = answer.answer.match(/^[A-D]\./i);
+      const submittedAnswer = submittedAnswerMatch
+        ? submittedAnswerMatch[0].replace(".", "").trim()
+        : "";
+      const correctAnswer = correctAnswersMap[answer.questionId];
+
       console.log(
-        `Checking: Question ID: ${submittedAnswer.questionId}, Submitted Answer: ${submittedAnswer.answer} (ID: ${submittedAnswerId}), Correct Answer: ${correctAnswer}`
+        `Checking: Question ID: ${answer.questionId}, Submitted Answer: ${submittedAnswer}, Correct Answer: ${correctAnswer}`
       );
 
-      if (correctAnswer && correctAnswer === submittedAnswerId) {
+      if (correctAnswer && correctAnswer === submittedAnswer) {
         score++;
       }
     });
@@ -1113,7 +1113,7 @@ export async function POST(
       return NextResponse.json({ message: "Chapter quiz not found" }, { status: 404 });
     }
 
-    // Create the quiz attempt
+    // Create the quiz attempt with all required fields
     const quizAttempt = await prisma.chapterQuizAttempt.create({
       data: {
         chapterQuiz: {
@@ -1124,7 +1124,7 @@ export async function POST(
         },
         score,
         totalQuestions,
-        chapterId,
+        chapterId, // Added required chapterId from params
         answers: JSON.stringify(answers),
       },
     });
@@ -1148,7 +1148,3 @@ export async function POST(
     );
   }
 }
-
-// Ensure the route is not treated as a page for static generation
-export const dynamic = "force-dynamic";
-

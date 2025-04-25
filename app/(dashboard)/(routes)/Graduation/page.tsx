@@ -2641,18 +2641,33 @@ const Certificate: React.FC<CertificateProps> = ({
   });
 
   // Generate QR code for verification
-  useEffect(() => {
-    if (user) {
-      const qrData = `https://example.com/verify?certificateId=${certificateId}&user=${user.id}&course=${encodeURIComponent(courseTitle)}`;
-      QRCode.toDataURL(qrData, { width: 100, margin: 1 }, (err, url) => {
-        if (err) {
-          console.error('Error generating QR code:', err);
-          return;
-        }
-        setQrCodeUrl(url);
-      });
-    }
-  }, [user, certificateId, courseTitle]);
+  // useEffect(() => {
+  //   if (user) {
+  //     const qrData = `https://example.com/verify?certificateId=${certificateId}&user=${user.id}&course=${encodeURIComponent(courseTitle)}`;
+  //     QRCode.toDataURL(qrData, { width: 100, margin: 1 }, (err, url) => {
+  //       if (err) {
+  //         console.error('Error generating QR code:', err);
+  //         return;
+  //       }
+  //       setQrCodeUrl(url);
+  //     });
+  //   }
+  // }, [user, certificateId, courseTitle]);
+
+
+  // In your Certificate component, update the QR code generation:
+useEffect(() => {
+  if (user) {
+    const qrData = `${window.location.origin}/verify?certificateId=${certificateId}&user=${user.id}&course=${encodeURIComponent(courseTitle)}`;
+    QRCode.toDataURL(qrData, { width: 100, margin: 1 }, (err, url) => {
+      if (err) {
+        console.error('Error generating QR code:', err);
+        return;
+      }
+      setQrCodeUrl(url);
+    });
+  }
+}, [user, certificateId, courseTitle]);
 
   const handleDownloadPDF = async () => {
     if (!certificateRef.current) return;
