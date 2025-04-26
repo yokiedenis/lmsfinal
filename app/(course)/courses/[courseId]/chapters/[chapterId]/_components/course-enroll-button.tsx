@@ -626,6 +626,68 @@
 
 
 
+// "use client";
+
+// import axios from "axios";
+// import { useState } from "react";
+// import { Button } from "@/components/ui/button";
+// import { formatPrice } from "@/lib/format";
+// import toast from "react-hot-toast";
+
+// interface CourseEnrollButtonProps {
+//   price: number;
+//   courseId: string;
+//   chapterId: string;
+//   serviceType: number; // New: to specify which service type (3854 or 5525)
+// }
+
+// export const CourseEnrollButton = ({
+//   price,
+//   courseId,
+//   chapterId,
+//   serviceType
+// }: CourseEnrollButtonProps) => {
+//   const [isLoading, setIsLoading] = useState(false);
+
+//   const onClick = async () => {
+//     try {
+//       setIsLoading(true);
+
+//       // Prepare the data including the service type for DPO
+//       const response = await axios.post(`/api/courses/${courseId}/chapters/${chapterId}/checkout`, { 
+//         price: 0, // or whatever price
+//         serviceType: 3854, 
+//         serviceDate: '2023-12-31' // Example; you'd get this from user input
+//       });
+
+//       // Redirect to the payment URL returned from your server after creating the token
+//       window.location.assign(response.data.url);
+//     } catch (error) {
+//       console.error("DPO_PAY_ERROR", error);
+//       toast.error("Something went wrong");
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   return (
+//     <Button
+//       onClick={onClick}
+//       disabled={isLoading}
+//       size="sm"
+//       className="w-full md:w-auto bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md transition-colors duration-300 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed"
+//     >
+//       Unlock Full Certified Course {formatPrice(price)}
+//     </Button>
+//   );
+// };
+
+
+
+
+
+
+
 "use client";
 
 import axios from "axios";
@@ -633,38 +695,51 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface CourseEnrollButtonProps {
   price: number;
   courseId: string;
   chapterId: string;
-  serviceType: number; // New: to specify which service type (3854 or 5525)
+  serviceType: number;
 }
 
 export const CourseEnrollButton = ({
   price,
   courseId,
   chapterId,
-  serviceType
+  serviceType,
 }: CourseEnrollButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const onClick = async () => {
     try {
       setIsLoading(true);
+      console.log("Enrolling for courseId:", courseId, "Price:", price);
 
-      // Prepare the data including the service type for DPO
-      const response = await axios.post(`/api/courses/${courseId}/chapters/${chapterId}/checkout`, { 
-        price: 0, // or whatever price
-        serviceType: 3854, 
-        serviceDate: '2023-12-31' // Example; you'd get this from user input
-      });
+      if (!courseId) {
+        throw new Error("Course ID is missing");
+      }
+      if (typeof price !== 'number' || price < 0) {
+        throw new Error("Invalid price");
+      }
 
-      // Redirect to the payment URL returned from your server after creating the token
-      window.location.assign(response.data.url);
-    } catch (error) {
-      console.error("DPO_PAY_ERROR", error);
-      toast.error("Something went wrong");
+      if (price > 0) {
+        const response = await axios.post(`/api/courses/${courseId}/chapters/${chapterId}/checkout`, {
+          price,
+          serviceType,
+          serviceDate: new Date().toISOString().split('T')[0],
+        });
+        window.location.assign(response.data.url);
+      } else {
+        await axios.post(`/api/courses/${courseId}/enroll`, {});
+        toast.success("You've successfully enrolled in this course");
+        router.refresh();
+      }
+    } catch (error: unknown) {
+      console.error('Enrollment error:', error);
+      return new Response("Internal Error", { status: 500 });
     } finally {
       setIsLoading(false);
     }
@@ -677,12 +752,10 @@ export const CourseEnrollButton = ({
       size="sm"
       className="w-full md:w-auto bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md transition-colors duration-300 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed"
     >
-      Unlock Full Certified Course {formatPrice(price)}
+      {price > 0 ? `Unlock Full Certified Course ${formatPrice(price)}` : "Enroll a Full Certified Course for Free"}
     </Button>
   );
 };
-
-
 
 
 
