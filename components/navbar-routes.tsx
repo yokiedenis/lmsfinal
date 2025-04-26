@@ -1069,7 +1069,7 @@ export const NavbarRoutes: React.FC<NavbarRoutesProps> = () => {
                 {unreadCount}
               </span>
             )}
-            <span className="hidden md:block text-sm text-custom-yellow">Notifications</span>
+            <span className="hidden md:block text-sm text-custom-yellow">Community Forum</span>
           </div>
         </Link>
 

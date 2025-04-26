@@ -963,7 +963,7 @@ export default async function Dashboard() {
       {/* Advanced Carousel Section */}
       <section className="space-y-6">
         <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">
-          Featured Courses
+          Upcoming Courses
         </h2>
         <div className="relative">
           <div className="overflow-hidden rounded-xl">
