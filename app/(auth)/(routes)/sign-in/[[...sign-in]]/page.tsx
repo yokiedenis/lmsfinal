@@ -83,7 +83,7 @@ const SignInPage: React.FC = () => {
       {/* Image at the bottom */}
       <div className="absolute bottom-10 left-10 z-20 items-end mb-20">
         <img
-          src="/bgi.png"
+          src="/eduskill.png"
           alt="Logo"
           className="h-50 w-5500"
         />
