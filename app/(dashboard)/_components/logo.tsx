@@ -7,7 +7,7 @@ export const Logo = () => {
            height={130}
            width={130}
            alt="logo"
-           src="/logon.png"
+           src="/eduskill.png"
           />
         </div>
     )
