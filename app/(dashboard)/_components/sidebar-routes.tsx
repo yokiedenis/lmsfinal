@@ -191,7 +191,8 @@ const studentRoutes = [
 
 const teacherRoutes = [
   { icon: List, label: "Courses", href: "/teacher/courses" },
-  { icon: MessageCircle, label: "Student Feedback", href: "/teacher/feedback" },
+  //{ icon: MessageCircle, label: "Student Feedback", href: "/teacher/feedback" },
+  { icon: CircleHelp, label: "Student Helper", href: "/help" },
   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
   { icon: FileText, label: "Recordings & Materials", href: "/CourseMaterials" },
   { icon: Brain , label: "ChatBot AI", href: "/chatbot" },
