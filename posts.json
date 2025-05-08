@@ -15,33 +15,6 @@
     "isPinned": true
   },
   {
-    "id": "1744787986227",
-    "author": {
-      "name": "teachereduskill2",
-      "role": "Student",
-      "avatar": "https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18ydGV1cDgzZk41NGtCdW8xUWFWNVhuQm93dDcifQ"
-    },
-    "createdAt": 1744787986227,
-    "date": "Apr 16, 2025",
-    "timeSince": "Just now",
-    "title": "testing post",
-    "content": "whats this post about",
-    "replies": [
-      {
-        "id": "1744787986227-1744788010267",
-        "author": {
-          "name": "teachereduskill2",
-          "role": "Student",
-          "avatar": "https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18ydGV1cDgzZk41NGtCdW8xUWFWNVhuQm93dDcifQ"
-        },
-        "createdAt": 1744788010267,
-        "date": "Apr 16, 2025",
-        "content": "anything you want to say\n"
-      }
-    ],
-    "isPinned": true
-  },
-  {
     "id": "1744788988208",
     "author": {
       "name": "teachereduskill2",
