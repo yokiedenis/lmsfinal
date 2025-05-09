@@ -37,17 +37,17 @@ export default function PaymentSuccessPage() {
         <div className="flex justify-center mb-6">
           <CheckCircle2 className="w-16 h-16 text-green-500 animate-pulse" />
         </div>
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">Payment Successful!</h1>
-        <p className="text-gray-600 mb-6">
+        <h1 className="text-3xl font-bold text-white mb-4">Payment Successful!</h1>
+        <p className="text-white mb-6">
           Congratulations! You’ve successfully unlocked your course. Start learning now and take the next step in your educational journey!
         </p>
         {courseId && chapterId ? (
           <div className="mb-6">
-            <p className="text-gray-700 font-semibold">Course Access Granted</p>
-            <p className="text-gray-500">You can now access all chapters and resources.</p>
+            <p className="text-white font-semibold">Course Access Granted</p>
+            <p className="text-white">You can now access all chapters and resources.</p>
           </div>
         ) : (
-          <p className="text-gray-500 mb-6">Redirecting to your dashboard...</p>
+          <p className="text-white mb-6">Redirecting to your dashboard...</p>
         )}
         <Button
           onClick={handleContinue}

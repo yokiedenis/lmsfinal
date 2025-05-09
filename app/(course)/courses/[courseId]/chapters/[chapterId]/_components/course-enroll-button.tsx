@@ -626,26 +626,88 @@
 
 
 
+// "use client";
+
+// import axios from "axios";
+// import { useState } from "react";
+// import { Button } from "@/components/ui/button";
+// import { formatPrice } from "@/lib/format";
+// import toast from "react-hot-toast";
+
+// interface CourseEnrollButtonProps {
+//   price: number;
+//   courseId: string;
+//   chapterId: string;
+//   serviceType: number; // New: to specify which service type (3854 or 5525)
+// }
+
+// export const CourseEnrollButton = ({
+//   price,
+//   courseId,
+//   chapterId,
+//   serviceType
+// }: CourseEnrollButtonProps) => {
+//   const [isLoading, setIsLoading] = useState(false);
+
+//   const onClick = async () => {
+//     try {
+//       setIsLoading(true);
+
+//       // Prepare the data including the service type for DPO
+//       const response = await axios.post(`/api/courses/${courseId}/chapters/${chapterId}/checkout`, { 
+//         price: 0, // or whatever price
+//         serviceType: 3854, 
+//         serviceDate: '2023-12-31' // Example; you'd get this from user input
+//       });
+
+//       // Redirect to the payment URL returned from your server after creating the token
+//       window.location.assign(response.data.url);
+//     } catch (error) {
+//       console.error("DPO_PAY_ERROR", error);
+//       toast.error("Something went wrong");
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   return (
+//     <Button
+//       onClick={onClick}
+//       disabled={isLoading}
+//       size="sm"
+//       className="w-full md:w-auto bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md transition-colors duration-300 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed"
+//     >
+//       Unlock Full Certified Course {formatPrice(price)}
+//     </Button>
+//   );
+// };
+
+
+
+
+
+
+
+
 "use client";
 
+import React, { useState } from "react";
 import axios from "axios";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
-import toast from "react-hot-toast";
+import { LucideLoader2 } from "lucide-react";
 
 interface CourseEnrollButtonProps {
   price: number;
   courseId: string;
   chapterId: string;
-  serviceType: number; // New: to specify which service type (3854 or 5525)
+  serviceType: number;
 }
 
 export const CourseEnrollButton = ({
   price,
   courseId,
   chapterId,
-  serviceType
+  serviceType,
 }: CourseEnrollButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -653,34 +715,162 @@ export const CourseEnrollButton = ({
     try {
       setIsLoading(true);
 
-      // Prepare the data including the service type for DPO
-      const response = await axios.post(`/api/courses/${courseId}/chapters/${chapterId}/checkout`, { 
-        price: 0, // or whatever price
-        serviceType: 3854, 
-        serviceDate: '2023-12-31' // Example; you'd get this from user input
+      // Different API endpoint based on whether the course is free or paid
+      const endpoint = price === 0
+        ? `/api/courses/${courseId}/chapters/${chapterId}/free-enroll`
+        : `/api/courses/${courseId}/chapters/${chapterId}/checkout`;
+
+      // Prepare the request data
+      const requestData = price === 0
+        ? {} // No payment data needed for free courses
+        : {
+            price,
+            serviceType,
+            serviceDate: new Date().toISOString().split("T")[0],
+          };
+
+      // Log the request data for debugging
+      console.log("Sending request to", endpoint, "with data:", requestData);
+
+      const response = await axios.post(endpoint, requestData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
-      // Redirect to the payment URL returned from your server after creating the token
+       // Redirect to the success page or DPO payment page
       window.location.assign(response.data.url);
     } catch (error) {
-      console.error("DPO_PAY_ERROR", error);
-      toast.error("Something went wrong");
+      console.error(
+        price === 0 ? "FREE_ENROLL_ERROR" : "DPO_PAY_ERROR",
+        error
+      );
+      showToast("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Simple toast function
+  const showToast = (message: string) => {
+    const toast = document.createElement("div");
+    toast.className =
+      "fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded shadow-lg";
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
+  };
+
   return (
-    <Button
+    <button
       onClick={onClick}
       disabled={isLoading}
-      size="sm"
-      className="w-full md:w-auto bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md transition-colors duration-300 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed"
+      className={`w-full md:w-auto py-2 px-4 rounded-lg shadow-md transition-colors duration-300 flex items-center justify-center ${
+        price === 0
+          ? "bg-green-600 hover:bg-green-700 disabled:bg-green-300"
+          : "bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300"
+      } text-white disabled:cursor-not-allowed`}
     >
-      Unlock Full Certified Course {formatPrice(price)}
-    </Button>
+      {isLoading ? (
+        <>
+          <LucideLoader2 className="w-5 h-5 mr-2 animate-spin" />
+          {price === 0 ? "Enrolling..." : "Processing..."}
+        </>
+      ) : (
+        <>
+          {price === 0
+            ? "Enroll For a Full Certified Course For Free"
+            : `Unlock Full Certified Course ${formatPrice(price)}`}
+        </>
+      )}
+    </button>
   );
 };
+
+
+
+ 
+
+
+
+
+
+
+// "use client";
+
+// import axios from "axios";
+// import { useState } from "react";
+// import { Button } from "@/components/ui/button";
+// import { formatPrice } from "@/lib/format";
+// import toast from "react-hot-toast";
+
+// interface CourseEnrollButtonProps {
+//   price: number;
+//   courseId: string;
+//   chapterId: string;
+//   serviceType: number; // New: to specify which service type (3854 or 5525)
+// }
+
+// export const CourseEnrollButton = ({
+//   price,
+//   courseId,
+//   chapterId,
+//   serviceType,
+// }: CourseEnrollButtonProps) => {
+//   const [isLoading, setIsLoading] = useState(false);
+
+//   const onClick = async () => {
+//     try {
+//       setIsLoading(true);
+
+//       if (price === 0) {
+//         // Free course — skip DPO
+//         await axios.post(`/api/courses/${courseId}/chapters/${chapterId}/checkout`, {
+//           price,
+//           serviceType,
+//         });
+
+//         toast.success("Course unlocked successfully!");
+//         window.location.reload(); // Or navigate to course content
+//       } else {
+//         // Paid course — go to DPO
+//         const response = await axios.post(`/api/courses/${courseId}/chapters/${chapterId}/checkout`, {
+//           price,
+//           serviceType,
+//         });
+
+//         window.location.assign(response.data.url);
+//       }
+//     } catch (error) {
+//       console.error("DPO_PAY_ERROR", error);
+//       toast.error("Something went wrong");
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   return (
+//     <Button
+//       onClick={onClick}
+//       disabled={isLoading}
+//       size="sm"
+//       className="w-full md:w-auto bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md transition-colors duration-300 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed"
+//     >
+//       Unlock Full Certified Course {formatPrice(price)}
+//     </Button>
+//   );
+// };
+
+
+
+
+
+
+
+
+ 
 
 
 
