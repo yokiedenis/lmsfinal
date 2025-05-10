@@ -2948,7 +2948,7 @@ export default function Forum() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800">Forum</h2>
+          <h2 className="text-3xl font-bold text-gray-800">Eduskill Community Forum</h2>
           <div className="flex items-center space-x-4">
             <button className="flex items-center space-x-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50">
               <FiFilter className="text-gray-500" />
