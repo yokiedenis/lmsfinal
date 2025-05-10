@@ -467,9 +467,8 @@ const ProfilePage = () => {
                 className="w-full p-2 bg-gray-800 text-white rounded-md border border-gray-700"
               >
                 <option value="STUDENT">Student</option>
-                <option value="TEACHER">Teacher</option>
                 <option value="EMPLOYEE">Employee</option>
-                <option value="ADMIN">Admin</option>
+                 
               </select>
             </div>
           </form>

@@ -181,8 +181,8 @@ const studentRoutes = [
   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
  // { icon: Video, label: "Class Live Stream", href: "/livestream" }, // Base path, will be dynamic
  // { icon: FileText, label: "Recordings & Materials", href: "/CourseMaterials" },
-  { icon: FileText, label: "Recordings", href: "/recordings" }, // New Recordings route
-  { icon: FileText, label: "Attachments", href: "/attachments" }, // New Attachments route
+ // { icon: FileText, label: "Recordings", href: "/recordings" }, // New Recordings route
+ // { icon: FileText, label: "Attachments", href: "/attachments" }, // New Attachments route
   { icon: TrendingUp, label: "Progress Tracker", href: "/progress" }, // New Progress Tracker item
   { icon: Brain , label: "ChatBot AI", href: "/chatbot" },
   { icon: User, label: "User Profile", href: "/profile" },
@@ -194,7 +194,7 @@ const teacherRoutes = [
   //{ icon: MessageCircle, label: "Student Feedback", href: "/teacher/feedback" },
   { icon: CircleHelp, label: "Student Helper", href: "/help" },
   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
-  { icon: FileText, label: "Recordings & Materials", href: "/CourseMaterials" },
+ // { icon: FileText, label: "Recordings & Materials", href: "/CourseMaterials" },
   { icon: Brain , label: "ChatBot AI", href: "/chatbot" },
   //{ icon: Video, label: "Class Live Stream", href: "/livestream" }, // Base path, will be dynamic
 ];

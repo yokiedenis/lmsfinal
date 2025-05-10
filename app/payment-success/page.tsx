@@ -69,7 +69,7 @@ export default function PaymentSuccessPage() {
         <div className="flex justify-center mb-6">
           <CheckCircle2 className="w-16 h-16 text-green-500 animate-pulse" />
         </div>
-        <h1 className="text-3xl font-bold text-white mb-4">Payment Successful!</h1>
+        <h1 className="text-3xl font-bold text-white mb-4">Enrollment Successful!</h1>
         <p className="text-gray-300 mb-6">
           Congratulations! You’ve successfully unlocked your course. Start learning now and take the next step in your educational journey!
         </p>
