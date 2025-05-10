@@ -520,6 +520,8 @@ model User {
   points       Int            @default(0)
   level        Int            @default(1)  // Default level is 1
   userProgress UserProgress[] // Add this line to establish the relation
+  posts        Post[]        //  : Users can author posts
+  replies      Reply[]       //   Users can author replies
   number String? // Optional field for phone number
   transactions Transaction[]
   projectsubmission ProjectSubmission[]
@@ -630,4 +632,41 @@ model LiveSession {
   updatedAt DateTime @updatedAt
   
   @@index([courseId])
+}
+
+
+
+
+
+// Post model for forum posts
+model Post {
+  id         String   @id @map("_id") // Removed @default(uuid()) to allow custom string IDs
+  title      String
+  content    String
+  authorId   String
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  date       String
+  timeSince  String
+  isPinned   Boolean  @default(false)
+  replies    Reply[]  // Relation to replies
+  updatedAt  DateTime @updatedAt
+
+  @@index([authorId])
+}
+
+// Reply model for replies to posts
+model Reply {
+  id         String   @id @map("_id") // Removed @default(uuid()) to allow custom string IDs
+  content    String
+  authorId   String
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  postId     String
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  date       String
+  updatedAt  DateTime @updatedAt
+
+  @@index([postId])
+  @@index([authorId])
 }
