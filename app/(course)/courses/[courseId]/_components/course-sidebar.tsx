@@ -3670,6 +3670,226 @@
 
 
 
+// import { auth } from "@clerk/nextjs/server";
+// import { Chapter, Course, UserProgress, ChapterAttachment } from "@prisma/client";
+// import { redirect } from "next/navigation";
+// import { db } from "@/lib/db";
+// import { CourseProgress } from "@/components/course-progress";
+// import { CourseSidebarItem } from "./course-sidebar-item";
+// import QuizButton from "./quiz-button";
+// import ChapterQuizButton from "./chapter-quiz-button";
+// import { Logo } from "./logo";
+// import axios from "axios";
+
+// const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
+// interface CourseSidebarProps {
+//   course: Course & {
+//     chapters: (Chapter & {
+//       userProgress: UserProgress[] | null;
+//       chapterattachments: ChapterAttachment[];
+//     })[];
+//   };
+//   progressCount: number;
+//   quizId: string;
+// }
+
+// export const CourseSidebar = async ({
+//   course,
+//   progressCount,
+//   quizId,
+// }: CourseSidebarProps) => {
+//   const { userId, getToken } = auth();
+
+//   if (!userId) {
+//     return redirect("/");
+//   }
+
+//   const purchase = await db.purchase.findUnique({
+//     where: {
+//       userId_courseId: {
+//         userId,
+//         courseId: course.id,
+//       },
+//     },
+//   });
+
+//   const token = await getToken();
+
+//   // Check quiz status for each chapter
+//   const chapterQuizStatus = await Promise.all(
+//     course.chapters.map(async (chapter) => {
+//       try {
+//         const response = await axios.get(
+//           `${BASE_URL}/api/courses/${course.id}/chapters/${chapter.id}/chapterquizzes/results`,
+//           {
+//             headers: {
+//               "user-id": userId,
+//               Authorization: token ? `Bearer ${token}` : undefined,
+//             },
+//           }
+//         );
+//         const scorePercentage = response.data.totalQuestions > 0
+//           ? (response.data.score / response.data.totalQuestions) * 100
+//           : 0;
+//         console.log(`Chapter ${chapter.id} quiz results: score=${response.data.score}, totalQuestions=${response.data.totalQuestions}, passed=${scorePercentage >= 60}`);
+//         return { 
+//           chapterId: chapter.id, 
+//           passed: scorePercentage >= 60 || response.data.totalQuestions === 0, // Pass if no questions or score ≥ 60%
+//           completed: !!chapter.userProgress?.[0]?.isCompleted
+//         };
+//       } catch (error: any) {
+//         if (error.response?.status === 404) {
+//           console.log(`No quiz found for chapter ${chapter.id}, treating as passed`);
+//           return { 
+//             chapterId: chapter.id, 
+//             passed: true, // No quiz means passed for this purpose
+//             completed: !!chapter.userProgress?.[0]?.isCompleted
+//           };
+//         }
+//         console.error(`Failed to fetch quiz results for chapter ${chapter.id}:`, error);
+//         return { 
+//           chapterId: chapter.id, 
+//           passed: false,
+//           completed: !!chapter.userProgress?.[0]?.isCompleted
+//         };
+//       }
+//     })
+//   );
+
+//   // Check if all chapters are completed AND their quizzes are passed
+//   const allChaptersCompleted = course.chapters.every(
+//     (chapter) => !!chapter.userProgress?.[0]?.isCompleted
+//   );
+
+//   const allChapterQuizzesPassed = chapterQuizStatus.every(
+//     (status) => status.passed
+//   );
+
+//   // Log for debugging
+//   console.log(`allChaptersCompleted: ${allChaptersCompleted}, allChapterQuizzesPassed: ${allChapterQuizzesPassed}`);
+
+//   // Final condition to show the quiz button
+//   const showFinalQuizButton = allChaptersCompleted && allChapterQuizzesPassed;
+
+//   return (
+//     <div className="h-full border-r flex flex-col overflow-y-auto bg-gray-50 shadow-lg w-80">
+//       {/* Header Section */}
+//       <div className="p-6 bg-white">
+//         <Logo />
+//       </div>
+
+//       {/* Course Title and Progress */}
+//       <div className="p-6 bg-white border-b border-gray-200">
+//         <h1
+//           className="font-bold text-lg text-center"
+//           style={{
+//             color: "#FFD700",
+//             background: "linear-gradient(90deg, #6A0DAD, #8A2BE2)",
+//             padding: "12px",
+//             borderRadius: "8px",
+//             boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+//           }}
+//         >
+//           {course.title}
+//         </h1>
+//         {purchase && (
+//           <div className="mt-6">
+//             <CourseProgress variant="success" value={progressCount} size="sm" />
+//           </div>
+//         )}
+//       </div>
+
+//       {/* Chapters List */}
+//       <div className="flex-1 px-4 py-6 space-y-4">
+//         {course.chapters.map((chapter, index) => {
+//           const chapterStatus = chapterQuizStatus.find(
+//             (status) => status.chapterId === chapter.id
+//           );
+          
+//           const isCurrentChapterPassed = chapterStatus?.passed || false;
+//           const isPreviousChapterPassed = 
+//             index === 0 || chapterQuizStatus[index - 1]?.passed || false;
+          
+//           const isLocked = (!chapter.isFree && !purchase) || 
+//                          (index > 0 && !chapterQuizStatus[index - 1]?.passed);
+
+//           return (
+//             <div
+//               key={chapter.id}
+//               className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
+//             >
+//               <CourseSidebarItem
+//                 id={chapter.id}
+//                 label={chapter.title}
+//                 isCompleted={!!chapter.userProgress?.[0]?.isCompleted}
+//                 courseId={course.id}
+//                 isLocked={isLocked}
+//               />
+
+//               {!isLocked && chapter.chapterattachments?.length > 0 && (
+//                 <details className="group px-4 py-2">
+//                   <summary className="text-sm font-semibold text-gray-700 cursor-pointer flex items-center p-2 rounded-md hover:bg-gray-100 transition-colors duration-200">
+//                     <span className="mr-2 text-red-500">📎</span>
+//                     <span className="text-purple-800">
+//                       Resources ({chapter.chapterattachments.length})
+//                     </span>
+//                   </summary>
+//                   <div className="mt-2 space-y-2">
+//                     {chapter.chapterattachments.map((attachment) => (
+//                       <a
+//                         key={attachment.id}
+//                         href={attachment.url}
+//                         target="_blank"
+//                         rel="noopener noreferrer"
+//                         className="flex items-center p-2 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors duration-200 text-sm text-blue-600 hover:text-blue-800"
+//                       >
+//                         <span className="mr-2">📄</span>
+//                         <span className="truncate">{attachment.name}</span>
+//                       </a>
+//                     ))}
+//                   </div>
+//                 </details>
+//               )}
+
+//               {!!chapter.userProgress?.[0]?.isCompleted && isPreviousChapterPassed && (
+//                 <div className="px-4 pb-4">
+//                   <ChapterQuizButton courseId={course.id} chapterId={chapter.id} />
+//                 </div>
+//               )}
+//             </div>
+//           );
+//         })}
+//       </div>
+
+//       {/* Footer Section */}
+//       <div className="p-6 border-t border-gray-200 bg-white">
+//         {showFinalQuizButton ? (
+//           <QuizButton courseId={course.id} quizId={quizId} />
+//         ) : (
+//           <div className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-4 rounded-lg shadow-md">
+//             <h2 className="text-lg font-semibold">
+//               {allChaptersCompleted && !allChapterQuizzesPassed
+//                 ? "🎯 Pass All Chapter Quizzes"
+//                 : "🎯 Complete All Chapters"}
+//             </h2>
+//             <p className="text-sm mt-1">
+//               {allChaptersCompleted && !allChapterQuizzesPassed
+//                 ? "Complete all chapter quizzes to unlock the final quiz!"
+//                 : "Complete all chapters to unlock chapter quizzes!"}
+//             </p>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+
+
+
+
+// components/course-sidebar.tsx
 import { auth } from "@clerk/nextjs/server";
 import { Chapter, Course, UserProgress, ChapterAttachment } from "@prisma/client";
 import { redirect } from "next/navigation";
@@ -3732,25 +3952,28 @@ export const CourseSidebar = async ({
         const scorePercentage = response.data.totalQuestions > 0
           ? (response.data.score / response.data.totalQuestions) * 100
           : 0;
-        console.log(`Chapter ${chapter.id} quiz results: score=${response.data.score}, totalQuestions=${response.data.totalQuestions}, passed=${scorePercentage >= 60}`);
+        console.log(`Chapter ${chapter.id} quiz results: score=${response.data.score}, totalQuestions=${response.data.totalQuestions}, scorePercentage=${scorePercentage}, passed=${scorePercentage >= 60}, hasAttempted=true`);
         return { 
           chapterId: chapter.id, 
-          passed: scorePercentage >= 60 || response.data.totalQuestions === 0, // Pass if no questions or score ≥ 60%
+          hasAttempted: true, // Quiz results exist, so it was attempted
+          passed: scorePercentage >= 60, // Pass only if score ≥ 60%
           completed: !!chapter.userProgress?.[0]?.isCompleted
         };
       } catch (error: any) {
         if (error.response?.status === 404) {
-          console.log(`No quiz found for chapter ${chapter.id}, treating as passed`);
+          console.log(`No quiz results found for chapter ${chapter.id}, treating as not attempted`);
           return { 
             chapterId: chapter.id, 
-            passed: true, // No quiz means passed for this purpose
+            hasAttempted: false, // No results means not attempted
+            passed: false, // Not passed since not attempted
             completed: !!chapter.userProgress?.[0]?.isCompleted
           };
         }
-        console.error(`Failed to fetch quiz results for chapter ${chapter.id}:`, error);
+        console.error(`Failed to fetch quiz results for chapter ${chapter.id}:`, error.message);
         return { 
           chapterId: chapter.id, 
-          passed: false,
+          hasAttempted: false, // Treat errors as not attempted
+          passed: false, // Not passed due to error
           completed: !!chapter.userProgress?.[0]?.isCompleted
         };
       }
@@ -3763,14 +3986,15 @@ export const CourseSidebar = async ({
   );
 
   const allChapterQuizzesPassed = chapterQuizStatus.every(
-    (status) => status.passed
+    (status) => status.passed || !status.hasAttempted // Pass if not attempted or passed
   );
 
-  // Log for debugging
-  console.log(`allChaptersCompleted: ${allChaptersCompleted}, allChapterQuizzesPassed: ${allChapterQuizzesPassed}`);
-
-  // Final condition to show the quiz button
+  // Define showFinalQuizButton
   const showFinalQuizButton = allChaptersCompleted && allChapterQuizzesPassed;
+
+  // Log for debugging
+  console.log(`allChaptersCompleted: ${allChaptersCompleted}, allChapterQuizzesPassed: ${allChapterQuizzesPassed}, showFinalQuizButton: ${showFinalQuizButton}`);
+  console.log(`chapterQuizStatus:`, JSON.stringify(chapterQuizStatus, null, 2));
 
   return (
     <div className="h-full border-r flex flex-col overflow-y-auto bg-gray-50 shadow-lg w-80">
@@ -3809,10 +4033,13 @@ export const CourseSidebar = async ({
           
           const isCurrentChapterPassed = chapterStatus?.passed || false;
           const isPreviousChapterPassed = 
-            index === 0 || chapterQuizStatus[index - 1]?.passed || false;
+            index === 0 || (chapterQuizStatus[index - 1]?.passed || !chapterQuizStatus[index - 1]?.hasAttempted);
           
           const isLocked = (!chapter.isFree && !purchase) || 
-                         (index > 0 && !chapterQuizStatus[index - 1]?.passed);
+                         (index > 0 && !(chapterQuizStatus[index - 1]?.passed || !chapterQuizStatus[index - 1]?.hasAttempted));
+
+          // Debugging logs
+          console.log(`Chapter ${chapter.id}: isCompleted=${!!chapter.userProgress?.[0]?.isCompleted}, isPreviousChapterPassed=${isPreviousChapterPassed}, isLocked=${isLocked}, isQuizPassed=${isCurrentChapterPassed}, hasAttempted=${chapterStatus?.hasAttempted}`);
 
           return (
             <div
@@ -3854,7 +4081,12 @@ export const CourseSidebar = async ({
 
               {!!chapter.userProgress?.[0]?.isCompleted && isPreviousChapterPassed && (
                 <div className="px-4 pb-4">
-                  <ChapterQuizButton courseId={course.id} chapterId={chapter.id} />
+                  <ChapterQuizButton 
+                    courseId={course.id} 
+                    chapterId={chapter.id} 
+                    isQuizPassed={isCurrentChapterPassed}
+                    hideOnPass={true} // Hide when quiz is passed
+                  />
                 </div>
               )}
             </div>
@@ -3884,18 +4116,3 @@ export const CourseSidebar = async ({
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
