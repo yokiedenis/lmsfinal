@@ -1,4 +1,4 @@
-.container {
+ .container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -92,68 +92,9 @@
   background-size: 50px 50px;
 }
 
-/* Decorative corners - Simplified polyhedron-like shapes */
-.cornerDecorationTopLeft,
-.cornerDecorationTopRight,
-.cornerDecorationBottomLeft,
-.cornerDecorationBottomRight {
-  position: absolute;
-  width: 100px;
-  height: 100px;
-  background: none;
-  top: -0;
-  right: -1px;
-  opacity: 0.8;
-}
 
-.cornerDecorationTopLeft::before,
-.cornerDecorationTopRight::before,
-.cornerDecorationBottomLeft::before,
-.cornerDecorationBottomRight::before {
-  content: '';
-  position: absolute;
-  width: 80px;
-  height: 80px;
-  right: 30px;
-  border: 1px solid rgba(0, 255, 255, 0.3);
-  border-radius: 50%;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-  background: radial-gradient(circle, rgba(0, 255, 255, 0.2), transparent);
-}
 
-/* Position the pseudo-elements */
-.cornerDecorationTopLeft::before {
-  top: 10px;
-  left: 10px;
-}
-
-.cornerDecorationTopRight::before {
-  top: 10px;
-  right: 10px;
-}
-
-.cornerDecorationBottomLeft::before {
-  bottom: 10px;
-  left: 10px;
-}
-
-.cornerDecorationBottomRight::before {
-  bottom: 10px;
-  right: 10px;
-}
-
-/* Watermark */
-.watermark {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(-30deg);
-  font-size: 5rem;
-  font-weight: bold;
-  color: rgba(0, 255, 255, 0.05); /* Adjusted for visibility on dark background */
-  z-index: 0;
-  white-space: nowrap;
-}
+ 
 
 /* Header styles */
 .certificateHeader {
@@ -186,16 +127,96 @@
   width: 60%;
 }
 
-/* New shape styling */
-.shape {
-  position: absolute;
-  top: -5px;
-  right: 50px;
-  max-width: 200px;
-  height: 80px;
-  object-fit: contain; /* Ensure the image scales properly */
-   
 
+
+/* Decorative corners - Simplified polyhedron-like shapes */
+/* .cornerDecorationTopLeft, */
+.cornerDecorationTopRight,
+.cornerDecorationBottomLeft,
+.cornerDecorationBottomRight {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: none;
+  opacity: 0.8;
+}
+
+
+
+.cornerDecorationTopRight {
+  top: 0;
+  right: 0;
+}
+
+.cornerDecorationBottomLeft {
+  bottom: 0;
+  left: 0;
+}
+
+.cornerDecorationBottomRight {
+  bottom: 0;
+  right: 0;
+}
+
+/* .cornerDecorationTopLeft::before, */
+.cornerDecorationTopRight::before,
+.cornerDecorationBottomLeft::before,
+.cornerDecorationBottomRight::before {
+  content: '';
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.2), transparent);
+}
+
+/* Position the pseudo-elements */
+.cornerDecorationTopLeft::before {
+  top: 10px;
+  left: 10px;
+}
+
+.cornerDecorationTopRight::before {
+  top: 10px;
+  right: 10px;
+}
+
+.cornerDecorationBottomLeft::before {
+  bottom: 10px;
+  left: 10px;
+}
+
+.cornerDecorationBottomRight::before {
+  bottom: 10px;
+  right: 10px;
+}
+
+
+
+
+
+
+
+
+/* Header alignment for logo */
+.headerAlignment {
+  display: flex;
+  justify-content: flex-start;
+  position: relative;
+  margin-top: -20px; /* Move the header up */
+  margin-right: -10px; /* Adjust right positioning */
+}
+
+.logoPadding {
+  max-width: 250px; /* Reduced logo size */
+  height: auto;
+   
+  position: relative;
+  top: -10px; /* Move logo up to align with corners */
+  right: 30px;
+  font-size: 20px;
 }
 
 /* Body styles */
@@ -216,7 +237,6 @@
   font-family: 'Playfair Display', serif;
   font-size: 2.5rem;
   font-weight: 700;
-  
   margin: 1rem 0;
   color:#D4AF37;
   text-transform: uppercase;
@@ -283,6 +303,13 @@
 }
 
 /* Signature section */
+/* .signatureSection {
+  display: flex;
+  justify-content: space-between;
+  margin: 3rem 0 1rem;
+  padding: 0 5rem;
+} */
+
 .signatureSection {
   display: flex;
   justify-content: space-between;
@@ -290,22 +317,50 @@
   padding: 0 5rem;
 }
 
+/* .signatureBlock {
+  text-align: center;
+  width: 200px;
+} */
+
 .signatureBlock {
   text-align: center;
   width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
+/* .signatureLine {
+  height: 1px;
+  background: #00FFFF;  
+  margin-bottom: 0.5rem;
+} */
 
 .signatureLine {
   height: 1px;
+  width: 100%; /* Make line full width of container */
   background: #00FFFF; /* Cyan color */
-  margin-bottom: 0.5rem;
+  margin: 0.5rem 0; /* Adjust margin for better spacing */
 }
+
+/* .signatureLabel {
+  font-size: 0.9rem;
+  color: #B0C4DE;  
+  margin: 0;
+} */
 
 .signatureLabel {
   font-size: 0.9rem;
   color: #B0C4DE; /* Light steel blue */
   margin: 0;
+  width: 100%; /* Ensure full width for alignment */
+  text-align: center;
 }
+
+ 
+
+
+
 
 /* Issuer section */
 .issuerSection {
@@ -420,23 +475,25 @@
     margin-bottom: 1rem;
   }
 
+ 
+
+/* Print-specific styles */
+@media print {
   .headerAlignment {
     display: flex;
-    align-items: center;
-    justify-content: flex-end; /* Align items to the right */
-    padding: 40px 40px 40px 40px; /* Keep padding but set top to 0 */
-    padding-top: 0; /* Remove top padding to move to the top */
+    justify-content: flex-start; /* Changed to flex-start for left alignment */
     position: relative;
-    margin-right: 20px;
-    margin-top: 0; /* Ensure no top margin */
-    background-color: white; /* Make the header background white */
-}
+    margin-top: -20px;
+    margin-left: -10px; /* Changed from margin-right */
+  }
 
   .logoPadding {
-    max-width: 300px; /* Maintain size */
-    filter: brightness(0) invert(1); /* Make the logo white */
-    margin-left: 20px; /* Space between shape and logo */
-    color: #ccc;
-     
+    max-width: 200px; /* Increased from 60px to 100px */
+    height: auto;
+    /* Removed the filter that made it white */
+    position: relative;
+    top: -10px;
+    left: 10px; /* Changed from right to left */
   }
+   }
 }

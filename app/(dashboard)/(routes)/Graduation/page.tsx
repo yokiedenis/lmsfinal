@@ -4769,7 +4769,7 @@ const Certificate: React.FC<CertificateProps> = ({
             /> */}
             {/* Logo moved to the right with white color via CSS */}
             <img 
-              src="/eduskill.png" 
+              src="/logo1.png" 
               alt="Logo"
               className={styles.logoPadding}
             />
@@ -4780,7 +4780,8 @@ const Certificate: React.FC<CertificateProps> = ({
           <div className={styles.cornerDecorationBottomLeft}></div>
           <div className={styles.cornerDecorationBottomRight}></div>
           
-          <div className={styles.watermark}>EDUSKILL ONLINE LEARNING</div>
+          {/* <div className={styles.watermark}>EDUSKILL ONLINE LEARNING</div> */}
+          
           
           <div className={styles.certificateHeader}>
              
@@ -4817,7 +4818,7 @@ const Certificate: React.FC<CertificateProps> = ({
             </div>
           </div>
 
-          <div className={styles.signatureSection}>
+          {/* <div className={styles.signatureSection}>
             <div className={styles.signatureBlock}>
               <div className={styles.signatureLine}></div>
               <p className={styles.signatureLabel}>Shivani Jobanputra</p>
@@ -4826,6 +4827,20 @@ const Certificate: React.FC<CertificateProps> = ({
               <p className={styles.signatureLabel}>{currentDate}</p>
               <div className={styles.signatureLine}></div>
               <p className={styles.signatureLabel}>Date</p>
+            </div>
+          </div> */}
+
+
+                    <div className={styles.signatureSection}>
+            <div className={styles.signatureBlock}>
+              <div className={styles.signatureLine}></div>
+              <p className={styles.signatureLabel}>Shivani Jobanputra</p>
+            </div>
+            <div className={styles.signatureBlock}>
+              <p className={styles.signatureLabel}>{currentDate}</p>
+              <div className={styles.signatureLine}></div>
+               <p className={styles.signatureLabel}>Date</p>
+              
             </div>
           </div>
 
