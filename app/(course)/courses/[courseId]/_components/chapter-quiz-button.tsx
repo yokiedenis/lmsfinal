@@ -205,60 +205,198 @@
 
 
 
+// // components/chapter-quiz-button.tsx
+// "use client";
+
+// import { useRouter } from "next/navigation";
+// import { useEffect, useState } from "react";
+// import { Eye, EyeOff } from "lucide-react";
+
+// interface ChapterQuizButtonProps {
+//   courseId: string;
+//   chapterId: string;
+//   isQuizPassed?: boolean;
+//   hideOnPass?: boolean;
+// }
+
+// const ChapterQuizButton = ({ courseId, chapterId, isQuizPassed = false, hideOnPass = false }: ChapterQuizButtonProps) => {
+//   const [isClient, setIsClient] = useState(false);
+//   const [isHidden, setIsHidden] = useState(hideOnPass && isQuizPassed);
+//   const router = useRouter();
+
+//   useEffect(() => {
+//     setIsClient(true);
+
+//     // Check if returning from quiz submission
+//     const checkQuizStatus = async () => {
+//       try {
+//         const response = await fetch(`/api/courses/${courseId}/chapters/${chapterId}/chapterquizzes/results`, {
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//         });
+
+//         if (response.ok) {
+//           const { score, totalQuestions } = await response.json();
+//           const scorePercentage = totalQuestions > 0 ? (score / totalQuestions) * 100 : 0;
+//           const passed = scorePercentage >= 60;
+
+//           if (passed && !isQuizPassed) {
+//             console.log(`Quiz for chapter ${chapterId} passed, refreshing course page`);
+//             // Refresh the course page to update showFinalQuizButton
+//             router.refresh();
+//           }
+//         }
+//       } catch (error) {
+//         console.error(`Failed to check quiz status for chapter ${chapterId}:`, error);
+//       }
+//     };
+
+//     if (typeof window !== "undefined" && window.location.pathname.includes("/quizzeschapter")) {
+//       checkQuizStatus();
+//     }
+//   }, [courseId, chapterId, isQuizPassed, router]);
+
+//   const handleQuizNavigation = () => {
+//     if (isClient) {
+//       router.push(`/courses/${courseId}/chapters/${chapterId}/quizzeschapter/`);
+//     }
+//   };
+
+//   const toggleVisibility = () => {
+//     setIsHidden(!isHidden);
+//   };
+
+//   if (!isClient) {
+//     return null;
+//   }
+
+//   return (
+//     <div className="flex items-center gap-2">
+//       <button
+//         onClick={toggleVisibility}
+//         className="p-1 text-purple-600 hover:text-purple-800 focus:outline-none"
+//         aria-label={isHidden ? "Show quiz button" : "Hide quiz button"}
+//       >
+//         {isHidden ? <Eye size={20} /> : <EyeOff size={20} />}
+//       </button>
+//       {!isHidden && (
+//         <button
+//           onClick={handleQuizNavigation}
+//           className="w-full py-2 px-4 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none"
+//           disabled={isQuizPassed}
+//         >
+//           {isQuizPassed ? "Quiz Completed" : "Start Chapter Quiz"}
+//         </button>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default ChapterQuizButton;
+
+
+
+
 // components/chapter-quiz-button.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
+import axios from "axios";
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 interface ChapterQuizButtonProps {
   courseId: string;
   chapterId: string;
   isQuizPassed?: boolean;
   hideOnPass?: boolean;
+  allChaptersCompleted: boolean;
+  allChapterQuizzesPassed: boolean;
 }
 
-const ChapterQuizButton = ({ courseId, chapterId, isQuizPassed = false, hideOnPass = false }: ChapterQuizButtonProps) => {
+const ChapterQuizButton = ({
+  courseId,
+  chapterId,
+  isQuizPassed: initialIsQuizPassed = false,
+  hideOnPass = false,
+  allChaptersCompleted,
+  allChapterQuizzesPassed,
+}: ChapterQuizButtonProps) => {
   const [isClient, setIsClient] = useState(false);
-  const [isHidden, setIsHidden] = useState(hideOnPass && isQuizPassed);
+  const [isHidden, setIsHidden] = useState(hideOnPass && initialIsQuizPassed);
+  const [isQuizPassed, setIsQuizPassed] = useState(initialIsQuizPassed);
   const router = useRouter();
+  const { userId } = useAuth();
+
+  const fetchQuizStatus = useCallback(async () => {
+    if (!userId) return;
+
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/api/courses/${courseId}/chapters/${chapterId}/chapterquizzes/results`,
+        {
+          headers: {
+            "user-id": userId,
+          },
+          withCredentials: true,
+        }
+      );
+      const scorePercentage =
+        response.data.totalQuestions > 0
+          ? (response.data.score / response.data.totalQuestions) * 100
+          : 0;
+      const passed = scorePercentage >= 60;
+      setIsQuizPassed(passed);
+      setIsHidden(hideOnPass && passed);
+      console.log(
+        `Chapter ${chapterId} quiz status: score=${response.data.score}, totalQuestions=${response.data.totalQuestions}, passed=${passed}`
+      );
+
+      if (passed && !initialIsQuizPassed) {
+        console.log(`Quiz for chapter ${chapterId} passed, notifying other components`);
+        window.dispatchEvent(new Event("chapterQuizSubmitted"));
+      }
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        setIsQuizPassed(false);
+        setIsHidden(hideOnPass && false);
+        console.log(`No quiz results for chapter ${chapterId}`);
+      } else {
+        console.error(
+          `Failed to fetch quiz status for chapter ${chapterId}:`,
+          error.message
+        );
+      }
+    }
+  }, [courseId, chapterId, userId, hideOnPass, initialIsQuizPassed]);
 
   useEffect(() => {
     setIsClient(true);
+    fetchQuizStatus();
+  }, [fetchQuizStatus]);
 
-    // Check if returning from quiz submission
-    const checkQuizStatus = async () => {
-      try {
-        const response = await fetch(`/api/courses/${courseId}/chapters/${chapterId}/chapterquizzes/results`, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (response.ok) {
-          const { score, totalQuestions } = await response.json();
-          const scorePercentage = totalQuestions > 0 ? (score / totalQuestions) * 100 : 0;
-          const passed = scorePercentage >= 60;
-
-          if (passed && !isQuizPassed) {
-            console.log(`Quiz for chapter ${chapterId} passed, refreshing course page`);
-            // Refresh the course page to update showFinalQuizButton
-            router.refresh();
-          }
-        }
-      } catch (error) {
-        console.error(`Failed to check quiz status for chapter ${chapterId}:`, error);
-      }
+  // Listen for quiz submission events
+  useEffect(() => {
+    const handleQuizSubmitted = () => {
+      fetchQuizStatus();
     };
 
-    if (typeof window !== "undefined" && window.location.pathname.includes("/quizzeschapter")) {
-      checkQuizStatus();
-    }
-  }, [courseId, chapterId, isQuizPassed, router]);
+    window.addEventListener("quizSubmitted", handleQuizSubmitted);
+    return () => {
+      window.removeEventListener("quizSubmitted", handleQuizSubmitted);
+    };
+  }, [fetchQuizStatus]);
 
   const handleQuizNavigation = () => {
     if (isClient) {
+      console.log(
+        "Navigating to:",
+        `/courses/${courseId}/chapters/${chapterId}/quizzeschapter/`
+      );
       router.push(`/courses/${courseId}/chapters/${chapterId}/quizzeschapter/`);
     }
   };
