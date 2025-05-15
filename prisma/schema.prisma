@@ -316,6 +316,8 @@ model Quiz {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
+   attempts  QuizAttempt[] //relation
+
  // results   QuizResult[] @relation("QuizResults") 
 }
 
@@ -353,7 +355,7 @@ model QuizAttempt {
   updatedAt     DateTime @updatedAt
   
   // Add relation if necessary
- // quiz           Quiz     @relation(fields: [quizId], references: [id])
+  quiz           Quiz     @relation(fields: [quizId], references: [id])
 
 }
 
