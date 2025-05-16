@@ -242,11 +242,179 @@
 
 
 
+// // components/resultpopupchapter.tsx
+// import React, { useState, useEffect } from "react";
+// import { useUser } from "@clerk/nextjs";
+// import Confetti from "react-confetti";
+// import useWindowSize from "react-use/lib/useWindowSize";
+
+// interface ResultPopupProps {
+//   score: number;
+//   totalQuestions: number;
+//   passingPercentage: number;
+//   onClose: () => void;
+//   onReattempt: () => void;
+//   onProceed: () => void;
+//   isLastChapter?: boolean;
+//   courseId?: string;
+// }
+
+// const ResultPopup: React.FC<ResultPopupProps> = ({
+//   score,
+//   totalQuestions,
+//   passingPercentage,
+//   onClose,
+//   onReattempt,
+//   onProceed,
+//   isLastChapter = false,
+//   courseId,
+// }) => {
+//   const { user } = useUser();
+//   const percentage = totalQuestions > 0 ? ((score / totalQuestions) * 100).toFixed(2) : "0";
+//   const hasPassed = parseFloat(percentage) >= passingPercentage;
+
+//   const [showConfetti, setShowConfetti] = useState(false);
+//   const { width, height } = useWindowSize();
+
+//   console.log("ResultPopup props:", {
+//     score,
+//     totalQuestions,
+//     percentage,
+//     passingPercentage,
+//     hasPassed,
+//     isLastChapter,
+//     courseId,
+//   });
+
+//   const updatePoints = async () => {
+//     if (hasPassed && user) {
+//       try {
+//         const response = await fetch('/api/updatePoints', {
+//           method: 'POST',
+//           headers: {
+//             'Content-Type': 'application/json',
+//           },
+//           body: JSON.stringify({
+//             userId: user.id,
+//             score,
+//             totalQuestions,
+//             passingPercentage,
+//           }),
+//         });
+
+//         const data = await response.json();
+//         console.log('Points updated:', data.points);
+//       } catch (error) {
+//         console.error('Error updating points:', error);
+//       }
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (hasPassed) {
+//       setShowConfetti(true);
+//       const timer = setTimeout(() => setShowConfetti(false), 10000);
+//       return () => clearTimeout(timer);
+//     }
+//   }, [hasPassed]);
+
+//   const handleProceed = () => {
+//     if (hasPassed) {
+//       updatePoints();
+//       console.log("Dispatching chapterQuizSubmitted from ResultPopup");
+//       window.dispatchEvent(new Event("chapterQuizSubmitted"));
+//       if (isLastChapter && courseId) {
+//         console.log("Dispatching lastChapterQuizPassed for course:", courseId);
+//         window.dispatchEvent(
+//           new CustomEvent("lastChapterQuizPassed", {
+//             detail: { courseId },
+//           })
+//         );
+//       }
+//     }
+//     console.log("Calling onProceed after dispatching events");
+//     onProceed();
+//   };
+
+//   return (
+//     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 backdrop-blur-sm">
+//       <div className="bg-white/90 rounded-2xl shadow-2xl p-8 max-w-md w-full transform transition-all duration-700 ease-out scale-100 hover:scale-105 backdrop-blur-sm border border-white/20">
+//         <h3 className="text-2xl font-bold text-gray-900 mb-4 tracking-wide">
+//           Chapter Quiz Results
+//         </h3>
+//         <p className="text-lg text-gray-700 mb-3">
+//           You scored <span className="font-semibold text-blue-600">{score}</span> out of{' '}
+//           <span className="font-semibold text-blue-600">{totalQuestions}</span> (
+//           <span className="font-semibold text-blue-600">{percentage}%</span>)
+//         </p>
+//         <p
+//           className={`text-xl font-semibold mt-2 ${hasPassed ? "text-green-500" : "text-red-500"}`}
+//         >
+//           {hasPassed ? "Congratulations, you passed!" : "You failed. Please try again."}
+//         </p>
+//         <div className="mt-6 flex justify-between items-center space-x-4">
+//           {!hasPassed && (
+//             <button
+//               onClick={onReattempt}
+//               className="px-6 py-3 bg-yellow-500 text-white rounded-xl font-medium hover:bg-yellow-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+//             >
+//               Reattempt Chapter Quiz
+//             </button>
+//           )}
+//           {hasPassed && !isLastChapter && (
+//             <button
+//               onClick={handleProceed}
+//               className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+//             >
+//               Proceed to Next Chapter
+//             </button>
+//           )}
+//           {hasPassed && isLastChapter && (
+//             <button
+//               onClick={handleProceed}
+//               className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+//             >
+//               Unlock Final Quiz
+//             </button>
+//           )}
+//           <button
+//             onClick={onClose}
+//             className="px-6 py-3 bg-gray-500 text-white rounded-xl font-medium hover:bg-gray-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+//           >
+//             Close
+//           </button>
+//         </div>
+//       </div>
+
+//       {showConfetti && hasPassed && (
+//         <Confetti
+//           width={width}
+//           height={height}
+//           numberOfPieces={1000}
+//           recycle={false}
+//           gravity={0.1}
+//           wind={0.01}
+//           colors={['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5']}
+//           confettiSource={{ x: width / 2, y: 0, w: width, h: 0 }}
+//           className="z-60"
+//         />
+//       )}
+//     </div>
+//   );
+// };
+
+// export default ResultPopup;
+
+
+
+
 // components/resultpopupchapter.tsx
 import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import Confetti from "react-confetti";
 import useWindowSize from "react-use/lib/useWindowSize";
+
+ 
 
 interface ResultPopupProps {
   score: number;
@@ -276,7 +444,6 @@ const ResultPopup: React.FC<ResultPopupProps> = ({
   const [showConfetti, setShowConfetti] = useState(false);
   const { width, height } = useWindowSize();
 
-  // Debugging log to check props and conditions
   console.log("ResultPopup props:", {
     score,
     totalQuestions,
@@ -331,8 +498,13 @@ const ResultPopup: React.FC<ResultPopupProps> = ({
             detail: { courseId },
           })
         );
+        // Navigate with page refresh to the course page
+        console.log("Navigating with refresh to:", `/courses/${courseId}`);
+        window.location.href = `/courses/${courseId}`;
+        return;
       }
     }
+    console.log("Calling onProceed after dispatching events");
     onProceed();
   };
 
