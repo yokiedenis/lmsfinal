@@ -1,9 +1,9 @@
- .container {
+ /* .container {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 2rem;
-  background: linear-gradient(135deg, #0A1E3C, #1C3A6B); /* Dark blue gradient */
+  background: linear-gradient(135deg, #0A1E3C, #1C3A6B);  
 }
 
 .controlsContainer {
@@ -12,8 +12,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 16px; /* Space between buttons */
-  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 16px;  
+  flex-wrap: wrap;  
 }
 
 .downloadButton {
@@ -76,17 +76,17 @@
   width: 100%;
   max-width: 1200px;
   position: relative;
-  background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.1)); /* Dark blue gradient */
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.1));  
 }
 
 .certificateBorder {
   position: relative;
   border: 20px solid #f5f5f5;
-  background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.1)); /* Dark blue gradient */
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.1));  
   padding: 3rem;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  min-height: 630px; /* Approximate A4 height in pixels for landscape (210mm * 3px/mm) */
+  min-height: 630px;  
   background-image: linear-gradient(rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.1)),
                     radial-gradient(circle, rgba(0, 255, 255, 0.2) 1px, transparent 1px);
   background-size: 50px 50px;
@@ -96,7 +96,7 @@
 
  
 
-/* Header styles */
+ 
 .certificateHeader {
   text-align: center;
   position: relative;
@@ -107,7 +107,7 @@
 .certificateHeader h1 {
   font-size: 3.5rem;
   margin: 0;
-  color: #FFFF; /* Cyan color for better contrast */
+  color: #FFFF;  
   font-weight: 700;
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -116,7 +116,7 @@
 .certificateHeader h2 {
   font-size: 2.8rem;
   margin: 0.5rem 0 1.5rem;
-  color: #FFFF; /* Cyan color */
+  color: #FFFF;  
   font-weight: 400;
 }
 
@@ -129,8 +129,7 @@
 
 
 
-/* Decorative corners - Simplified polyhedron-like shapes */
-/* .cornerDecorationTopLeft, */
+ 
 .cornerDecorationTopRight,
 .cornerDecorationBottomLeft,
 .cornerDecorationBottomRight {
@@ -158,7 +157,7 @@
   right: 0;
 }
 
-/* .cornerDecorationTopLeft::before, */
+ 
 .cornerDecorationTopRight::before,
 .cornerDecorationBottomLeft::before,
 .cornerDecorationBottomRight::before {
@@ -172,7 +171,7 @@
   background: radial-gradient(circle, rgba(0, 255, 255, 0.2), transparent);
 }
 
-/* Position the pseudo-elements */
+ 
 .cornerDecorationTopLeft::before {
   top: 10px;
   left: 10px;
@@ -200,26 +199,26 @@
 
 
 
-/* Header alignment for logo */
+ 
 .headerAlignment {
   display: flex;
   justify-content: flex-start;
   position: relative;
-  margin-top: -20px; /* Move the header up */
-  margin-right: -10px; /* Adjust right positioning */
+  margin-top: -20px;  
+  margin-right: -10px;  
 }
 
 .logoPadding {
-  max-width: 250px; /* Reduced logo size */
+  max-width: 250px;  
   height: auto;
    
   position: relative;
-  top: -10px; /* Move logo up to align with corners */
+  top: -10px;  
   right: 30px;
   font-size: 20px;
 }
 
-/* Body styles */
+ 
 .certificateBody {
   text-align: center;
   position: relative;
@@ -229,7 +228,7 @@
 
 .presentedTo, .hasCompleted {
   font-size: 1.2rem;
-  color: #B0C4DE; /* Light steel blue for contrast */
+  color: #B0C4DE;  
   margin: 0.5rem 0;
 }
 
@@ -241,27 +240,27 @@
   color:#D4AF37;
   text-transform: uppercase;
   letter-spacing: 1px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle embossed effect */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);  
 }
 
 .courseName {
   font-size: 1.8rem;
   margin: 1.5rem 0;
-  color: #D4AF37; /* Cyan color */
+  color: #D4AF37;  
   font-weight: 500;
   padding: 0.5rem 1rem;
   display: inline-block;
   border-bottom: 2px solid #00FFFF;
 }
 
-/* Score container */
+ 
 .scoreContainer {
   margin: 1.5rem 0;
 }
 
 .scoreContainer p {
   margin: 0;
-  color: #B0C4DE; /* Light steel blue */
+  color: #B0C4DE;  
   font-size: 1.1rem;
 }
 
@@ -277,7 +276,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Details container */
+ 
 .detailsContainer {
   display: flex;
   justify-content: center;
@@ -291,24 +290,18 @@
 
 .detailLabel {
   font-size: 0.9rem;
-  color: #B0C4DE; /* Light steel blue */
+  color: #B0C4DE;  
   margin: 0;
 }
 
 .detailValue {
   font-size: 1.1rem;
-  color: #00FFFF; /* Cyan color */
+  color: #00FFFF;  
   font-weight: 600;
   margin: 0.3rem 0 0;
 }
 
-/* Signature section */
-/* .signatureSection {
-  display: flex;
-  justify-content: space-between;
-  margin: 3rem 0 1rem;
-  padding: 0 5rem;
-} */
+ 
 
 .signatureSection {
   display: flex;
@@ -317,11 +310,7 @@
   padding: 0 5rem;
 }
 
-/* .signatureBlock {
-  text-align: center;
-  width: 200px;
-} */
-
+ 
 .signatureBlock {
   text-align: center;
   width: 200px;
@@ -330,30 +319,20 @@
   align-items: center;
 }
 
-/* .signatureLine {
-  height: 1px;
-  background: #00FFFF;  
-  margin-bottom: 0.5rem;
-} */
-
+ 
 .signatureLine {
   height: 1px;
-  width: 100%; /* Make line full width of container */
-  background: #00FFFF; /* Cyan color */
-  margin: 0.5rem 0; /* Adjust margin for better spacing */
+  width: 100%;  
+  background: #00FFFF;  
+  margin: 0.5rem 0;  
 }
 
-/* .signatureLabel {
+ 
+.signatureLabel {
   font-size: 0.9rem;
   color: #B0C4DE;  
   margin: 0;
-} */
-
-.signatureLabel {
-  font-size: 0.9rem;
-  color: #B0C4DE; /* Light steel blue */
-  margin: 0;
-  width: 100%; /* Ensure full width for alignment */
+  width: 100%;  
   text-align: center;
 }
 
@@ -362,7 +341,7 @@
 
 
 
-/* Issuer section */
+ 
 .issuerSection {
   text-align: center;
   margin-top: 1rem;
@@ -371,18 +350,18 @@
 .issuerName {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #FFFF; /* Cyan color */
+  color: #FFFF;  
   margin: 0;
 }
 
 .issuerTagline {
   font-size: 0.9rem;
-  color: #B0C4DE; /* Light steel blue */
+  color: #B0C4DE;  
   margin: 0.3rem 0 0;
   font-style: italic;
 }
 
-/* Verification section */
+ 
 .verification {
   position: absolute;
   bottom: 20px;
@@ -400,11 +379,11 @@
 
 .verification p {
   font-size: 0.7rem;
-  color: #B0C4DE; /* Light steel blue */
+  color: #B0C4DE;  
   margin: 0.3rem 0 0;
 }
 
-/* Print-specific styles */
+ 
 @media print {
   .controlsContainer {
     display: none;
@@ -416,9 +395,9 @@
     padding: 0;
     margin: 0;
     height: 100%;
-    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.1)); /* Ensure background in print */
-    background-image: linear-gradient(rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.1)),
-                      radial-gradient(circle, rgba(0, 255, 255, 0.2) 1px, transparent 1px);
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.1));  
+    background-image: linear-gradient(rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.1));
+                      
     background-size: 50px 50px;
   }
   
@@ -427,7 +406,7 @@
     width: 100vw;
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg,rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.1)); /* Ensure background in print */
+    background: linear-gradient(135deg,rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.1));   
   }
 
   .lockedButton {
@@ -477,23 +456,136 @@
 
  
 
-/* Print-specific styles */
+ 
 @media print {
   .headerAlignment {
     display: flex;
-    justify-content: flex-start; /* Changed to flex-start for left alignment */
+    justify-content: flex-start;  
     position: relative;
     margin-top: -20px;
-    margin-left: -10px; /* Changed from margin-right */
+    margin-left: -10px;  
   }
 
   .logoPadding {
-    max-width: 200px; /* Increased from 60px to 100px */
+    max-width: 200px;  
     height: auto;
-    /* Removed the filter that made it white */
+    
     position: relative;
     top: -10px;
-    left: 10px; /* Changed from right to left */
+    left: 10px;  
   }
    }
+} */
+
+
+
+
+
+
+/*  
+.certificate-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.certificate {
+  width: 800px;
+  background-color: white;
+  border: 15px solid #1a3e72;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.certificate-title {
+  color: #1a3e72;
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.certificate-subtitle {
+  color: #333;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+}
+
+.certificate-divider {
+  height: 2px;
+  background-color: #1a3e72;
+  margin: 30px auto;
+  width: 80%;
+}
+
+.certificate-given-to {
+  color: #333;
+  font-size: 18px;
+  margin: 20px 0;
+  text-transform: uppercase;
+}
+
+.certificate-body {
+  margin: 40px 0;
+  font-size: 20px;
+  line-height: 1.6;
+}
+
+.recipient-name {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.signature-block {
+  margin: 30px 0;
+}
+
+.signature-line {
+  width: 200px;
+  height: 1px;
+  background-color: #000;
+  margin: 0 auto 10px;
+}
+
+.signature-name {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.signature-title {
+  font-style: italic;
+  font-size: 16px;
+  color: #555;
+}
+
+.organization {
+  margin: 30px 0;
+}
+
+.organization-logo {
+  margin-bottom: 10px;
+}
+
+.organization-year {
+  font-weight: bold;
+  font-size: 18px;
+} */
+
+
+
+.clip-triangle-top-left {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.clip-triangle-bottom-right {
+  clip-path: polygon(100% 100%, 100% 0, 0 100%);
 }

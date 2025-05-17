@@ -4573,401 +4573,840 @@
 
 
 
+// "use client";
+
+// import React, { useRef, useEffect, useState } from 'react';
+// import { useUser } from '@clerk/clerk-react';
+// import { useSearchParams } from 'next/navigation';
+// import styles from '@/styles/Certificate.module.css';
+// import { getCourses } from '@/actions/get-courses';
+// import html2canvas from 'html2canvas';
+// import { jsPDF } from 'jspdf';
+// import { FaLinkedin } from 'react-icons/fa';
+// import QRCode from 'qrcode';
+
+// // Simple hash function to generate a stable certificate ID
+// const generateCertificateId = (userId: string, courseId: string): string => {
+//   const combined = `${userId}-${courseId}`;
+//   let hash = 0;
+//   for (let i = 0; i < combined.length; i++) {
+//     const char = combined.charCodeAt(i);
+//     hash = ((hash << 5) - hash) + char;
+//     hash = hash & hash; // Convert to 32-bit integer
+//   }
+//   return Math.abs(hash).toString(36).substring(0, 8).toUpperCase();
+// };
+
+// interface CertificateProps {
+//   courseTitle: string;
+//   date: string;
+//   issuerName?: string;
+//   score?: number;
+//   certificateId: string;
+//   locked?: boolean;
+//   onUnlockRequest?: () => void;
+// }
+
+// const Certificate: React.FC<CertificateProps> = ({
+//   courseTitle,
+//   date: propDate,
+//   issuerName = "EDUSKILL ONLINE LEARNING",
+//   score,
+//   certificateId,
+//   locked = false,
+//   onUnlockRequest
+// }) => {
+//   const { user } = useUser();
+//   const certificateRef = useRef<HTMLDivElement>(null);
+//   const [isGenerating, setIsGenerating] = useState(false);
+//   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
+
+//   const currentDate = new Date().toLocaleDateString('en-US', {
+//     year: 'numeric',
+//     month: 'long',
+//     day: 'numeric',
+//   });
+
+//   useEffect(() => {
+//     if (user) {
+//       const qrData = `${window.location.origin}/verify?certificateId=${certificateId}&user=${user.id}&course=${encodeURIComponent(courseTitle)}`;
+//       QRCode.toDataURL(qrData, { width: 100, margin: 1 }, (err, url) => {
+//         if (err) {
+//           console.error('Error generating QR code:', err);
+//           return;
+//         }
+//         setQrCodeUrl(url);
+//       });
+//     }
+//   }, [user, certificateId, courseTitle]);
+
+//   const handleDownloadPDF = async () => {
+//     if (!certificateRef.current) return;
+
+//     setIsGenerating(true);
+//     try {
+//       // Set fixed dimensions for A4 landscape in pixels (at 96dpi, 1mm ≈ 3.78px)
+//       const pdfWidth = 297 * 3.78; // A4 width in pixels (landscape)
+//       const pdfHeight = 210 * 3.78; // A4 height in pixels (landscape)
+
+//       // Temporarily set the certificate container to match A4 landscape dimensions
+//       certificateRef.current.style.width = `${pdfWidth}px`;
+//       certificateRef.current.style.height = `${pdfHeight}px`;
+
+//       // Ensure the background is applied
+//       certificateRef.current.style.backgroundColor = '#0A1E3C'; // Match the dark blue background
+
+//       const canvas = await html2canvas(certificateRef.current, {
+//         scale: 1, // Use scale 1 to match the exact pixel dimensions
+//         width: pdfWidth,
+//         height: pdfHeight,
+//         useCORS: true,
+//         logging: false,
+//         backgroundColor: '#0A1E3C', // Match the dark blue background
+//         removeContainer: true,
+//       });
+
+//       const imgData = canvas.toDataURL('image/png', 1.0);
+//       const pdf = new jsPDF({
+//         orientation: 'landscape',
+//         unit: 'mm',
+//         format: 'a4',
+//       });
+
+//       // Add the image to the PDF, fitting the A4 dimensions
+//       pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
+//       pdf.save(`${user?.fullName || 'User'}_${courseTitle.replace(/\s+/g, '_')}_Certificate.pdf`);
+
+//       // Reset the dimensions after generating the PDF
+//       certificateRef.current.style.width = '';
+//       certificateRef.current.style.height = '';
+//     } catch (error) {
+//       console.error('Error generating PDF:', error);
+//     } finally {
+//       setIsGenerating(false);
+//     }
+//   };
+
+//   const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+//     e.preventDefault();
+//     if (locked) {
+//       onUnlockRequest?.();
+//     } else {
+//       handleDownloadPDF();
+//     }
+//   };
+
+//   const addToLinkedIn = () => {
+//     const linkedInUrl = `https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=${encodeURIComponent(courseTitle)}&organizationName=${encodeURIComponent(issuerName)}&issueYear=${new Date().getFullYear()}&issueMonth=${new Date().getMonth() + 1}&certUrl=${encodeURIComponent(window.location.href)}&certId=${certificateId}`;
+//     window.open(linkedInUrl, '_blank');
+//   };
+
+//   if (!user) {
+//     return <div className={styles.container}>Please sign in to view your certificate.</div>;
+//   }
+
+//   return (
+//     <div className={styles.container}>
+//       <div className={styles.controlsContainer}>
+//         {!locked && (
+//           <>
+//             <div className={styles.buttonWrapper}>
+//               <button 
+//                 onClick={handleButtonClick} 
+//                 className={styles.downloadButton}
+//                 disabled={isGenerating}
+//               >
+//                 {isGenerating ? 'Generating PDF...' : 'Download PDF Certificate'}
+//               </button>
+//             </div>
+//             <div className={styles.buttonWrapper}>
+//               <button 
+//                 onClick={addToLinkedIn} 
+//                 className={styles.linkedinButton}
+//               >
+//                 <FaLinkedin size={20} />
+//                 Share on LinkedIn
+//               </button>
+//             </div>
+//           </>
+//         )}
+//         {locked && (
+//           <>
+//             <div className={styles.buttonWrapper}>
+//               <button 
+//                 onClick={handleButtonClick} 
+//                 className={`${styles.downloadButton} ${styles.lockedButton}`}
+//               >
+//                 Unlock Certificate
+//               </button>
+//             </div>
+//             <p className={styles.lockedMessage}>
+//               Complete the quiz with a passing score to unlock your certificate
+//             </p>
+//           </>
+//         )}
+//       </div>
+      
+//       <div 
+//         className={`${styles.certificateContainer} ${locked ? styles.lockedCertificate : ''}`} 
+//         ref={certificateRef}
+//       >
+//         {locked && (
+//           <div className={styles.lockOverlay}>
+//             <div className={styles.lockIcon}>🔒</div>
+//             <p>Certificate Locked</p>
+//             <p>Complete the quiz to unlock</p>
+//           </div>
+//         )}
+        
+//         <div className={styles.certificateBorder}>
+//           <div className={styles.headerAlignment}>
+//             {/* Shape image remains on the right */}
+//             {/* <img 
+//               src="/shape.png" 
+//               alt="Shape"
+//               className={styles.shape}
+//             /> */}
+//             {/* Logo moved to the right with white color via CSS */}
+//             <img 
+//               src="/logo1.png" 
+//               alt="Logo"
+//               className={styles.logoPadding}
+//             />
+//           </div>
+
+//           <div className={styles.cornerDecorationTopLeft}></div>
+//           <div className={styles.cornerDecorationTopRight}></div>
+//           <div className={styles.cornerDecorationBottomLeft}></div>
+//           <div className={styles.cornerDecorationBottomRight}></div>
+          
+//           {/* <div className={styles.watermark}>EDUSKILL ONLINE LEARNING</div> */}
+          
+          
+//           <div className={styles.certificateHeader}>
+             
+            
+
+
+//             <h2 className={styles.certificateTitle}>
+//               <div>CERTIFICATE OF COMPLETION</div>
+//             </h2>
+//           </div>
+
+//           <div className={styles.certificateBody}>
+//             <p className={styles.presentedTo}>This is to certify that</p>
+//             <h3 className={styles.recipientName}>{user.fullName}</h3>
+//             <p className={styles.presentedTo}>has successfully completed</p>
+//             <div className={styles.courseName}>{courseTitle}</div>
+            
+//             {score !== undefined && (
+//               <div className={styles.scoreContainer}>
+//                 <p>Achieving an outstanding score of</p>
+//                 <div className={styles.scoreBadge}>{score}%</div>
+//               </div>
+//             )}
+
+//             <div className={styles.detailsContainer}>
+//               <div className={styles.detailBox}>
+//                 <p className={styles.detailLabel}>Date of Completion</p>
+//                 <p className={styles.detailValue}>{currentDate}</p>
+//               </div>
+//               <div className={styles.detailBox}>
+//                 <p className={styles.detailLabel}>Certificate ID</p>
+//                 <p className={styles.detailValue}>{certificateId}</p>
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* <div className={styles.signatureSection}>
+//             <div className={styles.signatureBlock}>
+//               <div className={styles.signatureLine}></div>
+//               <p className={styles.signatureLabel}>Shivani Jobanputra</p>
+//             </div>
+//             <div className={styles.signatureBlock}>
+//               <p className={styles.signatureLabel}>{currentDate}</p>
+//               <div className={styles.signatureLine}></div>
+//               <p className={styles.signatureLabel}>Date</p>
+//             </div>
+//           </div> */}
+
+
+//                     <div className={styles.signatureSection}>
+//             <div className={styles.signatureBlock}>
+//               <div className={styles.signatureLine}></div>
+//               <p className={styles.signatureLabel}>Shivani Jobanputra</p>
+//             </div>
+//             <div className={styles.signatureBlock}>
+//               <p className={styles.signatureLabel}>{currentDate}</p>
+//               <div className={styles.signatureLine}></div>
+//                <p className={styles.signatureLabel}>Date</p>
+              
+//             </div>
+//           </div>
+
+//           <div className={styles.issuerSection}>
+//             <p className={styles.issuerName}>{issuerName}</p>
+//             <p className={styles.issuerTagline}>Skill Today, Lead Tomorrow</p>
+//           </div>
+
+//           <div className={styles.verification}>
+//             {qrCodeUrl ? (
+//               <img
+//                 src={qrCodeUrl}
+//                 alt="QR Code for Certificate Verification"
+//                 className={styles.qrCode}
+//               />
+//             ) : (
+//               <p>Generating QR code...</p>
+//             )}
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// const GraduationPage: React.FC = () => {
+//   const searchParams = useSearchParams();
+//   const { user } = useUser();
+//   const [courseTitle, setCourseTitle] = useState<string>('Default Course Title');
+//   const [certificateId, setCertificateId] = useState<string>('');
+//   const [isLoading, setIsLoading] = useState(true);
+
+//   useEffect(() => {
+//     const fetchCourseTitle = async () => {
+//       try {
+//         const courseId = searchParams.get('courseId');
+//         const courseTitleParam = searchParams.get('courseTitle');
+
+//         console.log('Query Params:', {
+//           courseId,
+//           courseTitleParam,
+//           decodedCourseTitle: courseTitleParam ? decodeURIComponent(courseTitleParam) : null,
+//         });
+
+//         // Generate certificateId if user and courseId are available
+//         if (user?.id && courseId) {
+//           const newCertificateId = generateCertificateId(user.id, courseId);
+//           setCertificateId(newCertificateId);
+//           console.log('Generated certificateId:', newCertificateId);
+//         }
+
+//         // Prioritize courseTitle from query params if available
+//         if (courseTitleParam) {
+//           setCourseTitle(decodeURIComponent(courseTitleParam));
+//           console.log('Set courseTitle from query param:', decodeURIComponent(courseTitleParam));
+//           setIsLoading(false);
+//           return;
+//         }
+
+//         if (!user?.id) {
+//           console.warn('No user ID available, using default course title.');
+//           setCourseTitle('Default Course Title');
+//           setIsLoading(false);
+//           return;
+//         }
+
+//         // Fallback to fetching course directly if courseId is available
+//         if (courseId) {
+//           try {
+//             const courseResponse = await fetch(`/api/courses/${courseId}`);
+//             if (courseResponse.ok) {
+//               const courseData = await courseResponse.json();
+//               if (courseData.title) {
+//                 setCourseTitle(courseData.title);
+//                 console.log('Set courseTitle from direct API call:', courseData.title);
+//                 setIsLoading(false);
+//                 return;
+//               }
+//             }
+//             console.warn('Course not found via direct API call for courseId:', courseId);
+//           } catch (error) {
+//             console.error('Error fetching course directly:', error);
+//           }
+//         }
+
+//         // Fallback to getCourses
+//         const courses = await getCourses({ userId: user.id });
+
+//         console.log('Fetched courses:', courses);
+
+//         if (courseId) {
+//           const course = courses.find((c) => c.id === courseId);
+//           if (course) {
+//             setCourseTitle(course.title);
+//             console.log('Set courseTitle from getCourses:', course.title);
+//           } else {
+//             console.warn('Course not found for courseId:', courseId);
+//             setCourseTitle('Default Course Title');
+//           }
+//         } else {
+//           console.warn('No courseId provided in query params.');
+//           setCourseTitle('Default Course Title');
+//         }
+//       } catch (error) {
+//         console.error('Error fetching course title:', error);
+//         setCourseTitle('Default Course Title');
+//       } finally {
+//         setIsLoading(false);
+//       }
+//     };
+
+//     fetchCourseTitle();
+//   }, [searchParams, user]);
+
+//   if (isLoading || !certificateId) {
+//     return <div className={styles.loadingContainer}>Loading certificate...</div>;
+//   }
+
+//   return (
+//     <Certificate
+//       courseTitle={courseTitle}
+//       date=""
+//       issuerName="EDUSKILL ONLINE LEARNING"
+//       certificateId={certificateId}
+//       locked={false}
+//     />
+//   );
+// };
+  
+// export default GraduationPage;
+
+
+
+
+
+
+
+
+// "use client";
+
+// import React, { useEffect, useState } from "react";
+// import { useUser } from "@clerk/clerk-react";
+// import { useSearchParams } from "next/navigation";
+// import Certificate from "@/components/certifdemo";
+
+// // Placeholder for getCourses action (replace with your actual implementation)
+// const getCourses = async ({ userId }: { userId: string }) => {
+//   // Simulate fetching courses from a database or API
+//   return [
+//     { id: "course123", title: "Data Analyst" },
+//     // Add more courses as needed
+//   ];
+// };
+
+// // Simple hash function to generate a stable certificate ID
+// const generateCertificateId = (userId: string, courseId: string): string => {
+//   const combined = `${userId}-${courseId}`;
+//   let hash = 0;
+//   for (let i = 0; i < combined.length; i++) {
+//     const char = combined.charCodeAt(i);
+//     hash = (hash << 5) - hash + char;
+//     hash = hash & hash; // Convert to 32-bit integer
+//   }
+//   return Math.abs(hash).toString(36).substring(0, 8).toUpperCase();
+// };
+
+// const CertificatePage: React.FC = () => {
+//   const searchParams = useSearchParams();
+//   const { user } = useUser();
+//   const [recipientName, setRecipientName] = useState<string>("");
+//   const [courseName, setCourseName] = useState<string>("Default Course");
+//   const [certificateId, setCertificateId] = useState<string>("");
+//   const [isLoading, setIsLoading] = useState(true);
+
+//   useEffect(() => {
+//     const fetchCourseData = async () => {
+//       try {
+//         const courseId = searchParams.get("courseId");
+//         const courseTitleParam = searchParams.get("courseTitle");
+
+//         // Set recipient name from user data
+//         if (user?.fullName) {
+//           setRecipientName(user.fullName);
+//         } else {
+//           console.warn("No user fullName available, using default.");
+//           setRecipientName("Unknown User");
+//         }
+
+//         // Generate certificateId if user and courseId are available
+//         if (user?.id && courseId) {
+//           const newCertificateId = generateCertificateId(user.id, courseId);
+//           setCertificateId(newCertificateId);
+//           console.log("Generated certificateId:", newCertificateId);
+//         }
+
+//         // Prioritize courseTitle from query params if available
+//         if (courseTitleParam) {
+//           setCourseName(decodeURIComponent(courseTitleParam));
+//           console.log("Set courseName from query param:", decodeURIComponent(courseTitleParam));
+//           setIsLoading(false);
+//           return;
+//         }
+
+//         if (!user?.id) {
+//           console.warn("No user ID available, using default course name.");
+//           setCourseName("Default Course");
+//           setIsLoading(false);
+//           return;
+//         }
+
+//         // Fallback to fetching course directly if courseId is available
+//         if (courseId) {
+//           try {
+//             const courseResponse = await fetch(`/api/courses/${courseId}`);
+//             if (courseResponse.ok) {
+//               const courseData = await courseResponse.json();
+//               if (courseData.title) {
+//                 setCourseName(courseData.title);
+//                 console.log("Set courseName from direct API call:", courseData.title);
+//                 setIsLoading(false);
+//                 return;
+//               }
+//             }
+//             console.warn("Course not found via direct API call for courseId:", courseId);
+//           } catch (error) {
+//             console.error("Error fetching course directly:", error);
+//           }
+//         }
+
+//         // Fallback to getCourses
+//         const courses = await getCourses({ userId: user.id });
+
+//         console.log("Fetched courses:", courses);
+
+//         if (courseId) {
+//           const course = courses.find((c) => c.id === courseId);
+//           if (course) {
+//             setCourseName(course.title);
+//             console.log("Set courseName from getCourses:", course.title);
+//           } else {
+//             console.warn("Course not found for courseId:", courseId);
+//             setCourseName("Default Course");
+//           }
+//         } else {
+//           console.warn("No courseId provided in query params.");
+//           setCourseName("Default Course");
+//         }
+//       } catch (error) {
+//         console.error("Error fetching course data:", error);
+//         setCourseName("Default Course");
+//       } finally {
+//         setIsLoading(false);
+//       }
+//     };
+
+//     fetchCourseData();
+//   }, [searchParams, user]);
+
+//   if (isLoading || !certificateId || !recipientName) {
+//     return <div className="text-center p-10">Loading certificate...</div>;
+//   }
+
+//   return (
+//     <main className="min-h-screen bg-gray-100 flex items-center justify-center">
+//       <Certificate
+//         recipientName={recipientName}
+//         courseName={courseName}
+//         date={new Date().toISOString().split("T")[0]} // Current date in YYYY-MM-DD
+//         issuerName="EDUSKILL ONLINE LEARNING"
+//         certificateId={certificateId}
+//         locked={false}
+//         onUnlockRequest={() => console.log("Unlock requested")}
+//       />
+//     </main>
+//   );
+// };
+
+// export default CertificatePage;
+
+
+
+
+// app/(dashboard)/(routes)/Graduation/page.tsx
+// "use client";
+
+// import React, { useEffect, useState } from "react";
+// import { useUser } from "@clerk/clerk-react";
+// import { useSearchParams } from "next/navigation";
+// import Certificate from "@/components/certifdemo";
+
+// // Placeholder for getCourses action (replace with your actual implementation)
+// const getCourses = async ({ userId }: { userId: string }) => {
+//   // Simulate fetching courses from a database or API
+//   return [
+//     { id: "course123", title: "Data Analyst", score: 95, locked: false },
+//     // Add more courses as needed
+//   ];
+// };
+
+// // Simple hash function to generate a stable certificate ID
+// const generateCertificateId = (userId: string, courseId: string): string => {
+//   const combined = `${userId}-${courseId}`;
+//   let hash = 0;
+//   for (let i = 0; i < combined.length; i++) {
+//     const char = combined.charCodeAt(i);
+//     hash = (hash << 5) - hash + char;
+//     hash = hash & hash; // Convert to 32-bit integer
+//   }
+//   return Math.abs(hash).toString(36).substring(0, 8).toUpperCase();
+// };
+
+// const CertificatePage: React.FC = () => {
+//   const searchParams = useSearchParams();
+//   const { user, isLoaded } = useUser();
+//   const [recipientName, setRecipientName] = useState<string>("");
+//   const [courseName, setCourseName] = useState<string>("Default Course");
+//   const [certificateId, setCertificateId] = useState<string>("");
+//   const [score, setScore] = useState<number | undefined>(undefined);
+//   const [locked, setLocked] = useState<boolean>(false);
+//   const [isLoading, setIsLoading] = useState(true);
+
+//   useEffect(() => {
+//     const fetchCourseData = async () => {
+//       if (!isLoaded || !user) {
+//         console.warn("User not loaded or not authenticated");
+//         setIsLoading(false);
+//         return;
+//       }
+
+//       try {
+//         const courseId = searchParams.get("courseId");
+//         const courseTitleParam = searchParams.get("courseTitle");
+
+//         // Set recipient name from user data
+//         if (user.fullName) {
+//           setRecipientName(user.fullName);
+//         } else {
+//           console.warn("No user fullName available, using default.");
+//           setRecipientName("Unknown User");
+//         }
+
+//         // Generate certificateId if user and courseId are available
+//         if (user.id && courseId) {
+//           const newCertificateId = generateCertificateId(user.id, courseId);
+//           setCertificateId(newCertificateId);
+//           console.log("Generated certificateId:", newCertificateId);
+//         }
+
+//         // Prioritize courseTitle from query params if available
+//         if (courseTitleParam) {
+//           setCourseName(decodeURIComponent(courseTitleParam));
+//           console.log("Set courseName from query param:", decodeURIComponent(courseTitleParam));
+//           setIsLoading(false);
+//           return;
+//         }
+
+//         // Fallback to fetching course directly if courseId is available
+//         if (courseId) {
+//           try {
+//             const courseResponse = await fetch(`/api/courses/${courseId}`);
+//             if (courseResponse.ok) {
+//               const courseData = await courseResponse.json();
+//               if (courseData.title) {
+//                 setCourseName(courseData.title);
+//                 setScore(courseData.score || undefined);
+//                 setLocked(courseData.locked || false);
+//                 console.log("Set courseName from direct API call:", courseData.title);
+//                 setIsLoading(false);
+//                 return;
+//               }
+//             }
+//             console.warn("Course not found via direct API call for courseId:", courseId);
+//           } catch (error) {
+//             console.error("Error fetching course directly:", error);
+//           }
+//         }
+
+//         // Fallback to getCourses
+//         const courses = await getCourses({ userId: user.id });
+
+//         console.log("Fetched courses:", courses);
+
+//         if (courseId) {
+//           const course = courses.find((c) => c.id === courseId);
+//           if (course) {
+//             setCourseName(course.title);
+//             setScore(course.score || undefined);
+//             setLocked(course.locked || false);
+//             console.log("Set courseName from getCourses:", course.title);
+//           } else {
+//             console.warn("Course not found for courseId:", courseId);
+//             setCourseName("Default Course");
+//           }
+//         } else {
+//           console.warn("No courseId provided in query params.");
+//           setCourseName("Default Course");
+//         }
+//       } catch (error) {
+//         console.error("Error fetching course data:", error);
+//         setCourseName("Default Course");
+//       } finally {
+//         setIsLoading(false);
+//       }
+//     };
+
+//     fetchCourseData();
+//   }, [searchParams, user, isLoaded]);
+
+//   if (!isLoaded || isLoading || !certificateId || !recipientName) {
+//     return <div className="text-center p-10">Loading certificate...</div>;
+//   }
+
+//   return (
+//     <main className="min-h-screen bg-gray-100 flex items-center justify-center">
+//       <Certificate
+//         recipientName={recipientName}
+//         courseName={courseName}
+//         date={new Date().toISOString().split("T")[0]} // Current date in YYYY-MM-DD
+//         issuerName="EDUSKILL ONLINE LEARNING"
+//         score={score}
+//         certificateId={certificateId}
+//         locked={locked}
+//         onUnlockRequest={() => console.log("Unlock requested")}
+//       />
+//     </main>
+//   );
+// };
+
+// export default CertificatePage;
+
+
+
 "use client";
 
-import React, { useRef, useEffect, useState } from 'react';
-import { useUser } from '@clerk/clerk-react';
-import { useSearchParams } from 'next/navigation';
-import styles from '@/styles/Certificate.module.css';
-import { getCourses } from '@/actions/get-courses';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
-import { FaLinkedin } from 'react-icons/fa';
-import QRCode from 'qrcode';
+import React, { useEffect, useState } from "react";
+import { useUser } from "@clerk/clerk-react";
+import { useSearchParams } from "next/navigation";
+import Certificate from "@/components/certifdemo";
 
-// Simple hash function to generate a stable certificate ID
+const getCourses = async ({ userId }: { userId: string }) => {
+  return [
+    { id: "course123", title: "Data Analyst", score: 95, locked: false },
+  ];
+};
+
 const generateCertificateId = (userId: string, courseId: string): string => {
   const combined = `${userId}-${courseId}`;
   let hash = 0;
   for (let i = 0; i < combined.length; i++) {
     const char = combined.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
   }
   return Math.abs(hash).toString(36).substring(0, 8).toUpperCase();
 };
 
-interface CertificateProps {
-  courseTitle: string;
-  date: string;
-  issuerName?: string;
-  score?: number;
-  certificateId: string;
-  locked?: boolean;
-  onUnlockRequest?: () => void;
-}
-
-const Certificate: React.FC<CertificateProps> = ({
-  courseTitle,
-  date: propDate,
-  issuerName = "EDUSKILL ONLINE LEARNING",
-  score,
-  certificateId,
-  locked = false,
-  onUnlockRequest
-}) => {
-  const { user } = useUser();
-  const certificateRef = useRef<HTMLDivElement>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
-
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-
-  useEffect(() => {
-    if (user) {
-      const qrData = `${window.location.origin}/verify?certificateId=${certificateId}&user=${user.id}&course=${encodeURIComponent(courseTitle)}`;
-      QRCode.toDataURL(qrData, { width: 100, margin: 1 }, (err, url) => {
-        if (err) {
-          console.error('Error generating QR code:', err);
-          return;
-        }
-        setQrCodeUrl(url);
-      });
-    }
-  }, [user, certificateId, courseTitle]);
-
-  const handleDownloadPDF = async () => {
-    if (!certificateRef.current) return;
-
-    setIsGenerating(true);
-    try {
-      // Set fixed dimensions for A4 landscape in pixels (at 96dpi, 1mm ≈ 3.78px)
-      const pdfWidth = 297 * 3.78; // A4 width in pixels (landscape)
-      const pdfHeight = 210 * 3.78; // A4 height in pixels (landscape)
-
-      // Temporarily set the certificate container to match A4 landscape dimensions
-      certificateRef.current.style.width = `${pdfWidth}px`;
-      certificateRef.current.style.height = `${pdfHeight}px`;
-
-      // Ensure the background is applied
-      certificateRef.current.style.backgroundColor = '#0A1E3C'; // Match the dark blue background
-
-      const canvas = await html2canvas(certificateRef.current, {
-        scale: 1, // Use scale 1 to match the exact pixel dimensions
-        width: pdfWidth,
-        height: pdfHeight,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#0A1E3C', // Match the dark blue background
-        removeContainer: true,
-      });
-
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      const pdf = new jsPDF({
-        orientation: 'landscape',
-        unit: 'mm',
-        format: 'a4',
-      });
-
-      // Add the image to the PDF, fitting the A4 dimensions
-      pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
-      pdf.save(`${user?.fullName || 'User'}_${courseTitle.replace(/\s+/g, '_')}_Certificate.pdf`);
-
-      // Reset the dimensions after generating the PDF
-      certificateRef.current.style.width = '';
-      certificateRef.current.style.height = '';
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    if (locked) {
-      onUnlockRequest?.();
-    } else {
-      handleDownloadPDF();
-    }
-  };
-
-  const addToLinkedIn = () => {
-    const linkedInUrl = `https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=${encodeURIComponent(courseTitle)}&organizationName=${encodeURIComponent(issuerName)}&issueYear=${new Date().getFullYear()}&issueMonth=${new Date().getMonth() + 1}&certUrl=${encodeURIComponent(window.location.href)}&certId=${certificateId}`;
-    window.open(linkedInUrl, '_blank');
-  };
-
-  if (!user) {
-    return <div className={styles.container}>Please sign in to view your certificate.</div>;
-  }
-
-  return (
-    <div className={styles.container}>
-      <div className={styles.controlsContainer}>
-        {!locked && (
-          <>
-            <div className={styles.buttonWrapper}>
-              <button 
-                onClick={handleButtonClick} 
-                className={styles.downloadButton}
-                disabled={isGenerating}
-              >
-                {isGenerating ? 'Generating PDF...' : 'Download PDF Certificate'}
-              </button>
-            </div>
-            <div className={styles.buttonWrapper}>
-              <button 
-                onClick={addToLinkedIn} 
-                className={styles.linkedinButton}
-              >
-                <FaLinkedin size={20} />
-                Share on LinkedIn
-              </button>
-            </div>
-          </>
-        )}
-        {locked && (
-          <>
-            <div className={styles.buttonWrapper}>
-              <button 
-                onClick={handleButtonClick} 
-                className={`${styles.downloadButton} ${styles.lockedButton}`}
-              >
-                Unlock Certificate
-              </button>
-            </div>
-            <p className={styles.lockedMessage}>
-              Complete the quiz with a passing score to unlock your certificate
-            </p>
-          </>
-        )}
-      </div>
-      
-      <div 
-        className={`${styles.certificateContainer} ${locked ? styles.lockedCertificate : ''}`} 
-        ref={certificateRef}
-      >
-        {locked && (
-          <div className={styles.lockOverlay}>
-            <div className={styles.lockIcon}>🔒</div>
-            <p>Certificate Locked</p>
-            <p>Complete the quiz to unlock</p>
-          </div>
-        )}
-        
-        <div className={styles.certificateBorder}>
-          <div className={styles.headerAlignment}>
-            {/* Shape image remains on the right */}
-            {/* <img 
-              src="/shape.png" 
-              alt="Shape"
-              className={styles.shape}
-            /> */}
-            {/* Logo moved to the right with white color via CSS */}
-            <img 
-              src="/logo1.png" 
-              alt="Logo"
-              className={styles.logoPadding}
-            />
-          </div>
-
-          <div className={styles.cornerDecorationTopLeft}></div>
-          <div className={styles.cornerDecorationTopRight}></div>
-          <div className={styles.cornerDecorationBottomLeft}></div>
-          <div className={styles.cornerDecorationBottomRight}></div>
-          
-          {/* <div className={styles.watermark}>EDUSKILL ONLINE LEARNING</div> */}
-          
-          
-          <div className={styles.certificateHeader}>
-             
-            
-
-
-            <h2 className={styles.certificateTitle}>
-              <div>CERTIFICATE OF COMPLETION</div>
-            </h2>
-          </div>
-
-          <div className={styles.certificateBody}>
-            <p className={styles.presentedTo}>This is to certify that</p>
-            <h3 className={styles.recipientName}>{user.fullName}</h3>
-            <p className={styles.presentedTo}>has successfully completed</p>
-            <div className={styles.courseName}>{courseTitle}</div>
-            
-            {score !== undefined && (
-              <div className={styles.scoreContainer}>
-                <p>Achieving an outstanding score of</p>
-                <div className={styles.scoreBadge}>{score}%</div>
-              </div>
-            )}
-
-            <div className={styles.detailsContainer}>
-              <div className={styles.detailBox}>
-                <p className={styles.detailLabel}>Date of Completion</p>
-                <p className={styles.detailValue}>{currentDate}</p>
-              </div>
-              <div className={styles.detailBox}>
-                <p className={styles.detailLabel}>Certificate ID</p>
-                <p className={styles.detailValue}>{certificateId}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* <div className={styles.signatureSection}>
-            <div className={styles.signatureBlock}>
-              <div className={styles.signatureLine}></div>
-              <p className={styles.signatureLabel}>Shivani Jobanputra</p>
-            </div>
-            <div className={styles.signatureBlock}>
-              <p className={styles.signatureLabel}>{currentDate}</p>
-              <div className={styles.signatureLine}></div>
-              <p className={styles.signatureLabel}>Date</p>
-            </div>
-          </div> */}
-
-
-                    <div className={styles.signatureSection}>
-            <div className={styles.signatureBlock}>
-              <div className={styles.signatureLine}></div>
-              <p className={styles.signatureLabel}>Shivani Jobanputra</p>
-            </div>
-            <div className={styles.signatureBlock}>
-              <p className={styles.signatureLabel}>{currentDate}</p>
-              <div className={styles.signatureLine}></div>
-               <p className={styles.signatureLabel}>Date</p>
-              
-            </div>
-          </div>
-
-          <div className={styles.issuerSection}>
-            <p className={styles.issuerName}>{issuerName}</p>
-            <p className={styles.issuerTagline}>Skill Today, Lead Tomorrow</p>
-          </div>
-
-          <div className={styles.verification}>
-            {qrCodeUrl ? (
-              <img
-                src={qrCodeUrl}
-                alt="QR Code for Certificate Verification"
-                className={styles.qrCode}
-              />
-            ) : (
-              <p>Generating QR code...</p>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const GraduationPage: React.FC = () => {
+const CertificatePage: React.FC = () => {
   const searchParams = useSearchParams();
-  const { user } = useUser();
-  const [courseTitle, setCourseTitle] = useState<string>('Default Course Title');
-  const [certificateId, setCertificateId] = useState<string>('');
+  const { user, isLoaded } = useUser();
+  const [recipientName, setRecipientName] = useState<string>("");
+  const [courseName, setCourseName] = useState<string>("Default Course");
+  const [certificateId, setCertificateId] = useState<string>("");
+  const [score, setScore] = useState<number | undefined>(undefined);
+  const [locked, setLocked] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCourseTitle = async () => {
+    const fetchCourseData = async () => {
+      if (!isLoaded || !user) {
+        console.warn("User not loaded or not authenticated");
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        const courseId = searchParams.get('courseId');
-        const courseTitleParam = searchParams.get('courseTitle');
+        const courseId = searchParams.get("courseId");
+        const courseTitleParam = searchParams.get("courseTitle");
 
-        console.log('Query Params:', {
-          courseId,
-          courseTitleParam,
-          decodedCourseTitle: courseTitleParam ? decodeURIComponent(courseTitleParam) : null,
-        });
+        if (user.fullName) {
+          setRecipientName(user.fullName);
+        } else {
+          console.warn("No user fullName available, using default.");
+          setRecipientName("Unknown User");
+        }
 
-        // Generate certificateId if user and courseId are available
-        if (user?.id && courseId) {
+        if (user.id && courseId) {
           const newCertificateId = generateCertificateId(user.id, courseId);
           setCertificateId(newCertificateId);
-          console.log('Generated certificateId:', newCertificateId);
+          console.log("Generated certificateId:", newCertificateId);
         }
 
-        // Prioritize courseTitle from query params if available
         if (courseTitleParam) {
-          setCourseTitle(decodeURIComponent(courseTitleParam));
-          console.log('Set courseTitle from query param:', decodeURIComponent(courseTitleParam));
+          setCourseName(decodeURIComponent(courseTitleParam));
+          console.log("Set courseName from query param:", decodeURIComponent(courseTitleParam));
           setIsLoading(false);
           return;
         }
 
-        if (!user?.id) {
-          console.warn('No user ID available, using default course title.');
-          setCourseTitle('Default Course Title');
-          setIsLoading(false);
-          return;
-        }
-
-        // Fallback to fetching course directly if courseId is available
         if (courseId) {
           try {
             const courseResponse = await fetch(`/api/courses/${courseId}`);
             if (courseResponse.ok) {
               const courseData = await courseResponse.json();
               if (courseData.title) {
-                setCourseTitle(courseData.title);
-                console.log('Set courseTitle from direct API call:', courseData.title);
+                setCourseName(courseData.title);
+                setScore(courseData.score || undefined);
+                setLocked(courseData.locked || false);
+                console.log("Set courseName from direct API call:", courseData.title);
                 setIsLoading(false);
                 return;
               }
             }
-            console.warn('Course not found via direct API call for courseId:', courseId);
+            console.warn("Course not found via direct API call for courseId:", courseId);
           } catch (error) {
-            console.error('Error fetching course directly:', error);
+            console.error("Error fetching course directly:", error);
           }
         }
 
-        // Fallback to getCourses
         const courses = await getCourses({ userId: user.id });
 
-        console.log('Fetched courses:', courses);
+        console.log("Fetched courses:", courses);
 
         if (courseId) {
           const course = courses.find((c) => c.id === courseId);
           if (course) {
-            setCourseTitle(course.title);
-            console.log('Set courseTitle from getCourses:', course.title);
+            setCourseName(course.title);
+            setScore(course.score || undefined);
+            setLocked(course.locked || false);
+            console.log("Set courseName from getCourses:", course.title);
           } else {
-            console.warn('Course not found for courseId:', courseId);
-            setCourseTitle('Default Course Title');
+            console.warn("Course not found for courseId:", courseId);
+            setCourseName("Default Course");
           }
         } else {
-          console.warn('No courseId provided in query params.');
-          setCourseTitle('Default Course Title');
+          console.warn("No courseId provided in query params.");
+          setCourseName("Default Course");
         }
       } catch (error) {
-        console.error('Error fetching course title:', error);
-        setCourseTitle('Default Course Title');
+        console.error("Error fetching course data:", error);
+        setCourseName("Default Course");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchCourseTitle();
-  }, [searchParams, user]);
+    fetchCourseData();
+  }, [searchParams, user, isLoaded]);
 
-  if (isLoading || !certificateId) {
-    return <div className={styles.loadingContainer}>Loading certificate...</div>;
+  if (!isLoaded || isLoading || !certificateId || !recipientName) {
+    return <div className="text-center p-10">Loading certificate...</div>;
   }
 
   return (
-    <Certificate
-      courseTitle={courseTitle}
-      date=""
-      issuerName="EDUSKILL ONLINE LEARNING"
-      certificateId={certificateId}
-      locked={false}
-    />
+    <main className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <Certificate
+        recipientName={recipientName}
+        courseName={courseName}
+        date={new Date().toISOString().split("T")[0]} // YYYY-MM-DD format
+        issuerName="EDUSKILL ONLINE LEARNING"
+        score={score}
+        certificateId={certificateId}
+        locked={locked}
+        onUnlockRequest={() => console.log("Unlock requested")}
+      />
+    </main>
   );
 };
-  
-export default GraduationPage;
+
+export default CertificatePage;

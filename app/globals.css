@@ -776,6 +776,50 @@ table.dataTable tbody tr:hover {
 }
 
 
+/* Styles for the signup page (scoped to .signup-page) */
+.signup-page .cl-headerTitle {
+  font-size: 18px;
+  font-weight: bold;
+  color: #00008B;
+  letter-spacing: 2px;
+  width: 100%;
+  height: 50px;
+  background-color: #00008B;
+  border: 1px solid blue;
+  display: block;
+  position: relative;
+}
+
+.signup-page .cl-headerTitle::before {
+  content: 'Create your account ';
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  letter-spacing: 2px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  background-color: #00008B;
+}
+
+.signup-page .cl-headerSubtitle {
+  font-size: 14px;
+  color: #B0C4DE;
+  letter-spacing: 1px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+
+
+
+
 /* globals.css or styles.css */
 .input {
   @apply w-[180px] px-4 py-2 bg-white border border-[#E5E7EB] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#34C759]/50 text-[#1F2A44] text-sm font-medium transition-all duration-200;
@@ -1041,7 +1085,73 @@ table.dataTable tbody tr:hover {
 }
 
 
-  
+  /* .clip-triangle-top-left {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.clip-triangle-bottom-right {
+  clip-path: polygon(100% 100%, 100% 0, 0 100%);
+} */
+
+
+
+/* .clip-triangle-top-left {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.clip-triangle-top-left-smaller {
+  clip-path: polygon(0 0, 80% 0, 0 80%);
+}
+
+.clip-triangle-bottom-right {
+  clip-path: polygon(100% 100%, 100% 0, 0 100%);
+}
+
+.clip-triangle-bottom-right-smaller {
+  clip-path: polygon(100% 100%, 100% 20%, 20% 100%);
+} */
+
+
+
+
+/* .clip-triangle-top-left {
+  clip-path: polygon(0 0, 100% 0, 0 100%);   
+}
+
+.clip-triangle-top-left-smaller {
+  clip-path: polygon(0 0, 100% 0, 0 50%);  
+}
+
+.clip-triangle-bottom-right {
+  clip-path: polygon(0% 100%, 100% 0%, 100% 100%);
+}
+
+.clip-triangle-bottom-right-smaller {
+  clip-path: polygon(0% 100%, 100% 20%, 100% 100%);
+} */
+
+
+
+ 
+/* .clip-triangle-top-left {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.clip-triangle-top-left-smaller {
+  clip-path: polygon(0 0, 80% 0, 0 80%);
+}
+
+ 
+.clip-triangle-bottom-right {
+  clip-path: polygon(0% 100%, 100% 0%, 100% 100%);
+}
+
+.clip-triangle-bottom-right-smaller {
+  clip-path: polygon(20% 100%, 100% 0%, 100% 100%);
+}
+ */
+
+
 
 
 @import "~@uploadthing/react/styles.css"
