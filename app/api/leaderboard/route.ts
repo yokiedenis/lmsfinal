@@ -497,6 +497,121 @@
 
 
 
+// import { NextResponse } from 'next/server';
+// import { PrismaClient } from '@prisma/client';
+
+// const prisma = new PrismaClient();
+
+// export async function GET() {
+//   try {
+//     console.log('Starting leaderboard fetch');
+    
+//     // Fetch all users with relevant fields
+//     const users = await prisma.user.findMany({
+//       select: {
+//         id: true,
+//         name: true,
+//         points: true, // Keep this for reference, but we'll override with totalScore
+//         level: true,
+//         purchases: {
+//           select: {
+//             course: {
+//               select: {
+//                 id: true,
+//                 title: true,
+//               },
+//             },
+//           },
+//         },
+//       },
+//       orderBy: {
+//         points: 'desc', // Optional: you might want to order by totalScore later
+//       },
+//     });
+
+//     console.log('Fetched raw users:', users);
+
+//     if (!users || users.length === 0) {
+//       return NextResponse.json(
+//         { message: 'No users found in the database' },
+//         { status: 404 }
+//       );
+//     }
+
+//     // Calculate total scores for each user
+//     const leaderboardData = await Promise.all(
+//       users.map(async (user) => {
+//         const chapterQuizAttempts = await prisma.chapterQuizAttempt.findMany({
+//           where: { studentId: user.id },
+//           select: { score: true },
+//         });
+
+//         const quizAttempts = await prisma.quizAttempt.findMany({
+//           where: { studentId: user.id },
+//           select: { score: true },
+//         });
+
+//         const quizResults = await prisma.quizResult.findMany({
+//           where: { studentId: user.id },
+//           select: { score: true },
+//         });
+
+//         // Sum up all scores
+//         const totalChapterQuizScore = chapterQuizAttempts.reduce((acc, cur) => acc + (cur.score || 0), 0);
+//         const totalQuizAttemptScore = quizAttempts.reduce((acc, cur) => acc + (cur.score || 0), 0);
+//         const totalQuizResultScore = quizResults.reduce((acc, cur) => acc + (cur.score || 0), 0);
+
+//         const totalScore = (user.points || 0) + totalChapterQuizScore + totalQuizAttemptScore + totalQuizResultScore;
+
+//         console.log('Calculated scores for user', user.id, {
+//           chapter: totalChapterQuizScore,
+//           quiz: totalQuizAttemptScore,
+//           result: totalQuizResultScore,
+//           total: totalScore,
+//         });
+
+//         return {
+//           id: user.id,
+//           name: user.name || 'Anonymous',
+//           totalScore: totalScore, // Use totalScore instead of points
+//           level: user.level ?? 1,
+//           enrolledCourses: user.purchases.length,
+//           courseTitles: user.purchases.map((p) => p.course.title),
+//         };
+//       })
+//     );
+
+//     // Sort by totalScore for final ordering
+//     leaderboardData.sort((a, b) => b.totalScore - a.totalScore);
+
+//     console.log('Final leaderboard data:', leaderboardData);
+//     return NextResponse.json(leaderboardData, { status: 200 });
+//   } catch (error: unknown) {
+//     console.error('Error fetching leaderboard:', {
+//       message: error instanceof Error ? error.message : 'Unknown error',
+//       stack: error instanceof Error ? error.stack : undefined,
+//     });
+
+//     let errorMessage = 'Internal server error';
+//     if (error instanceof Error) {
+//       errorMessage = error.message;
+//     }
+
+//     return NextResponse.json(
+//       { message: errorMessage },
+//       { status: 500 }
+//     );
+//   } finally {
+//     await prisma.$disconnect();
+//   }
+// }
+
+
+
+
+
+
+
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
@@ -506,12 +621,16 @@ export async function GET() {
   try {
     console.log('Starting leaderboard fetch');
     
+    // Verify database connection
+    await prisma.$connect();
+    console.log('Database connected successfully');
+
     // Fetch all users with relevant fields
     const users = await prisma.user.findMany({
       select: {
         id: true,
         name: true,
-        points: true, // Keep this for reference, but we'll override with totalScore
+        points: true,
         level: true,
         purchases: {
           select: {
@@ -525,17 +644,16 @@ export async function GET() {
         },
       },
       orderBy: {
-        points: 'desc', // Optional: you might want to order by totalScore later
+        points: 'desc',
       },
     });
 
     console.log('Fetched raw users:', users);
 
+    // If no users, return empty array with 200 status
     if (!users || users.length === 0) {
-      return NextResponse.json(
-        { message: 'No users found in the database' },
-        { status: 404 }
-      );
+      console.log('No users found, returning empty leaderboard');
+      return NextResponse.json([], { status: 200 });
     }
 
     // Calculate total scores for each user
@@ -556,7 +674,6 @@ export async function GET() {
           select: { score: true },
         });
 
-        // Sum up all scores
         const totalChapterQuizScore = chapterQuizAttempts.reduce((acc, cur) => acc + (cur.score || 0), 0);
         const totalQuizAttemptScore = quizAttempts.reduce((acc, cur) => acc + (cur.score || 0), 0);
         const totalQuizResultScore = quizResults.reduce((acc, cur) => acc + (cur.score || 0), 0);
@@ -573,7 +690,7 @@ export async function GET() {
         return {
           id: user.id,
           name: user.name || 'Anonymous',
-          totalScore: totalScore, // Use totalScore instead of points
+          totalScore: totalScore,
           level: user.level ?? 1,
           enrolledCourses: user.purchases.length,
           courseTitles: user.purchases.map((p) => p.course.title),

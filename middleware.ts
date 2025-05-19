@@ -39,6 +39,46 @@
 
 
 
+// import { authMiddleware } from "@clerk/nextjs/server";
+// import { isTeacher } from "@/lib/teacher";
+// import { isSuperAdmin } from "@/lib/isSuperAdmin";
+
+// export default authMiddleware({
+//   //debug: true, // Enable debug mode for more detailed logs
+//   publicRoutes: [
+//     "/api/webhook",
+//     "/api/uploadthing",
+//     "/",
+//     "/search",
+//     "/api/posts(.*)",
+//     /^\/api\/courses\/[^/]+\/quizzes\/[^/]+\/get$/,
+//     /^\/api\/courses\/[^/]+\/chapterquizzes\/[^/]+\/get$/,
+//   ],
+//     ignoredRoutes: ['/api/auth/*'], // Changed from ignoredPaths to ignoredRoutes
+//   afterAuth: async (auth, req) => {
+//    // console.log("Incoming Request:", req); // Log the incoming request
+
+//     const { userId } = auth;
+
+//     if (req.nextUrl.pathname.startsWith("/teacher/feedback")) {
+//       if (!userId || (!isTeacher(userId) && !isSuperAdmin(userId))) {
+//         return new Response(null, { status: 302, headers: { Location: "/" } });
+//       }
+//     }
+
+//     if (req.nextUrl.pathname.startsWith("/admin")) {
+//       if (!userId || !isSuperAdmin(userId)) {
+//         return new Response(null, { status: 302, headers: { Location: "/" } });
+//       }
+//     }
+//   },
+// });
+
+// export const config = {
+//   matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+// };
+
+
 import { authMiddleware } from "@clerk/nextjs/server";
 import { isTeacher } from "@/lib/teacher";
 import { isSuperAdmin } from "@/lib/isSuperAdmin";
@@ -50,11 +90,13 @@ export default authMiddleware({
     "/api/uploadthing",
     "/",
     "/search",
+    "/api/posts(.*)",
     /^\/api\/courses\/[^/]+\/quizzes\/[^/]+\/get$/,
     /^\/api\/courses\/[^/]+\/chapterquizzes\/[^/]+\/get$/,
   ],
+  ignoredRoutes: [/^\/api\/auth\/.*/], // Use regex to match all /api/auth/* routes
   afterAuth: async (auth, req) => {
-   // console.log("Incoming Request:", req); // Log the incoming request
+    // console.log("Incoming Request:", req); // Log the incoming request
 
     const { userId } = auth;
 
