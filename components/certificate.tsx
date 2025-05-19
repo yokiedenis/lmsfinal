@@ -1146,22 +1146,24 @@ const Certificate: React.FC<CertificateProps> = ({
       const a4WidthPx = 1123; // 297mm * 96 DPI / 25.4 mm/inch
       const a4HeightPx = 794; // 210mm * 96 DPI / 25.4 mm/inch
 
-      // Temporarily set the certificate container to A4 dimensions for capture
+      // Temporarily set the certificate container to A4 dimensions and override responsive styles
       const originalWidth = certificateRef.current.style.width;
       const originalHeight = certificateRef.current.style.height;
       const originalPosition = certificateRef.current.style.position;
       const originalLeft = certificateRef.current.style.left;
       const originalTop = certificateRef.current.style.top;
+      const originalClassName = certificateRef.current.className;
 
       certificateRef.current.style.width = `${a4WidthPx}px`;
       certificateRef.current.style.height = `${a4HeightPx}px`;
       certificateRef.current.style.position = 'absolute';
       certificateRef.current.style.left = '-9999px'; // Move off-screen to avoid layout shifts
       certificateRef.current.style.top = '0';
+      certificateRef.current.className = `${originalClassName} ${styles.captureOverride}`; // Add class to override responsive styles
 
       // Adjust scale based on device pixel ratio for better quality
       const devicePixelRatio = window.devicePixelRatio || 1;
-      const scale = Math.max(2, devicePixelRatio); // Use at least 2, or higher if DPR is greater
+      const scale = Math.max(3, devicePixelRatio); // Increased base scale to 3 for better quality on high-DPI screens
 
       // Capture the certificate element as an image using html2canvas
       const canvas = await html2canvas(certificateRef.current, {
@@ -1179,6 +1181,7 @@ const Certificate: React.FC<CertificateProps> = ({
       certificateRef.current.style.position = originalPosition;
       certificateRef.current.style.left = originalLeft;
       certificateRef.current.style.top = originalTop;
+      certificateRef.current.className = originalClassName;
 
       const imgData = canvas.toDataURL('image/png');
 

@@ -589,3 +589,16 @@
 .clip-triangle-bottom-right {
   clip-path: polygon(100% 100%, 100% 0, 0 100%);
 }
+
+.captureOverride {
+  width: 1123px !important;
+  height: 794px !important;
+  min-width: 1123px !important;
+  max-width: 1123px !important;
+  min-height: 794px !important;
+  max-height: 794px !important;
+}
+.captureOverride * {
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+}
