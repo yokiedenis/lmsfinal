@@ -1152,6 +1152,21 @@ table.dataTable tbody tr:hover {
  */
 
 
+ .captureOverride {
+  width: 900px !important;
+  height: 636px !important;
+  min-width: 900px !important;
+  max-width: 900px !important;
+  min-height: 636px !important;
+  max-height: 636px !important;
+  overflow: visible !important;
+}
+.captureOverride * {
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+}
+
+
 
 
 @import "~@uploadthing/react/styles.css"

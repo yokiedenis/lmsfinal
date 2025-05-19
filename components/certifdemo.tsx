@@ -2632,6 +2632,328 @@
 
 
 
+// "use client";
+
+// import React, { useRef, useEffect, useState } from "react";
+// import { useUser } from "@clerk/clerk-react";
+// import Image from "next/image";
+// import html2canvas from "html2canvas";
+// import { jsPDF } from "jspdf";
+// import { FaLinkedin } from "react-icons/fa";
+// import QRCode from "qrcode";
+
+// interface CertificateProps {
+//   recipientName: string;
+//   courseName: string;
+//   date: string;
+//   issuerName?: string;
+//   score?: number;
+//   certificateId: string;
+//   locked?: boolean;
+//   onUnlockRequest?: () => void;
+// }
+
+
+// const Certificate: React.FC<CertificateProps> = ({
+//   recipientName,
+//   courseName,
+//   date,
+//   issuerName = "EDUSKILL ONLINE LEARNING",
+//   score,
+//   certificateId,
+//   locked = false,
+//   onUnlockRequest,
+// }) => {
+//   const { user } = useUser();
+//   const certificateRef = useRef<HTMLDivElement>(null);
+//   const [isGenerating, setIsGenerating] = useState(false);
+//   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
+
+//   const displayDate = date || new Date().toLocaleDateString("en-US", {
+//     year: "numeric",
+//     month: "2-digit",
+//     day: "2-digit",
+//   }).split("/").join("-");
+
+//   useEffect(() => {
+//     if (user) {
+//       const qrData = `${window.location.origin}/verify?certificateId=${certificateId}&user=${user.id}&course=${encodeURIComponent(courseName)}`;
+//       QRCode.toDataURL(qrData, { width: 80, margin: 1 }, (err, url) => {
+//         if (err) {
+//           console.error("Error generating QR code:", err);
+//           return;
+//         }
+//         setQrCodeUrl(url);
+//       });
+//     }
+//   }, [user, certificateId, courseName]);
+
+//   const handleDownloadPDF = async () => {
+//     if (!certificateRef.current) return;
+
+//     setIsGenerating(true);
+//     try {
+//       const certificateClone = certificateRef.current.cloneNode(true) as HTMLElement;
+//       certificateClone.style.position = "absolute";
+//       certificateClone.style.left = "-9999px";
+//       certificateClone.style.top = "0";
+//       certificateClone.style.width = "900px";
+//       certificateClone.style.height = "636px";
+//       document.body.appendChild(certificateClone);
+
+//       // Wait for images to load
+//       const images = certificateClone.querySelectorAll("img");
+//       const loadPromises = Array.from(images).map(
+//         (img) =>
+//           new Promise((resolve) => {
+//             if (img.complete) {
+//               resolve(true);
+//             } else {
+//               img.onload = () => resolve(true);
+//               img.onerror = () => resolve(true);
+//             }
+//           })
+//       );
+
+//       await Promise.all(loadPromises);
+//       await new Promise(resolve => setTimeout(resolve, 1000)); // Increased delay to ensure rendering
+
+//       const canvas = await html2canvas(certificateClone, {
+//         scale: 2,
+//         width: 900,
+//         height: 636,
+//         useCORS: true,
+//         logging: false,
+//         backgroundColor: "#fff",
+//         removeContainer: true,
+//       });
+
+//       document.body.removeChild(certificateClone);
+
+//       const imgData = canvas.toDataURL("image/png", 1.0);
+//       const pdf = new jsPDF({
+//         orientation: "landscape",
+//         unit: "px",
+//         format: [900, 636],
+//       });
+
+//       pdf.addImage(imgData, "PNG", 0, 0, 900, 636);
+//       pdf.save(`${recipientName}_${courseName.replace(/\s+/g, "_")}_Certificate.pdf`);
+//     } catch (error) {
+//       console.error("Error generating PDF:", error);
+//     } finally {
+//       setIsGenerating(false);
+//     }
+//   };
+
+//   const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+//     e.preventDefault();
+//     if (locked) {
+//       onUnlockRequest?.();
+//     } else {
+//       handleDownloadPDF();
+//     }
+//   };
+
+//   const addToLinkedIn = () => {
+//     const linkedInUrl = `https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=${encodeURIComponent(courseName)}&organizationName=${encodeURIComponent(issuerName)}&issueYear=${new Date().getFullYear()}&issueMonth=${new Date().getMonth() + 1}&certUrl=${encodeURIComponent(window.location.href)}&certId=${certificateId}`;
+//     window.open(linkedInUrl, "_blank");
+//   };
+
+//   if (!user) {
+//     return <div className="text-center p-10">Please sign in to view your certificate.</div>;
+//   }
+
+//   return (
+//     <div className="w-full max-w-[900px] mx-auto p-4 box-border">
+//       <div className="flex justify-center mb-4 space-x-4">
+//         {!locked && (
+//           <>
+//             <button
+//               onClick={handleButtonClick}
+//               className={`px-6 py-2 text-white rounded-lg ${isGenerating ? "bg-gray-400 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"}`}
+//               disabled={isGenerating}
+//             >
+//               {isGenerating ? "Generating PDF..." : "Download PDF Certificate"}
+//             </button>
+//             <button
+//               onClick={addToLinkedIn}
+//               className="px-6 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center space-x-2"
+//             >
+//               <FaLinkedin size={20} />
+//               <span>Share on LinkedIn</span>
+//             </button>
+//           </>
+//         )}
+//         {locked && (
+//           <>
+//             <button
+//               onClick={handleButtonClick}
+//               className="px-6 py-2 text-white bg-gray-400 cursor-not-allowed rounded-lg"
+//             >
+//               Unlock Certificate
+//             </button>
+//             <p className="text-red-500 text-sm mt-2">
+//               Complete the quiz with a passing score to unlock your certificate
+//             </p>
+//           </>
+//         )}
+//       </div>
+
+//       <div
+//         ref={certificateRef}
+//         className={`relative w-[900px] h-[636px] mx-auto p-8 pb-12 bg-white border-4 border-gray-200 shadow-xl rounded-lg text-center font-serif overflow-visible ${
+//           locked ? "opacity-50" : ""
+//         }`}
+//         style={{
+//           backgroundImage: "none",
+//           backgroundSize: "cover",
+//           backgroundPosition: "center",
+//           backgroundRepeat: "no-repeat",
+//         }}
+//       >
+//         {locked && (
+//           <div className="absolute inset-0 flex flex-col justify-center items-center bg-gray-200 bg-opacity-50 z-30">
+//             <div className="text-4xl">🔒</div>
+//             <p className="text-lg font-bold">Certificate Locked</p>
+//             <p>Complete the quiz to unlock</p>
+//           </div>
+//         )}
+
+//         {/* Top Left Corner: Two Overlapping Triangles (SVG) */}
+//         <div className="absolute top-0 left-0 w-32 h-32 z-0">
+//           <svg width="128" height="128" viewBox="0 0 128 128" style={{ position: "absolute" }}>
+//             <polygon points="0,0 128,0 0,128" fill="#6B21A8" />
+//             <polygon points="64,0 128,0 0,128" fill="#2563EB" />
+//           </svg>
+//         </div>
+
+//         {/* Bottom Right Corner: Two Overlapping Triangles (SVG) */}
+//         <div className="absolute bottom-0 right-0 w-32 h-32 z-0">
+//           <svg width="128" height="128" viewBox="0 0 128 128" style={{ position: "absolute" }}>
+//             <polygon points="128,128 128,0 0,128" fill="#6B21A8" />
+//             <polygon points="64,128 128,0 128,128" fill="#2563EB" />
+//           </svg>
+//         </div>
+
+//         {/* Ribbon Badge */}
+//         <div className="absolute top-5 left-5 z-20">
+//           <Image src="/ribbonremover.png" alt="Badge" width={64} height={64} />
+//         </div>
+
+//         {/* Logo */}
+//         <div className="flex justify-center items-center mb-2 z-10 relative">
+//           <Image src="/pic-ed.png" alt="Pic-Ed Logo" width={80} height={80} />
+//         </div>
+
+//         <h2
+//           className="text-4xl font-bold mb-1 z-10 relative bg-white inline-block px-3"
+//           style={{ color: "black" }}
+//         >
+//           CERTIFICATE
+//         </h2>
+
+//         <h2
+//           className="text-xl tracking-wide mb-4 z-10 relative"
+//           style={{ color: "#8B5CF6" }}
+//         >
+//           {courseName}
+//         </h2>
+
+//         <p className="text-base uppercase mb-4 text-gray-700 font-medium tracking-widest z-10 relative">
+//           The following certificate is given to
+//         </p>
+
+//         <h3
+//           className="text-xl font-bold mb-2 border-b border-purple-500 inline-block px-6 py-1 z-10 relative"
+//           style={{ color: "blue", textTransform: "uppercase" }}
+//         >
+//           {recipientName}
+//         </h3>
+
+//         <p className="text-sm text-gray-700 mt-4 mb-6 max-w-lg mx-auto z-10 relative">
+//           This certificate is given to{" "}
+//           <strong style={{ color: "blue" }}>{recipientName}</strong> for
+//           successfully completing the{" "}
+//           <strong style={{ color: "black" }}>{courseName}</strong> course
+//           {score !== undefined && ` with an outstanding score of ${score}%`}
+//         </p>
+
+//         {/* Certificate ID */}
+//         <div className="flex justify-center mb-4 z-10 relative">
+//           <div className="text-center">
+//             <p className="text-xs font-bold" style={{ color: "black" }}>
+//               Certificate ID
+//             </p>
+//             <p className="text-xs" style={{ color: "blue" }}>
+//               {certificateId}
+//             </p>
+//           </div>
+//         </div>
+
+//         {/* QR Code */}
+//         <div className="flex justify-center mb-4 z-10 relative">
+//           {qrCodeUrl ? (
+//             <div className="p-2 bg-white border border-gray-300">
+//               <Image
+//                 src={qrCodeUrl}
+//                 alt="QR Code for Certificate Verification"
+//                 width={64}
+//                 height={64}
+//               />
+//             </div>
+//           ) : (
+//             <p className="text-sm">Generating QR code...</p>
+//           )}
+//         </div>
+
+//         {/* Footer */}
+//         <div className="flex justify-between items-end mt-6 px-8 z-20 relative">
+//           <div className="text-center">
+//             <div className="flex justify-center mb-1">
+//               <Image src="/shivsig.png" alt="Shivani Signature" width={110} height={38} />
+//             </div>
+//             <div className="border-t border-purple-500 w-32 mb-1 mx-auto"></div>
+//             <p
+//               className="font-bold text-sm"
+//               style={{ color: "blue", textTransform: "uppercase", lineHeight: "1.25rem" }}
+//             >
+//               SHIVANI JOBANPUTRA
+//             </p>
+//           </div>
+
+//           <div className="text-center">
+//             <div className="-ml-8">
+//               <Image src="/logg.png" alt="Eduskill Logo" width={150} height={48} />
+//             </div>
+//           </div>
+
+//           <div className="text-center">
+//             <p className="font-bold mb-1 text-sm" style={{ color: "black" }}>
+//               {displayDate}
+//             </p>
+//             <div className="border-t border-purple-800 w-32 mb-1  mx-auto"></div>
+//             <p
+//               className="font-bold text-sm"
+//               style={{ color: "blue", textTransform: "uppercase", lineHeight: "1.25rem" }}
+//             >
+//               DATE
+//             </p>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Certificate;
+
+
+
+
+
+
+
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
@@ -2692,13 +3014,32 @@ const Certificate: React.FC<CertificateProps> = ({
 
     setIsGenerating(true);
     try {
+      // Define the certificate dimensions
+      const certWidthPx = 900;
+      const certHeightPx = 636;
+
+      // Create a temporary wrapper to isolate the cloned element
+      const tempWrapper = document.createElement("div");
+      tempWrapper.style.position = "absolute";
+      tempWrapper.style.left = "-9999px";
+      tempWrapper.style.top = "0";
+      tempWrapper.style.width = `${certWidthPx}px`;
+      tempWrapper.style.height = `${certHeightPx}px`;
+      tempWrapper.style.overflow = "hidden";
+
+      // Clone the certificate element
       const certificateClone = certificateRef.current.cloneNode(true) as HTMLElement;
-      certificateClone.style.position = "absolute";
-      certificateClone.style.left = "-9999px";
-      certificateClone.style.top = "0";
-      certificateClone.style.width = "900px";
-      certificateClone.style.height = "636px";
-      document.body.appendChild(certificateClone);
+
+      // Store original styles to restore later
+      const originalClassName = certificateClone.className;
+
+      // Apply fixed dimensions and override responsive styles
+      certificateClone.style.width = `${certWidthPx}px`;
+      certificateClone.style.height = `${certHeightPx}px`;
+      certificateClone.className = `${originalClassName} captureOverride`;
+
+      tempWrapper.appendChild(certificateClone);
+      document.body.appendChild(tempWrapper);
 
       // Wait for images to load
       const images = certificateClone.querySelectorAll("img");
@@ -2715,28 +3056,36 @@ const Certificate: React.FC<CertificateProps> = ({
       );
 
       await Promise.all(loadPromises);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Increased delay to ensure rendering
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Ensure rendering completes
 
+      // Adjust scale based on device pixel ratio for better quality
+      const devicePixelRatio = window.devicePixelRatio || 1;
+      const scale = Math.max(4, devicePixelRatio); // Increased base scale to 4 for better quality
+
+      // Capture the certificate element as an image using html2canvas
       const canvas = await html2canvas(certificateClone, {
-        scale: 2,
-        width: 900,
-        height: 636,
+        scale: scale,
+        width: certWidthPx,
+        height: certHeightPx,
         useCORS: true,
         logging: false,
         backgroundColor: "#fff",
         removeContainer: true,
+        windowWidth: certWidthPx, // Force viewport width for consistent rendering
+        windowHeight: certHeightPx, // Force viewport height for consistent rendering
       });
 
-      document.body.removeChild(certificateClone);
+      // Clean up: remove the temporary wrapper
+      document.body.removeChild(tempWrapper);
 
       const imgData = canvas.toDataURL("image/png", 1.0);
       const pdf = new jsPDF({
         orientation: "landscape",
         unit: "px",
-        format: [900, 636],
+        format: [certWidthPx, certHeightPx],
       });
 
-      pdf.addImage(imgData, "PNG", 0, 0, 900, 636);
+      pdf.addImage(imgData, "PNG", 0, 0, certWidthPx, certHeightPx);
       pdf.save(`${recipientName}_${courseName.replace(/\s+/g, "_")}_Certificate.pdf`);
     } catch (error) {
       console.error("Error generating PDF:", error);
