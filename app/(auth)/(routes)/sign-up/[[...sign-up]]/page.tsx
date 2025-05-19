@@ -149,6 +149,93 @@
 
 
 
+// "use client";
+
+// import { SignUp, useSignUp } from '@clerk/nextjs';
+// import { useEffect, useState } from 'react';
+
+// export default function Page() {
+//   const isSignedUp = useSignUp();
+//   const [showMessage, setShowMessage] = useState(true);
+
+//   useEffect(() => {
+//     if (isSignedUp) {
+//       fetch('/api/auth/createUser', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         credentials: 'include',
+//       });
+//     }
+
+//     const timer = setTimeout(() => {
+//       setShowMessage(false);
+//     }, 30000);
+
+//     return () => clearTimeout(timer);
+//   }, [isSignedUp]);
+
+//   return (
+//     <div className="relative h-screen w-full">
+//       {/* Static Background Image */}
+//       <div className="absolute inset-0 h-full w-full">
+//         <div className="h-full w-full relative">
+//           <div className="absolute w-full h-full z-0">
+//             <img
+//               src="/ppp.jpg"
+//               alt="Background"
+//               className="object-cover w-full h-full"
+//             />
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Overlay for form */}
+//       <div className="absolute inset-0 z-10 flex justify-end items-center pr-10 md:pr-16 lg:pr-24">
+//         <div className="w-full max-w-md">
+//           <SignUp appearance={{
+//             elements: {
+//               rootBox: {
+//                 boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+//                 borderRadius: "12px",
+//               }
+//             }
+//           }} />
+//         </div>
+//       </div>
+
+//       {/* Notification Message */}
+//       {showMessage && (
+//         <div className="absolute top-4 left-4 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg z-20">
+//           <p className="text-lg font-semibold">
+//             To Sign Up You Must Be 18 and Above
+//           </p>
+//         </div>
+//       )}
+
+//       {/* Logo at the bottom */}
+//       <div className="absolute bottom-10 left-10 z-20">
+//         <img
+//           src="/eduskill.png"
+//           alt="EduSkill Logo"
+//           className="w-auto h-[40px] sm:h-[50px] md:h-[60px] lg:h-[70px] xl:h-[80px] 2xl:h-[90px]
+//                    max-w-[150px] sm:max-w-[180px] md:max-w-[220px] lg:max-w-[260px] xl:max-w-[300px]
+//                    object-contain transition-all duration-300"
+//         />
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+
+
 "use client";
 
 import { SignUp, useSignUp } from '@clerk/nextjs';
@@ -192,8 +279,8 @@ export default function Page() {
       </div>
 
       {/* Overlay for form */}
-      <div className="absolute inset-0 z-10 flex justify-end items-center pr-10 md:pr-16 lg:pr-24">
-        <div className="w-full max-w-md">
+      <div className="absolute inset-0 z-10 flex justify-end items-center pr-6 sm:pr-8 md:pr-12 lg:pr-16 xl:pr-20 2xl:pr-24">
+        <div className="w-full max-w-md py-8">
           <SignUp appearance={{
             elements: {
               rootBox: {
@@ -207,15 +294,17 @@ export default function Page() {
 
       {/* Notification Message */}
       {showMessage && (
-        <div className="absolute top-4 left-4 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg z-20">
-          <p className="text-lg font-semibold">
-            To Sign Up You Must Be 18 and Above
-          </p>
+        <div className="absolute top-8 left-6 sm:top-10 sm:left-8 md:top-12 md:left-10 z-20">
+          <div className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg">
+            <p className="text-lg font-semibold">
+              To Sign Up You Must Be 18 and Above
+            </p>
+          </div>
         </div>
       )}
 
       {/* Logo at the bottom */}
-      <div className="absolute bottom-10 left-10 z-20">
+      <div className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8 md:bottom-10 md:left-10 z-20">
         <img
           src="/eduskill.png"
           alt="EduSkill Logo"
@@ -227,14 +316,6 @@ export default function Page() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
 
 
 
