@@ -867,6 +867,226 @@
 
 
 
+// "use client";
+
+// import React, { useRef, useEffect } from 'react';
+// import { useUser } from '@clerk/clerk-react';
+// import styles from '@/styles/Certificate.module.css';
+// import html2canvas from 'html2canvas';
+// import jsPDF from 'jspdf';
+// import { saveAs } from 'file-saver'; // Import FileSaver.js
+
+// // Preload images to ensure they are available during rendering
+// const preloadImages = () => {
+//   const images = [
+//     '/images/seal.png',
+//     '/images/qr-placeholder.png',
+//     '/images/corner-decoration.png',
+//   ];
+//   images.forEach((image) => {
+//     const img = new Image();
+//     img.src = image;
+//   });
+// };
+
+// interface CertificateProps {
+//   recipientName: string;
+//   courseName: string;
+//   date: string;
+//   issuerName?: string;
+//   score?: number;
+//   certificateId?: string;
+//   locked?: boolean;
+//   onUnlockRequest?: () => void;
+// }
+
+// const Certificate: React.FC<CertificateProps> = ({
+//   recipientName,
+//   courseName,
+//   date,
+//   issuerName = "EDUSKILL ONLINE LEARNING",
+//   score,
+//   certificateId = Math.random().toString(36).substring(2, 10).toUpperCase(),
+//   locked = false,
+//   onUnlockRequest
+// }) => {
+//   const { user } = useUser();
+//   const certificateRef = useRef<HTMLDivElement>(null);
+
+//   // Preload images when the component mounts
+//   useEffect(() => {
+//     preloadImages();
+//   }, []);
+
+//   const handleDownloadPDF = async () => {
+//     if (!certificateRef.current) return;
+
+//     try {
+//       // Capture the certificate element as an image using html2canvas
+//       const canvas = await html2canvas(certificateRef.current, {
+//         scale: 2, // Increase scale for better quality
+//         useCORS: true, // Enable CORS for images
+//         logging: false,
+//         backgroundColor: null, // Preserve transparency
+//       });
+
+//       const imgData = canvas.toDataURL('image/png');
+
+//       // Create a new jsPDF instance (A4 landscape)
+//       const pdf = new jsPDF({
+//         orientation: 'landscape',
+//         unit: 'mm',
+//         format: 'a4',
+//       });
+
+//       // A4 dimensions in mm (landscape: 297mm wide, 210mm high)
+//       const pdfWidth = 297;
+//       const pdfHeight = 210;
+
+//       // Calculate the image dimensions to fit within A4 while maintaining aspect ratio
+//       const imgWidth = canvas.width;
+//       const imgHeight = canvas.height;
+//       const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+//       const scaledWidth = imgWidth * ratio;
+//       const scaledHeight = imgHeight * ratio;
+
+//       // Center the image on the PDF page
+//       const xOffset = (pdfWidth - scaledWidth) / 2;
+//       const yOffset = (pdfHeight - scaledHeight) / 2;
+
+//       // Add the image to the PDF
+//       pdf.addImage(imgData, 'PNG', xOffset, yOffset, scaledWidth, scaledHeight);
+
+//       // Use FileSaver.js to save the PDF
+//       const pdfBlob = pdf.output('blob'); // Get the PDF as a Blob
+//       saveAs(pdfBlob, `${recipientName}_${courseName}_Certificate.pdf`); // Save using FileSaver.js
+//     } catch (error) {
+//       console.error('Error generating PDF:', error);
+//     }
+//   };
+
+//   const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+//     e.preventDefault();
+//     if (locked) {
+//       onUnlockRequest?.();
+//     } else {
+//       handleDownloadPDF();
+//     }
+//   };
+
+//   if (!user) {
+//     return <div className={styles.container}>Please sign in to view your certificate.</div>;
+//   }
+
+//   return (
+//     <div className={styles.container}>
+//       <div className={styles.downloadContainer}>
+//         <button 
+//           onClick={handleButtonClick} 
+//           className={`${styles.downloadButton} ${locked ? styles.lockedButton : ''}`}
+//         >
+//           {locked ? 'Unlock Certificate' : 'Download PDF Certificate'}
+//         </button>
+//         {locked && (
+//           <p className={styles.lockedMessage}>
+//             Complete the quiz with a passing score to unlock your certificate
+//           </p>
+//         )}
+//       </div>
+      
+//       <div 
+//         className={`${styles.certificateContainer} ${locked ? styles.lockedCertificate : ''}`} 
+//         ref={certificateRef}
+//       >
+//         {locked && (
+//           <div className={styles.lockOverlay}>
+//             <div className={styles.lockIcon}>🔒</div>
+//             <p>Certificate Locked</p>
+//             <p>Complete the quiz to unlock</p>
+//           </div>
+//         )}
+        
+//         <div className={styles.certificateBorder}>
+//           <div className={styles.cornerDecorationTopLeft}></div>
+//           <div className={styles.cornerDecorationTopRight}></div>
+//           <div className={styles.cornerDecorationBottomLeft}></div>
+//           <div className={styles.cornerDecorationBottomRight}></div>
+          
+//           <div className={styles.watermark}>EDUSKILL ONLINE LEARNING</div>
+          
+//           <div className={styles.certificateHeader}>
+//             <div className={styles.seal}>
+//               <div className={styles.sealInner}>
+//                 <span>Skill Today, Lead Tomorrow</span>
+//               </div>
+//             </div>
+//             <h2
+//               className={styles.certificateTitle}
+//               style={{
+//                 backgroundColor: 'white',
+//                 display: 'inline-block',
+//                 padding: '4rem 2rem',
+//                 borderRadius: '6px',
+//                 fontSize: '40px',
+//               }}
+//             >
+//               <div>CERTIFICATE OF COMPLETION</div>
+//             </h2>
+//           </div>
+
+//           <div className={styles.certificateBody}>
+//             <p className={styles.presentedTo}>This is to certify that</p>
+//             <h3 className={styles.recipientName}>{recipientName}</h3>
+//             <p className={styles.presentedTo}>has successfully completed</p>
+//             <div className={styles.courseName}>{courseName}</div>
+            
+//             {score !== undefined && (
+//               <div className={styles.scoreContainer}>
+//                 <p>Achieving an outstanding score of</p>
+//                 <div className={styles.scoreBadge}>{score}%</div>
+//               </div>
+//             )}
+
+//             <div className={styles.detailsContainer}>
+//               <div className={styles.detailBox}>
+//                 <p className={styles.detailLabel}>Date of Completion</p>
+//                 <p className={styles.detailValue}>{date}</p>
+//               </div>
+//             </div>
+//           </div>
+
+//           <div className={styles.signatureSection}>
+//             <div className={styles.signatureBlock}>
+//               <div className={styles.signatureLine}></div>
+//               <p className={styles.signatureLabel}>Authorized Signature</p>
+//             </div>
+//             <div className={styles.signatureBlock}>
+//               <div className={styles.signatureLine}></div>
+//               <p className={styles.signatureLabel}>Date</p>
+//             </div>
+//           </div>
+
+//           <div className={styles.issuerSection}>
+//             <p className={styles.issuerName}>{issuerName}</p>
+//             <p className={styles.issuerTagline}>Skill Today, Lead Tomorrow</p>
+//           </div>
+
+//           <div className={styles.verification}>
+//             <div className={styles.qrPlaceholder}></div>
+//             <p>Scan to verify authenticity</p>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Certificate;
+
+
+
+
+
 "use client";
 
 import React, { useRef, useEffect } from 'react';
@@ -874,7 +1094,7 @@ import { useUser } from '@clerk/clerk-react';
 import styles from '@/styles/Certificate.module.css';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { saveAs } from 'file-saver'; // Import FileSaver.js
+import { saveAs } from 'file-saver';
 
 // Preload images to ensure they are available during rendering
 const preloadImages = () => {
@@ -922,13 +1142,43 @@ const Certificate: React.FC<CertificateProps> = ({
     if (!certificateRef.current) return;
 
     try {
+      // Define A4 dimensions in pixels (at 96 DPI for consistency)
+      const a4WidthPx = 1123; // 297mm * 96 DPI / 25.4 mm/inch
+      const a4HeightPx = 794; // 210mm * 96 DPI / 25.4 mm/inch
+
+      // Temporarily set the certificate container to A4 dimensions for capture
+      const originalWidth = certificateRef.current.style.width;
+      const originalHeight = certificateRef.current.style.height;
+      const originalPosition = certificateRef.current.style.position;
+      const originalLeft = certificateRef.current.style.left;
+      const originalTop = certificateRef.current.style.top;
+
+      certificateRef.current.style.width = `${a4WidthPx}px`;
+      certificateRef.current.style.height = `${a4HeightPx}px`;
+      certificateRef.current.style.position = 'absolute';
+      certificateRef.current.style.left = '-9999px'; // Move off-screen to avoid layout shifts
+      certificateRef.current.style.top = '0';
+
+      // Adjust scale based on device pixel ratio for better quality
+      const devicePixelRatio = window.devicePixelRatio || 1;
+      const scale = Math.max(2, devicePixelRatio); // Use at least 2, or higher if DPR is greater
+
       // Capture the certificate element as an image using html2canvas
       const canvas = await html2canvas(certificateRef.current, {
-        scale: 2, // Increase scale for better quality
-        useCORS: true, // Enable CORS for images
+        scale: scale,
+        useCORS: true,
         logging: false,
-        backgroundColor: null, // Preserve transparency
+        backgroundColor: null,
+        width: a4WidthPx,
+        height: a4HeightPx,
       });
+
+      // Restore the original styles
+      certificateRef.current.style.width = originalWidth;
+      certificateRef.current.style.height = originalHeight;
+      certificateRef.current.style.position = originalPosition;
+      certificateRef.current.style.left = originalLeft;
+      certificateRef.current.style.top = originalTop;
 
       const imgData = canvas.toDataURL('image/png');
 
@@ -958,8 +1208,8 @@ const Certificate: React.FC<CertificateProps> = ({
       pdf.addImage(imgData, 'PNG', xOffset, yOffset, scaledWidth, scaledHeight);
 
       // Use FileSaver.js to save the PDF
-      const pdfBlob = pdf.output('blob'); // Get the PDF as a Blob
-      saveAs(pdfBlob, `${recipientName}_${courseName}_Certificate.pdf`); // Save using FileSaver.js
+      const pdfBlob = pdf.output('blob');
+      saveAs(pdfBlob, `${recipientName}_${courseName}_Certificate.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
     }
