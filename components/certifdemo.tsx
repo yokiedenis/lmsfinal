@@ -3341,7 +3341,6 @@
 
 
 
-
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
@@ -3378,6 +3377,8 @@ const Certificate: React.FC<CertificateProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [topLeftTrianglePng, setTopLeftTrianglePng] = useState<string | null>(null);
+  const [bottomRightTrianglePng, setBottomRightTrianglePng] = useState<string | null>(null);
 
   const displayDate = date || new Date().toLocaleDateString("en-US", {
     year: "numeric",
@@ -3409,6 +3410,34 @@ const Certificate: React.FC<CertificateProps> = ({
       .catch((err) => console.error("Error preloading images:", err));
   }, []);
 
+  // Convert SVGs to PNGs
+  useEffect(() => {
+    const svgToPng = async (svgElement: SVGSVGElement, width: number, height: number) => {
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      const img = new window.Image();
+      img.src = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgData)))}`;
+      await new Promise((resolve) => (img.onload = resolve));
+      ctx?.drawImage(img, 0, 0, width, height);
+      return canvas.toDataURL("image/png", 1.0);
+    };
+
+    if (certificateRef.current) {
+      const topLeftSvg = certificateRef.current.querySelector(".top-left-svg") as SVGSVGElement;
+      const bottomRightSvg = certificateRef.current.querySelector(".bottom-right-svg") as SVGSVGElement;
+
+      if (topLeftSvg) {
+        svgToPng(topLeftSvg, 128, 128).then(setTopLeftTrianglePng).catch((err) => console.error("Error converting top-left SVG:", err));
+      }
+      if (bottomRightSvg) {
+        svgToPng(bottomRightSvg, 128, 128).then(setBottomRightTrianglePng).catch((err) => console.error("Error converting bottom-right SVG:", err));
+      }
+    }
+  }, [imagesLoaded]);
+
   // Generate QR code
   useEffect(() => {
     if (user && imagesLoaded) {
@@ -3424,40 +3453,62 @@ const Certificate: React.FC<CertificateProps> = ({
   }, [user, certificateId, courseName, imagesLoaded]);
 
   const handleDownloadPDF = async () => {
-    if (!certificateRef.current || !imagesLoaded) return;
+    if (!certificateRef.current || !imagesLoaded || !topLeftTrianglePng || !bottomRightTrianglePng) {
+      console.error("Required assets not loaded");
+      setIsGenerating(false);
+      return;
+    }
 
     setIsGenerating(true);
     try {
       // Create a clone of the certificate node
       const certificateClone = certificateRef.current.cloneNode(true) as HTMLElement;
+
+      // Replace SVGs with PNGs in the clone
+      const topLeftSvg = certificateClone.querySelector(".top-left-svg") as SVGSVGElement;
+      const bottomRightSvg = certificateClone.querySelector(".bottom-right-svg") as SVGSVGElement;
+      if (topLeftSvg && bottomRightSvg) {
+        const topLeftImg = document.createElement("img");
+        topLeftImg.src = topLeftTrianglePng;
+        topLeftImg.style.width = "128px";
+        topLeftImg.style.height = "128px";
+        topLeftSvg.parentNode?.replaceChild(topLeftImg, topLeftSvg);
+
+        const bottomRightImg = document.createElement("img");
+        bottomRightImg.src = bottomRightTrianglePng;
+        bottomRightImg.style.width = "128px";
+        bottomRightImg.style.height = "128px";
+        bottomRightSvg.parentNode?.replaceChild(bottomRightImg, bottomRightSvg);
+      }
+
       certificateClone.style.position = "absolute";
       certificateClone.style.left = "-9999px";
       certificateClone.style.top = "0";
-      certificateClone.style.width = "940px"; // Increased to add padding
-      certificateClone.style.height = "676px"; // Increased to add padding
-      certificateClone.style.padding = "20px"; // Add padding to ensure all elements are captured
+      certificateClone.style.width = "960px"; // Increased for more padding
+      certificateClone.style.height = "696px"; // Increased for more padding
+      certificateClone.style.padding = "30px"; // More padding
       certificateClone.style.boxSizing = "border-box";
       certificateClone.style.overflow = "visible";
-      certificateClone.style.transform = "scale(1)"; // Ensure no scaling issues
+      certificateClone.style.transform = "scale(1)";
       document.body.appendChild(certificateClone);
 
       // Wait for fonts to load
       await document.fonts.ready;
 
-      // Longer delay to ensure SVGs and images are fully rendered
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Extended delay for rendering
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       const canvas = await html2canvas(certificateClone, {
-        scale: window.devicePixelRatio || 2, // Use device pixel ratio for better quality
-        width: 940, // Match cloned element size
-        height: 676, // Match cloned element size
+        scale: 2, // Fixed scale for consistency
+        width: 960,
+        height: 696,
         useCORS: true,
-        logging: true, // Enable for debugging
+        logging: true,
         backgroundColor: "#fff",
         removeContainer: true,
         allowTaint: true,
-        windowWidth: 940, // Match cloned element size
-        windowHeight: 676, // Match cloned element size
+        windowWidth: 960,
+        windowHeight: 696,
         scrollX: 0,
         scrollY: 0,
       });
@@ -3468,11 +3519,11 @@ const Certificate: React.FC<CertificateProps> = ({
       const pdf = new jsPDF({
         orientation: "landscape",
         unit: "px",
-        format: [900, 636], // Final PDF size, cropped to original dimensions
+        format: [900, 636],
       });
 
-      // Center the larger canvas in the PDF to crop padding
-      pdf.addImage(imgData, "PNG", -20, -20, 940, 676, undefined, "FAST");
+      // Center the larger canvas
+      pdf.addImage(imgData, "PNG", -30, -30, 960, 696, undefined, "FAST");
 
       // Add metadata
       if ("setProperties" in pdf) {
@@ -3570,7 +3621,7 @@ const Certificate: React.FC<CertificateProps> = ({
 
         {/* Top Left Corner: Two Overlapping Triangles (SVG) */}
         <div className="absolute top-0 left-0 w-32 h-32 z-0">
-          <svg width="128" height="128" viewBox="0 0 128 128" style={{ position: "absolute" }}>
+          <svg className="top-left-svg" width="128" height="128" viewBox="0 0 128 128" style={{ position: "absolute" }}>
             <polygon points="0,0 128,0 0,128" fill="#6B21A8" />
             <polygon points="64,0 128,0 0,128" fill="#2563EB" />
           </svg>
@@ -3578,7 +3629,7 @@ const Certificate: React.FC<CertificateProps> = ({
 
         {/* Bottom Right Corner: Two Overlapping Triangles (SVG) */}
         <div className="absolute bottom-0 right-0 w-32 h-32 z-0">
-          <svg width="128" height="128" viewBox="0 0 128 128" style={{ position: "absolute" }}>
+          <svg className="bottom-right-svg" width="128" height="128" viewBox="0 0 128 128" style={{ position: "absolute" }}>
             <polygon points="128,128 128,0 0,128" fill="#6B21A8" />
             <polygon points="64,128 128,0 128,128" fill="#2563EB" />
           </svg>
