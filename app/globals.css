@@ -1154,20 +1154,22 @@ table.dataTable tbody tr:hover {
 
  .captureOverride {
   width: 900px !important;
-  height: 636px !important;
+  height: auto !important; /* Allow height to expand during capture */
   min-width: 900px !important;
   max-width: 900px !important;
-  min-height: 636px !important;
-  max-height: 636px !important;
   overflow: visible !important;
 }
 .captureOverride * {
   flex-shrink: 0 !important;
   flex-grow: 0 !important;
 }
-
-
-
+.captureOverride img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+}
 
 @import "~@uploadthing/react/styles.css"
 
