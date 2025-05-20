@@ -3346,10 +3346,19 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useUser } from "@clerk/clerk-react";
 import Image from "next/image";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
 import { FaLinkedin } from "react-icons/fa";
 import QRCode from "qrcode";
+import { Document, Page, Text, View, StyleSheet, Image as PDFImage, pdf, Font } from "@react-pdf/renderer";
+import { Canvas } from "@react-pdf/renderer";
+
+// Register Roboto font (or your custom font)
+Font.register({
+  family: "Roboto",
+  fonts: [
+    { src: "/fonts/fon.ttf" },
+    //{ src: "/fonts/Roboto-Bold.ttf", fontWeight: "bold" },
+  ],
+});
 
 interface CertificateProps {
   recipientName: string;
@@ -3361,6 +3370,182 @@ interface CertificateProps {
   locked?: boolean;
   onUnlockRequest?: () => void;
 }
+
+// Define styles for @react-pdf/renderer
+const pdfStyles = StyleSheet.create({
+  page: {
+    width: 900,
+    height: 636,
+    padding: 32,
+    paddingBottom: 48,
+    backgroundColor: "#ffffff",
+    flexDirection: "column",
+    position: "relative",
+    fontFamily: "Roboto",
+  },
+  topLeftTriangle: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 128,
+    height: 128,
+  },
+  bottomRightTriangle: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    width: 128,
+    height: 128,
+  },
+  ribbon: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    width: 64,
+    height: 64,
+  },
+  logoContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 8,
+  },
+  logo: {
+    width: 80,
+    height: 80,
+  },
+  title: {
+    fontSize: 36,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 4,
+    color: "black",
+  },
+  courseName: {
+    fontSize: 20,
+    textAlign: "center",
+    marginBottom: 16,
+    color: "#8B5CF6",
+  },
+  subtitle: {
+    fontSize: 14,
+    textAlign: "center",
+    color: "#4B5563",
+    textTransform: "uppercase",
+    marginBottom: 16,
+    letterSpacing: 2,
+  },
+  recipientName: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "blue",
+    textTransform: "uppercase",
+    borderBottomWidth: 2,
+    borderBottomColor: "#8B5CF6",
+    paddingHorizontal: 24,
+    paddingVertical: 4,
+    marginBottom: 8,
+  },
+  description: {
+    fontSize: 12,
+    textAlign: "center",
+    color: "#4B5563",
+    marginHorizontal: 80,
+    marginBottom: 24,
+  },
+  certificateIdContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  certificateIdLabel: {
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "black",
+    textAlign: "center",
+  },
+  certificateId: {
+    fontSize: 10,
+    color: "blue",
+    textAlign: "center",
+  },
+  qrCodeContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 16,
+    padding: 8,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+  },
+  qrCode: {
+    width: 64,
+    height: 64,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 24,
+    paddingHorizontal: 32,
+    position: "absolute",
+    bottom: 32,
+    width: "100%",
+  },
+  footerLeft: {
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  footerRight: {
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  footerCenter: {
+    flexDirection: "column",
+    alignItems: "center",
+    marginLeft: -32,
+  },
+  signatureImage: {
+    width: 110,
+    height: 38,
+    marginBottom: 4,
+  },
+  eduskillLogo: {
+    width: 150,
+    height: 48,
+  },
+  signatureLine: {
+    borderTopWidth: 2,
+    borderTopColor: "#8B5CF6",
+    width: 128,
+    marginBottom: 4,
+  },
+  dateLine: {
+    borderTopWidth: 2,
+    borderTopColor: "#6B21A8",
+    width: 128,
+    marginBottom: 4,
+  },
+  signatureName: {
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "blue",
+    textTransform: "uppercase",
+    lineHeight: 1.25,
+  },
+  dateText: {
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "black",
+    marginBottom: 4,
+  },
+  dateLabel: {
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "blue",
+    textTransform: "uppercase",
+    lineHeight: 1.25,
+  },
+});
 
 const Certificate: React.FC<CertificateProps> = ({
   recipientName,
@@ -3376,9 +3561,7 @@ const Certificate: React.FC<CertificateProps> = ({
   const certificateRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
-  const [imagesLoaded, setImagesLoaded] = useState(false);
-  const [topLeftTrianglePng, setTopLeftTrianglePng] = useState<string | null>(null);
-  const [bottomRightTrianglePng, setBottomRightTrianglePng] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const displayDate = date || new Date().toLocaleDateString("en-US", {
     year: "numeric",
@@ -3386,158 +3569,162 @@ const Certificate: React.FC<CertificateProps> = ({
     day: "2-digit",
   }).split("/").join("-");
 
-  // Preload all images
-  useEffect(() => {
-    const images = [
-      "/ribbonremover.png",
-      "/pic-ed.png",
-      "/shivsig.png",
-      "/logg.png",
-    ];
-
-    const loadPromises = images.map(
-      (src) =>
-        new Promise((resolve, reject) => {
-          const img = new window.Image();
-          img.src = src;
-          img.onload = () => resolve(true);
-          img.onerror = (err) => reject(err);
-        })
-    );
-
-    Promise.all(loadPromises)
-      .then(() => setImagesLoaded(true))
-      .catch((err) => console.error("Error preloading images:", err));
-  }, []);
-
-  // Convert SVGs to PNGs
-  useEffect(() => {
-    const svgToPng = async (svgElement: SVGSVGElement, width: number, height: number) => {
-      const svgData = new XMLSerializer().serializeToString(svgElement);
-      const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext("2d");
-      const img = new window.Image();
-      img.src = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgData)))}`;
-      await new Promise((resolve) => (img.onload = resolve));
-      ctx?.drawImage(img, 0, 0, width, height);
-      return canvas.toDataURL("image/png", 1.0);
-    };
-
-    if (certificateRef.current) {
-      const topLeftSvg = certificateRef.current.querySelector(".top-left-svg") as SVGSVGElement;
-      const bottomRightSvg = certificateRef.current.querySelector(".bottom-right-svg") as SVGSVGElement;
-
-      if (topLeftSvg) {
-        svgToPng(topLeftSvg, 128, 128).then(setTopLeftTrianglePng).catch((err) => console.error("Error converting top-left SVG:", err));
-      }
-      if (bottomRightSvg) {
-        svgToPng(bottomRightSvg, 128, 128).then(setBottomRightTrianglePng).catch((err) => console.error("Error converting bottom-right SVG:", err));
-      }
-    }
-  }, [imagesLoaded]);
-
   // Generate QR code
   useEffect(() => {
-    if (user && imagesLoaded) {
+    if (user) {
       const qrData = `${window.location.origin}/verify?certificateId=${certificateId}&user=${user.id}&course=${encodeURIComponent(courseName)}`;
-      QRCode.toDataURL(qrData, { width: 80, margin: 1 }, (err, url) => {
+      QRCode.toDataURL(qrData, { width: 80, margin: 1, type: "image/png" }, (err, url) => {
         if (err) {
           console.error("Error generating QR code:", err);
+          setError("Failed to generate QR code");
           return;
         }
         setQrCodeUrl(url);
       });
     }
-  }, [user, certificateId, courseName, imagesLoaded]);
+  }, [user, certificateId, courseName]);
+
+  // Define the PDF document
+  const MyDocument = () => (
+    <Document
+      title={`${recipientName} - ${courseName} Certificate`}
+      subject="Certificate of Completion"
+      author="Eduskill"
+      creator="Eduskill Online Learning"
+    >
+      <Page size={[900, 636]} style={pdfStyles.page}>
+        {/* Top Left Corner: Two Overlapping Triangles */}
+        <View style={pdfStyles.topLeftTriangle}>
+          <Canvas
+            paint={(painter, availableWidth, availableHeight) => {
+              // First triangle
+              painter
+                .fillColor("#6B21A8")
+                .moveTo(0, 0)
+                .lineTo(128, 0)
+                .lineTo(0, 128)
+                .fill();
+              // Second triangle
+              painter
+                .fillColor("#2563EB")
+                .moveTo(64, 0)
+                .lineTo(128, 0)
+                .lineTo(0, 128)
+                .fill();
+              return null;
+            }}
+          />
+        </View>
+
+        {/* Bottom Right Corner: Two Overlapping Triangles */}
+        <View style={pdfStyles.bottomRightTriangle}>
+          <Canvas
+            paint={(painter, availableWidth, availableHeight) => {
+              // First triangle
+              painter
+                .fillColor("#6B21A8")
+                .moveTo(128, 128)
+                .lineTo(128, 0)
+                .lineTo(0, 128)
+                .fill();
+              // Second triangle
+              painter
+                .fillColor("#2563EB")
+                .moveTo(64, 128)
+                .lineTo(128, 0)
+                .lineTo(128, 128)
+                .fill();
+              return null;
+            }}
+          />
+        </View>
+
+        {/* Ribbon Badge */}
+        <PDFImage style={pdfStyles.ribbon} src="/ribbonremover.png" />
+
+        {/* Logo */}
+        <View style={pdfStyles.logoContainer}>
+          <PDFImage style={pdfStyles.logo} src="/pic-ed.png" />
+        </View>
+
+        {/* Title */}
+        <Text style={pdfStyles.title}>CERTIFICATE</Text>
+
+        {/* Course Name */}
+        <Text style={pdfStyles.courseName}>{courseName}</Text>
+
+        {/* Subtitle */}
+        <Text style={pdfStyles.subtitle}>The following certificate is given to</Text>
+
+        {/* Recipient Name */}
+        <Text style={pdfStyles.recipientName}>{recipientName}</Text>
+
+        {/* Description */}
+        <Text style={pdfStyles.description}>
+          This certificate is given to{" "}
+          <Text style={{ color: "blue" }}>{recipientName}</Text> for successfully
+          completing the <Text style={{ color: "black" }}>{courseName}</Text>{" "}
+          course{score !== undefined && ` with an outstanding score of ${score}%`}
+        </Text>
+
+        {/* Certificate ID */}
+        <View style={pdfStyles.certificateIdContainer}>
+          <View>
+            <Text style={pdfStyles.certificateIdLabel}>Certificate ID</Text>
+            <Text style={pdfStyles.certificateId}>{certificateId}</Text>
+          </View>
+        </View>
+
+        {/* QR Code */}
+        {qrCodeUrl && (
+          <View style={pdfStyles.qrCodeContainer}>
+            <PDFImage style={pdfStyles.qrCode} src={qrCodeUrl} />
+          </View>
+        )}
+
+        {/* Footer */}
+        <View style={pdfStyles.footer}>
+          <View style={pdfStyles.footerLeft}>
+            <PDFImage style={pdfStyles.signatureImage} src="/shivsig.png" />
+            <View style={pdfStyles.signatureLine} />
+            <Text style={pdfStyles.signatureName}>SHIVANI JOBANPUTRA</Text>
+          </View>
+
+          <View style={pdfStyles.footerCenter}>
+            <PDFImage style={pdfStyles.eduskillLogo} src="/logg.png" />
+          </View>
+
+          <View style={pdfStyles.footerRight}>
+            <Text style={pdfStyles.dateText}>{displayDate}</Text>
+            <View style={pdfStyles.dateLine} />
+            <Text style={pdfStyles.dateLabel}>DATE</Text>
+          </View>
+        </View>
+      </Page>
+    </Document>
+  );
 
   const handleDownloadPDF = async () => {
-    if (!certificateRef.current || !imagesLoaded || !topLeftTrianglePng || !bottomRightTrianglePng) {
-      console.error("Required assets not loaded");
-      setIsGenerating(false);
+    if (!qrCodeUrl) {
+      setError("QR code not generated yet");
       return;
     }
 
     setIsGenerating(true);
+    setError(null);
     try {
-      // Create a clone of the certificate node
-      const certificateClone = certificateRef.current.cloneNode(true) as HTMLElement;
-
-      // Replace SVGs with PNGs in the clone
-      const topLeftSvg = certificateClone.querySelector(".top-left-svg") as SVGSVGElement;
-      const bottomRightSvg = certificateClone.querySelector(".bottom-right-svg") as SVGSVGElement;
-      if (topLeftSvg && bottomRightSvg) {
-        const topLeftImg = document.createElement("img");
-        topLeftImg.src = topLeftTrianglePng;
-        topLeftImg.style.width = "128px";
-        topLeftImg.style.height = "128px";
-        topLeftSvg.parentNode?.replaceChild(topLeftImg, topLeftSvg);
-
-        const bottomRightImg = document.createElement("img");
-        bottomRightImg.src = bottomRightTrianglePng;
-        bottomRightImg.style.width = "128px";
-        bottomRightImg.style.height = "128px";
-        bottomRightSvg.parentNode?.replaceChild(bottomRightImg, bottomRightSvg);
-      }
-
-      certificateClone.style.position = "absolute";
-      certificateClone.style.left = "-9999px";
-      certificateClone.style.top = "0";
-      certificateClone.style.width = "960px"; // Increased for more padding
-      certificateClone.style.height = "696px"; // Increased for more padding
-      certificateClone.style.padding = "30px"; // More padding
-      certificateClone.style.boxSizing = "border-box";
-      certificateClone.style.overflow = "visible";
-      certificateClone.style.transform = "scale(1)";
-      document.body.appendChild(certificateClone);
-
-      // Wait for fonts to load
-      await document.fonts.ready;
-
-      // Extended delay for rendering
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      const canvas = await html2canvas(certificateClone, {
-        scale: 2, // Fixed scale for consistency
-        width: 960,
-        height: 696,
-        useCORS: true,
-        logging: true,
-        backgroundColor: "#fff",
-        removeContainer: true,
-        allowTaint: true,
-        windowWidth: 960,
-        windowHeight: 696,
-        scrollX: 0,
-        scrollY: 0,
-      });
-
-      document.body.removeChild(certificateClone);
-
-      const imgData = canvas.toDataURL("image/png", 1.0);
-      const pdf = new jsPDF({
-        orientation: "landscape",
-        unit: "px",
-        format: [900, 636],
-      });
-
-      // Center the larger canvas
-      pdf.addImage(imgData, "PNG", -30, -30, 960, 696, undefined, "FAST");
-
-      // Add metadata
-      if ("setProperties" in pdf) {
-        pdf.setProperties({
-          title: `${recipientName} - ${courseName} Certificate`,
-          subject: "Certificate of Completion",
-          author: "Eduskill",
-          creator: "Eduskill Online Learning",
-        });
-      }
-
-      pdf.save(`${recipientName}_${courseName.replace(/\s+/g, "_")}_Certificate.pdf`);
+      const blob = await pdf(<MyDocument />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${recipientName}_${courseName.replace(/\s+/g, "_")}_Certificate.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error generating PDF:", error);
+      setError("Failed to generate PDF. Please check image paths and try again.");
     } finally {
       setIsGenerating(false);
     }
@@ -3563,14 +3750,13 @@ const Certificate: React.FC<CertificateProps> = ({
 
   return (
     <div className="w-full max-w-[900px] mx-auto p-4 box-border">
+      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
       <div className="flex justify-center mb-4 space-x-4">
         {!locked && (
           <>
             <button
               onClick={handleButtonClick}
-              className={`px-6 py-2 text-white rounded-lg ${
-                isGenerating ? "bg-gray-400 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"
-              }`}
+              className={`px-6 py-2 text-white rounded-lg ${isGenerating ? "bg-gray-400 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"}`}
               disabled={isGenerating}
             >
               {isGenerating ? "Generating PDF..." : "Download PDF Certificate"}
@@ -3621,7 +3807,7 @@ const Certificate: React.FC<CertificateProps> = ({
 
         {/* Top Left Corner: Two Overlapping Triangles (SVG) */}
         <div className="absolute top-0 left-0 w-32 h-32 z-0">
-          <svg className="top-left-svg" width="128" height="128" viewBox="0 0 128 128" style={{ position: "absolute" }}>
+          <svg width="128" height="128" viewBox="0 0 128 128" style={{ position: "absolute" }}>
             <polygon points="0,0 128,0 0,128" fill="#6B21A8" />
             <polygon points="64,0 128,0 0,128" fill="#2563EB" />
           </svg>
@@ -3629,7 +3815,7 @@ const Certificate: React.FC<CertificateProps> = ({
 
         {/* Bottom Right Corner: Two Overlapping Triangles (SVG) */}
         <div className="absolute bottom-0 right-0 w-32 h-32 z-0">
-          <svg className="bottom-right-svg" width="128" height="128" viewBox="0 0 128 128" style={{ position: "absolute" }}>
+          <svg width="128" height="128" viewBox="0 0 128 128" style={{ position: "absolute" }}>
             <polygon points="128,128 128,0 0,128" fill="#6B21A8" />
             <polygon points="64,128 128,0 128,128" fill="#2563EB" />
           </svg>
@@ -3671,8 +3857,10 @@ const Certificate: React.FC<CertificateProps> = ({
         </h3>
 
         <p className="text-sm text-gray-700 mt-4 mb-6 max-w-lg mx-auto z-10 relative">
-          This certificate is given to <strong style={{ color: "blue" }}>{recipientName}</strong> for
-          successfully completing the <strong style={{ color: "black" }}>{courseName}</strong> course
+          This certificate is given to{" "}
+          <strong style={{ color: "blue" }}>{recipientName}</strong> for
+          successfully completing the{" "}
+          <strong style={{ color: "black" }}>{courseName}</strong> course
           {score !== undefined && ` with an outstanding score of ${score}%`}
         </p>
 
@@ -3745,8 +3933,6 @@ const Certificate: React.FC<CertificateProps> = ({
 };
 
 export default Certificate;
-
-
 
 
 
