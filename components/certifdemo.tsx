@@ -7251,7 +7251,7 @@ const pdfStyles = StyleSheet.create({
   footerRight: {
     flexDirection: "column",
     alignItems: "center",
-    marginRight: 50, // Shift left to avoid triangle corner
+    marginRight: 70, // Shift left to avoid triangle corner
   },
   footerCenter: {
     flexDirection: "column",
@@ -7264,9 +7264,9 @@ const pdfStyles = StyleSheet.create({
   },
   eduskillLogo: {
     objectFit: "contain",
-    width: 270,
+    width: 900,
     height: 80,
-    marginRight:70,
+    marginRight:30,
      
   },
   signatureLine: {
