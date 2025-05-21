@@ -6609,7 +6609,7 @@ const pdfStyles = StyleSheet.create({
   footerCenter: {
     flexDirection: "column",
     alignItems: "center",
-    marginRight: -24,
+    marginRight: -21,
   },
   signatureImage: {
     width: 110,
