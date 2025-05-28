@@ -101,7 +101,7 @@ export const ProgressDistribution = ({ data, className }: ProgressDistributionPr
                     // Only show label if percentage is significant enough to be readable
                     // You can adjust this threshold (e.g., 0.05 for 5%)
                     if (percent * 100 > 5) {
-                        return `${name}: ${(percent * 100).toFixed(0)}%`;
+                        return ` ${(percent * 100).toFixed(0)}%`;
                     }
                     return ''; // Don't render label for very small slices
                 }}
