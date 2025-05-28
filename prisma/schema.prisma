@@ -33,6 +33,7 @@ model Profile {
  // purchases Purchase[]
   certificatesEarned Int @default(0)
 
+  totalCourseTime     Float @default(0) // New field for total course completion time (in minutes)
   gender String?
   country String?
   contactNo String?

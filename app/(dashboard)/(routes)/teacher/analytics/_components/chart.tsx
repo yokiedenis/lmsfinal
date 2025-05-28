@@ -189,6 +189,66 @@
 
 
 
+// "use client";
+
+// import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from "recharts";
+// import { Card } from "@/components/ui/card";
+
+// interface ChartProps {
+//   data: {
+//     name: string;
+//     total: number;
+//   }[];
+//   title?: string;
+//   className?:string;
+// }
+
+// export const Chart = ({ data, title, className }: ChartProps) => {
+//   return (
+//     <Card className="p-4">
+//       <h3 className="text-lg font-semibold mb-4">{title || "Overview"}</h3>
+//       <div className="h-[300px]">
+//         <ResponsiveContainer width="100%" height="100%">
+//           <BarChart data={data}>
+//             <CartesianGrid strokeDasharray="3 3" />
+//             <XAxis
+//               dataKey="name"
+//               stroke="#888888"
+//               fontSize={12}
+//               tickLine={false}
+//               axisLine={false}
+//             />
+//             <YAxis
+//               stroke="#888888"
+//               fontSize={12}
+//               tickLine={false}
+//               axisLine={false}
+//               tickFormatter={(value) => `$${value}`}
+//             />
+//             <Tooltip 
+//               formatter={(value) => [`$${value}`, "Revenue"]}
+//               cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
+//             />
+//             <Legend />
+//             <Bar
+//               dataKey="total"
+//               name="Revenue"
+//               fill="#8884d8"
+//               radius={[4, 4, 0, 0]}
+//             />
+//           </BarChart>
+//         </ResponsiveContainer>
+//       </div>
+//     </Card>
+//   );
+// };
+
+
+
+
+
+
+
 "use client";
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from "recharts";
@@ -205,8 +265,12 @@ interface ChartProps {
 
 export const Chart = ({ data, title, className }: ChartProps) => {
   return (
-    <Card className="p-4">
-      <h3 className="text-lg font-semibold mb-4">{title || "Overview"}</h3>
+    // Applied the 'className' prop here to allow external styling for the Card wrapper
+    <Card className={className}>
+      {/* Added text-blue-600 to make the title blue */}
+      <h3 className="text-lg font-semibold mb-4 text-blue-600">
+        {title || "Overview"}
+      </h3>
       <div className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data}>
@@ -242,10 +306,6 @@ export const Chart = ({ data, title, className }: ChartProps) => {
     </Card>
   );
 };
-
-
-
-
 
 
 
