@@ -588,6 +588,134 @@
 
 
 
+// import { auth } from '@clerk/nextjs/server';
+// import { redirect } from 'next/navigation';
+// import { getAnalytics } from '@/actions/get-analytics';
+// import { DataCard } from './_components/data-card';
+// import { Chart } from './_components/chart';
+// import { UserDetails } from './_components/user-details';
+// import { ProgressDistribution } from './_components/progress-distribution';
+// import { RecentActivity } from './_components/recent-activity';
+// import { RevenueTrend } from './_components/revenue-trend';
+// import { TopCourses } from './_components/top-courses';
+
+// const AnalyticsPage = async () => {
+//     const { userId } = await auth();
+//     if (!userId) {
+//         return redirect('/');
+//     }
+
+//     const {
+//         data,
+//         totalRevenue,
+//         totalSales,
+//         totalUsers,
+//         totalEnrolledCourses,
+//         userDetails,
+//         recentActivity,
+//         courseProgressData,
+//         revenueTrendData,
+//         topCourses
+//     } = await getAnalytics(userId);
+
+//     return (
+//         <div className="p-6 md:p-8 space-y-8 bg-gray-50 min-h-screen">
+//             {/* Enhanced Data Cards Section */}
+//             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+//                 <DataCard
+//                     label="Total Revenue"
+//                     value={totalRevenue}
+//                     shouldFormat
+//                     icon="dollar"
+//                     trend="up"
+//                     trendValue="12%"
+//                     description="From last month"
+//                     className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg rounded-xl transform transition-transform duration-300 hover:scale-[1.02]"
+//                 />
+//                 <DataCard
+//                     label="Total Sales"
+//                     value={totalSales}
+//                     shouldFormat={false}
+//                     icon="cart"
+//                     trend="up"
+//                     trendValue="8%"
+//                     description="From last month"
+//                     className="bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg rounded-xl transform transition-transform duration-300 hover:scale-[1.02]"
+//                 />
+//                 <DataCard
+//                     label="Total Users"
+//                     value={totalUsers}
+//                     shouldFormat={false}
+//                     icon="users"
+//                     trend="up"
+//                     trendValue="15%"
+//                     description="From last month"
+//                     className="bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg rounded-xl transform transition-transform duration-300 hover:scale-[1.02]"
+//                 />
+//                 <DataCard
+//                     label="Courses Enrolled"
+//                     value={totalEnrolledCourses}
+//                     shouldFormat={false}
+//                     icon="book"
+//                     trend="up"
+//                     trendValue="22%"
+//                     description="From last month"
+//                     className="bg-gradient-to-br from-pink-500 to-pink-600 text-white shadow-lg rounded-xl transform transition-transform duration-300 hover:scale-[1.02]"
+//                 />
+//             </div>
+
+//             {/* Main Content Grid - Adjusted for horizontal alignment and stretching */}
+//             {/* items-stretch ensures columns stretch to equal height */}
+//             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+//                 {/* Left Column: Revenue Trend and Bottom Charts */}
+//                 <div className="lg:col-span-2 flex flex-col space-y-8">
+//                     {/* Revenue Trend: Removed explicit height and flex-grow. Let its content dictate initial height. */}
+//                     {/* It will still be part of the flex column. */}
+//                     <RevenueTrend
+//                         data={revenueTrendData}
+//                         className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 flex-grow" // Set to flex-grow
+//                     />
+//                     <br></br>
+
+//                     {/* Chart and TopCourses: Will share the remaining space in this column, aligning their top
+//                         with RecentActivity if the column heights align overall. */}
+//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 flex-grow"> {/* This will take the remaining vertical space */}
+//                         <Chart data={data} title="Course Earnings" className="bg-white rounded-xl shadow-lg p-6 border  border-gray-100" />
+//                         <TopCourses data={topCourses} className="bg-white rounded-xl shadow-lg p-6 border border-gray-100" />
+//                     </div>
+//                 </div>
+
+//                 {/* Right Column: Progress Distribution & Recent Activity */}
+//                 <div className="flex flex-col space-y-8">
+//                     {/* Progress Distribution: Must have the same height as RevenueTrend for alignment. */}
+//                     {/* Setting it to flex-grow will make it expand to match the height of RevenueTrend if RevenueTrend also flex-grows */}
+//                     <ProgressDistribution data={courseProgressData} className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 flex-grow" />
+
+//                     {/* Recent Activity: Its height will be determined by the remaining space in the column.
+//                         It will align its top with the Chart/TopCourses grid's top. */}
+//                     <RecentActivity
+//                         data={recentActivity}
+//                         className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 overflow-auto flex-grow" // flex-grow to share remaining space
+//                     />
+//                 </div>
+//             </div>
+
+//             {/* User Details Section */}
+//             <UserDetails userDetails={userDetails} className="bg-white rounded-xl shadow-lg p-6 border border-gray-100" />
+//         </div>
+//     )
+// }
+
+// export default AnalyticsPage;
+
+
+
+
+
+
+
+
+
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { getAnalytics } from '@/actions/get-analytics';
@@ -600,110 +728,107 @@ import { RevenueTrend } from './_components/revenue-trend';
 import { TopCourses } from './_components/top-courses';
 
 const AnalyticsPage = async () => {
-    const { userId } = await auth();
-    if (!userId) {
-        return redirect('/');
-    }
+  const { userId } = await auth();
+  if (!userId) {
+    return redirect('/');
+  }
 
-    const {
-        data,
-        totalRevenue,
-        totalSales,
-        totalUsers,
-        totalEnrolledCourses,
-        userDetails,
-        recentActivity,
-        courseProgressData,
-        revenueTrendData,
-        topCourses
-    } = await getAnalytics(userId);
+  const {
+    data,
+    totalRevenue,
+    totalSales,
+    totalUsers,
+    totalEnrolledCourses,
+    userDetails,
+    recentActivity,
+    courseProgressData,
+    revenueTrendData,
+    topCourses
+  } = await getAnalytics(userId);
 
-    return (
-        <div className="p-6 md:p-8 space-y-8 bg-gray-50 min-h-screen">
-            {/* Enhanced Data Cards Section */}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <DataCard
-                    label="Total Revenue"
-                    value={totalRevenue}
-                    shouldFormat
-                    icon="dollar"
-                    trend="up"
-                    trendValue="12%"
-                    description="From last month"
-                    className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg rounded-xl transform transition-transform duration-300 hover:scale-[1.02]"
-                />
-                <DataCard
-                    label="Total Sales"
-                    value={totalSales}
-                    shouldFormat={false}
-                    icon="cart"
-                    trend="up"
-                    trendValue="8%"
-                    description="From last month"
-                    className="bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg rounded-xl transform transition-transform duration-300 hover:scale-[1.02]"
-                />
-                <DataCard
-                    label="Total Users"
-                    value={totalUsers}
-                    shouldFormat={false}
-                    icon="users"
-                    trend="up"
-                    trendValue="15%"
-                    description="From last month"
-                    className="bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg rounded-xl transform transition-transform duration-300 hover:scale-[1.02]"
-                />
-                <DataCard
-                    label="Courses Enrolled"
-                    value={totalEnrolledCourses}
-                    shouldFormat={false}
-                    icon="book"
-                    trend="up"
-                    trendValue="22%"
-                    description="From last month"
-                    className="bg-gradient-to-br from-pink-500 to-pink-600 text-white shadow-lg rounded-xl transform transition-transform duration-300 hover:scale-[1.02]"
-                />
-            </div>
+  return (
+    <div className="p-6 md:p-8 space-y-8 bg-gray-50 min-h-screen">
+      {/* Enhanced Data Cards Section */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <DataCard
+          label="Total Revenue"
+          value={totalRevenue}
+          shouldFormat
+          icon="dollar"
+          trend="up"
+          trendValue="12%"
+          description="From last month"
+          className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg rounded-xl transform transition-transform duration-300 hover:scale-[1.02]"
+        />
+        <DataCard
+          label="Total Sales"
+          value={totalSales}
+          shouldFormat={false}
+          icon="cart"
+          trend="up"
+          trendValue="8%"
+          description="From last month"
+          className="bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg rounded-xl transform transition-transform duration-300 hover:scale-[1.02]"
+        />
+        <DataCard
+          label="Total Users"
+          value={totalUsers}
+          shouldFormat={false}
+          icon="users"
+          trend="up"
+          trendValue="15%"
+          description="From last month"
+          className="bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg rounded-xl transform transition-transform duration-300 hover:scale-[1.02]"
+        />
+        <DataCard
+          label="Courses Enrolled"
+          value={totalEnrolledCourses}
+          shouldFormat={false}
+          icon="book"
+          trend="up"
+          trendValue="22%"
+          description="From last month"
+          className="bg-gradient-to-br from-pink-500 to-pink-600 text-white shadow-lg rounded-xl transform transition-transform duration-300 hover:scale-[1.02]"
+        />
+      </div>
 
-            {/* Main Content Grid - Adjusted for horizontal alignment and stretching */}
-            {/* items-stretch ensures columns stretch to equal height */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-                {/* Left Column: Revenue Trend and Bottom Charts */}
-                <div className="lg:col-span-2 flex flex-col space-y-8">
-                    {/* Revenue Trend: Removed explicit height and flex-grow. Let its content dictate initial height. */}
-                    {/* It will still be part of the flex column. */}
-                    <RevenueTrend
-                        data={revenueTrendData}
-                        className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 flex-grow" // Set to flex-grow
-                    />
-                    <br></br>
+      {/* Main Content Grid - Adjusted for horizontal alignment and stretching */}
+      {/* items-stretch ensures columns stretch to equal height */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+        {/* Left Column: Revenue Trend and Bottom Charts */}
+        <div className="lg:col-span-2 flex flex-col space-y-8">
+          {/* Revenue Trend: Removed explicit height and flex-grow. Let its content dictate initial height. */}
+          <RevenueTrend
+            data={revenueTrendData}
+            className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 flex-grow"
+          />
+          <br />
 
-                    {/* Chart and TopCourses: Will share the remaining space in this column, aligning their top
-                        with RecentActivity if the column heights align overall. */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 flex-grow"> {/* This will take the remaining vertical space */}
-                        <Chart data={data} title="Course Earnings" className="bg-white rounded-xl shadow-lg p-6 border  border-gray-100" />
-                        <TopCourses data={topCourses} className="bg-white rounded-xl shadow-lg p-6 border border-gray-100" />
-                    </div>
-                </div>
-
-                {/* Right Column: Progress Distribution & Recent Activity */}
-                <div className="flex flex-col space-y-8">
-                    {/* Progress Distribution: Must have the same height as RevenueTrend for alignment. */}
-                    {/* Setting it to flex-grow will make it expand to match the height of RevenueTrend if RevenueTrend also flex-grows */}
-                    <ProgressDistribution data={courseProgressData} className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 flex-grow" />
-
-                    {/* Recent Activity: Its height will be determined by the remaining space in the column.
-                        It will align its top with the Chart/TopCourses grid's top. */}
-                    <RecentActivity
-                        data={recentActivity}
-                        className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 overflow-auto flex-grow" // flex-grow to share remaining space
-                    />
-                </div>
-            </div>
-
-            {/* User Details Section */}
-            <UserDetails userDetails={userDetails} className="bg-white rounded-xl shadow-lg p-6 border border-gray-100" />
+          {/* Chart and TopCourses: Will share the remaining space in this column, aligning their top
+              with RecentActivity if the column heights align overall. */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 flex-grow">
+            <Chart data={data} title="Course Earnings" className="bg-white rounded-xl shadow-lg p-6 border border-gray-100" />
+            <TopCourses data={topCourses} className="bg-white rounded-xl shadow-lg p-6 border border-gray-100" />
+          </div>
         </div>
-    )
-}
+
+        {/* Right Column: Progress Distribution & Recent Activity */}
+        <div className="flex flex-col space-y-8">
+          {/* Progress Distribution: Must have the same height as RevenueTrend for alignment. */}
+          <ProgressDistribution data={courseProgressData} className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 flex-grow" />
+
+          {/* Recent Activity: Its height will be determined by the remaining space in the column. */}
+          <RecentActivity
+            data={recentActivity}
+            className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 overflow-auto flex-grow"
+          />
+        </div>
+      </div>
+
+      {/* User Details Section */}
+      <UserDetails userDetails={userDetails} className="bg-white rounded-xl shadow-lg p-6 border border-gray-100" />
+    </div>
+  );
+};
 
 export default AnalyticsPage;

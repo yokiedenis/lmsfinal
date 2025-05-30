@@ -2310,6 +2310,445 @@
 
 
 
+// import { db } from "@/lib/db";
+// import {
+//   Course,
+//   Purchase,
+//   Profile,
+//   UserProgress,
+//   Transaction,
+//   Logging,
+//   Chapter,
+//   Quiz,
+//   QuizAttempt
+// } from "@prisma/client";
+// import { Prisma } from "@prisma/client";
+
+// // Define the User type with relations and fields to match Prisma schema
+// type UserWithRelations = {
+//   id: string;
+//   name: string;
+//   email: string;
+//   number: string | null;
+//   courseId: string | null;
+//   points: number;
+//   level: number;
+//   profile: Profile | null;
+//   purchases: (Purchase & {
+//     course: Course & { chapters: Chapter[]; quizzes: Pick<Quiz, "id">[] };
+//     transaction: Transaction | null;
+//   })[];
+//   userProgress: UserProgress[];
+//   transactions: Transaction[];
+//   quizAttempts: QuizAttempt[];
+// };
+
+// type PurchaseWithCourseAndTransaction = Purchase & {
+//   course: Course & { chapters: Chapter[]; quizzes: Pick<Quiz, "id">[] };
+//   transaction: Transaction | null;
+// };
+
+// type UserDetails = {
+//   id: string;
+//   name: string;
+//   email: string;
+//   imageUrl: string;
+//   coursesEnrolled: number;
+//   lastLogin: Date;
+//   dateOfEnrollment: Date;
+//   studentLevel: number;
+//   certificatesEarned: number;
+//   enrolledCourses: {
+//     courseTitle: string;
+//     amountPaid: number;
+//     progress: number;
+//   }[];
+//   timeSpent: number; // In minutes
+//   totalSpent: number;
+// };
+
+// type RecentActivity = {
+//   id: string;
+//   userId: string;
+//   userName: string;
+//   action: string;
+//   courseTitle?: string;
+//   timestamp: Date;
+// };
+
+// type CourseProgressData = {
+//   name: string;
+//   value: number;
+// }[];
+
+// type RevenueTrendData = {
+//   month: string;
+//   revenue: number;
+// }[];
+
+// type TopCourse = {
+//   id: string;
+//   title: string;
+//   enrollments: number;
+//   revenue: number;
+// };
+
+// type AnalyticsData = {
+//   data: { name: string; total: number }[];
+//   totalRevenue: number;
+//   totalSales: number;
+//   totalUsers: number;
+//   totalEnrolledCourses: number;
+//   userDetails: UserDetails[];
+//   recentActivity: RecentActivity[];
+//   courseProgressData: CourseProgressData;
+//   revenueTrendData: RevenueTrendData;
+//   topCourses: TopCourse[];
+// };
+
+// const groupByCourse = (purchases: PurchaseWithCourseAndTransaction[]) => {
+//   const grouped: { [courseTitle: string]: number } = {};
+
+//   purchases.forEach((purchase) => {
+//     const courseTitle = purchase.course.title;
+//     if (!grouped[courseTitle]) {
+//       grouped[courseTitle] = 0;
+//     }
+//     if (purchase.transaction && purchase.transaction.amount > 0) {
+//       grouped[courseTitle] += purchase.transaction.amount;
+//     }
+//   });
+
+//   return grouped;
+// };
+
+// const getLast12MonthsRevenue = (purchases: PurchaseWithCourseAndTransaction[]) => {
+//   const months = [
+//     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+//     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+//   ];
+  
+//   const currentDate = new Date();
+//   const revenueByMonth: { [key: string]: number } = {};
+
+//   for (let i = 11; i >= 0; i--) {
+//     const date = new Date(currentDate);
+//     date.setMonth(date.getMonth() - i);
+//     const monthKey = `${months[date.getMonth()]} ${date.getFullYear()}`;
+//     revenueByMonth[monthKey] = 0;
+//   }
+
+//   purchases.forEach((purchase) => {
+//     if (purchase.transaction && purchase.transaction.amount > 0) {
+//       const purchaseDate = purchase.transaction.createdAt;
+//       const monthKey = `${months[purchaseDate.getMonth()]} ${purchaseDate.getFullYear()}`;
+      
+//       const twelveMonthsAgo = new Date(currentDate);
+//       twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+      
+//       if (purchaseDate >= twelveMonthsAgo) {
+//         revenueByMonth[monthKey] = (revenueByMonth[monthKey] || 0) + purchase.transaction.amount;
+//       }
+//     }
+//   });
+
+//   return Object.entries(revenueByMonth).map(([month, revenue]) => ({
+//     month,
+//     revenue
+//   }));
+// };
+
+// export const getAnalytics = async (userId: string): Promise<AnalyticsData> => {
+//   try {
+//     console.log("[GET_ANALYTICS] Fetching analytics for userId:", userId);
+
+//     // Fetch purchases
+//     const purchases = await db.purchase.findMany({
+//       where: {
+//         course: {
+//           userId: userId
+//         }
+//       },
+//       include: {
+//         course: {
+//           include: {
+//             chapters: true,
+//             quizzes: {
+//               select: { id: true }
+//             }
+//           }
+//         },
+//         transaction: true 
+//       }
+//     });
+
+//     console.log("[GET_ANALYTICS] Fetched purchases:", purchases.length, purchases.map(p => ({
+//       id: p.id,
+//       courseId: p.courseId,
+//       userId: p.userId,
+//       transactionId: p.transactionId,
+//       transactionAmount: p.transaction?.amount,
+//     })));
+
+//     // Fetch users with safe casting
+//     const rawUsers = await db.user.findMany({
+//       include: {
+//         profile: true,
+//         purchases: {
+//           include: {
+//             course: {
+//               include: {
+//                 chapters: true,
+//                 quizzes: {
+//                   select: { id: true }
+//                 }
+//               }
+//             },
+//             transaction: true,
+//           }
+//         },
+//         userProgress: true,
+//         transactions: true,
+//         quizAttempts: true,
+//       }
+//     });
+
+//     // Safely cast to UserWithRelations[]
+//     const users = rawUsers as unknown as UserWithRelations[];
+//     console.log("[GET_ANALYTICS] Fetched users:", users.length, users.map(u => ({ id: u.id, email: u.email })));
+
+//     // Group earnings by course
+//     const groupedEarnings = groupByCourse(purchases as PurchaseWithCourseAndTransaction[]);
+//     const courseData = Object.entries(groupedEarnings).map(([courseTitle, total]) => ({
+//       name: courseTitle,
+//       total
+//     }));
+//     console.log("[GET_ANALYTICS] Grouped earnings data:", courseData);
+
+//     // Calculate total revenue
+//     const totalRevenue = courseData.reduce((acc: number, curr: { total: number }) => acc + curr.total, 0);
+//     console.log("[GET_ANALYTICS] Calculated totalRevenue:", totalRevenue);
+
+//     // Calculate total sales
+//     const totalSales = purchases.length;
+//     console.log("[GET_ANALYTICS] Calculated totalSales:", totalSales);
+
+//     // Calculate total users
+//     const totalUsers = users.length;
+//     console.log("[GET_ANALYTICS] Calculated totalUsers:", totalUsers);
+
+//     // Calculate total enrolled courses
+//     const uniqueCourseIds = new Set(purchases.map((purchase: PurchaseWithCourseAndTransaction) => purchase.courseId));
+//     const totalEnrolledCourses = uniqueCourseIds.size;
+//     console.log("[GET_ANALYTICS] Calculated totalEnrolledCourses:", totalEnrolledCourses, "Unique course IDs:", Array.from(uniqueCourseIds));
+
+//     // Calculate course progress distribution
+//     const progressCounts = {
+//       '0-25%': 0,
+//       '26-50%': 0,
+//       '51-75%': 0,
+//       '76-99%': 0,
+//       'Completed': 0
+//     };
+
+//     users.forEach((user: UserWithRelations) => {
+//       const completedCount = user.userProgress.filter((up: UserProgress) => up.isCompleted).length;
+//       const totalCount = user.userProgress.length;
+//       const progressPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+
+//       if (progressPercentage === 100) {
+//         progressCounts['Completed']++;
+//       } else if (progressPercentage >= 76) {
+//         progressCounts['76-99%']++;
+//       } else if (progressPercentage >= 51) {
+//         progressCounts['51-75%']++;
+//       } else if (progressPercentage >= 26) {
+//         progressCounts['26-50%']++;
+//       } else {
+//         progressCounts['0-25%']++;
+//       }
+//     });
+//     console.log("[GET_ANALYTICS] Course progress distribution:", progressCounts);
+
+//     const courseProgressData = Object.entries(progressCounts).map(([name, value]) => ({
+//       name,
+//       value
+//     }));
+
+//     // Get revenue trend data
+//     const revenueTrendData = getLast12MonthsRevenue(purchases as PurchaseWithCourseAndTransaction[]);
+//     console.log("[GET_ANALYTICS] Revenue trend data:", revenueTrendData);
+
+//     // Get top courses
+//     const courseEnrollmentMap = new Map<string, { enrollments: number, revenue: number }>();
+    
+//     purchases.forEach((purchase: PurchaseWithCourseAndTransaction) => {
+//       const courseId = purchase.courseId;
+//       const current = courseEnrollmentMap.get(courseId) || { enrollments: 0, revenue: 0 };
+      
+//       current.enrollments += 1;
+//       if (purchase.transaction) {
+//         current.revenue += purchase.transaction.amount;
+//       }
+      
+//       courseEnrollmentMap.set(courseId, current);
+//     });
+
+//     const topCourses = Array.from(courseEnrollmentMap.entries())
+//       .map(([courseId, data]) => {
+//         const course = purchases.find((p: PurchaseWithCourseAndTransaction) => p.courseId === courseId)?.course;
+//         return {
+//           id: courseId,
+//           title: course?.title || 'Unknown Course',
+//           enrollments: data.enrollments,
+//           revenue: data.revenue
+//         };
+//       })
+//       .sort((a, b) => b.enrollments - a.enrollments)
+//       .slice(0, 5);
+//     console.log("[GET_ANALYTICS] Top courses:", topCourses);
+
+//     // Get recent activity
+//     const recentActivity: RecentActivity[] = purchases
+//       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+//       .slice(0, 10)
+//       .map((purchase: PurchaseWithCourseAndTransaction) => ({
+//         id: purchase.id,
+//         userId: purchase.userId,
+//         userName: users.find((u: UserWithRelations) => u.id === purchase.userId)?.name || 'Unknown User',
+//         action: 'Enrolled in course',
+//         courseTitle: purchase.course.title,
+//         timestamp: purchase.createdAt
+//       }));
+//     console.log("[GET_ANALYTICS] Recent activity:", recentActivity);
+
+//     // Calculate user details
+//     const userDetails: UserDetails[] = await Promise.all(
+//       users.map(async (user: UserWithRelations) => {
+//         const userLogs = await db.logging.findMany({
+//           where: {
+//             userId: user.id,
+//             url: { in: ["/login", "/logout"] },
+//           },
+//           orderBy: { createdAt: "asc" },
+//         });
+
+//         let lastLogin: Date | null = null;
+//         for (let i = 0; i < userLogs.length; i++) {
+//           if (userLogs[i].url === "/login") {
+//             lastLogin = userLogs[i].createdAt;
+//           }
+//         }
+
+//         const enrolledCourses = user.purchases.map((purchase) => {
+//           const progress = user.userProgress
+//             .filter((up: UserProgress) => up.courseId === purchase.courseId)
+//             .reduce((acc: number, curr: UserProgress) => acc + (curr.isCompleted ? 1 : 0), 0);
+          
+//           const totalChapters = purchase.course.chapters.length || 1;
+//           const progressPercentage = Math.round((progress / totalChapters) * 100);
+
+//           return {
+//             courseTitle: purchase.course.title,
+//             amountPaid: purchase.transaction?.amount || 0,
+//             progress: progressPercentage
+//           };
+//         });
+
+//         const totalSpent = user.transactions.reduce((sum: number, txn: Transaction) => sum + txn.amount, 0);
+
+//         // Calculate certificates earned
+//         let certificatesEarned = 0;
+//         const PASSING_SCORE_PERCENTAGE = 60;
+
+//         const userCourses = user.purchases.map(p => p.course);
+//         for (const course of userCourses) {
+//           const finalQuiz = course.quizzes?.[0];
+//           if (!finalQuiz) continue;
+
+//           const quizAttempts = user.quizAttempts.filter(attempt => attempt.quizId === finalQuiz.id)
+//             .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+//           const latestAttempt = quizAttempts[0];
+//           if (latestAttempt && latestAttempt.totalQuestions > 0) {
+//             const scorePercentage = (latestAttempt.score / latestAttempt.totalQuestions) * 100;
+//             if (scorePercentage >= PASSING_SCORE_PERCENTAGE) {
+//               certificatesEarned += 1;
+//             }
+//           }
+//         }
+
+//         // Calculate time spent based on completed chapters (persistent)
+//         const completedChapters = user.userProgress.filter(up => up.isCompleted);
+//         const estimatedTimePerChapter = 60; // Minutes per chapter (adjust as needed)
+//         const calculatedTimeSpent = completedChapters.length * estimatedTimePerChapter;
+
+//         // Update Profile.totalCourseTime if necessary
+//         if (user.profile) {
+//           const currentTotalCourseTime = user.profile.totalCourseTime || 0;
+//           if (calculatedTimeSpent !== currentTotalCourseTime) {
+//             await db.profile.update({
+//               where: { userId: user.id },
+//               data: { totalCourseTime: calculatedTimeSpent }
+//             });
+//           }
+//         }
+
+//         const timeSpent = user.profile?.totalCourseTime || calculatedTimeSpent;
+
+//         return {
+//           id: user.id,
+//           name: user.name || "Unknown User",
+//           email: user.email,
+//           imageUrl: user.profile?.imageUrl || "/default-avatar.png",
+//           coursesEnrolled: user.purchases.length,
+//           lastLogin: lastLogin || user.profile?.updatedAt || new Date(),
+//           dateOfEnrollment: user.profile?.createdAt || new Date(),
+//           studentLevel: user.userProgress[0]?.level || 1,
+//           certificatesEarned,
+//           enrolledCourses,
+//           timeSpent, // In minutes
+//           totalSpent
+//         };
+//       })
+//     );
+//     console.log("[GET_ANALYTICS] User details:", userDetails.length);
+
+//     return {
+//       data: courseData,
+//       totalRevenue,
+//       totalSales,
+//       totalUsers,
+//       totalEnrolledCourses,
+//       userDetails,
+//       recentActivity,
+//       courseProgressData,
+//       revenueTrendData,
+//       topCourses
+//     };
+//   } catch (error) {
+//     console.error("[GET_ANALYTICS] Error:", error);
+//     return {
+//       data: [],
+//       totalRevenue: 0,
+//       totalSales: 0,
+//       totalUsers: 0,
+//       totalEnrolledCourses: 0,
+//       userDetails: [],
+//       recentActivity: [],
+//       courseProgressData: [],
+//       revenueTrendData: [],
+//       topCourses: []
+//     };
+//   }
+// };
+
+
+
+
+
+
+
+
 import { db } from "@/lib/db";
 import {
   Course,
@@ -2323,6 +2762,8 @@ import {
   QuizAttempt
 } from "@prisma/client";
 import { Prisma } from "@prisma/client";
+import { clerkClient } from "@clerk/nextjs/server";
+import { syncClerkUsers } from "@/lib/sync-clerk-users"; // Import the sync function
 
 // Define the User type with relations and fields to match Prisma schema
 type UserWithRelations = {
@@ -2346,6 +2787,7 @@ type UserWithRelations = {
 type PurchaseWithCourseAndTransaction = Purchase & {
   course: Course & { chapters: Chapter[]; quizzes: Pick<Quiz, "id">[] };
   transaction: Transaction | null;
+  user: { name: string | null; email: string } | null; // Already optional
 };
 
 type UserDetails = {
@@ -2370,7 +2812,8 @@ type UserDetails = {
 type RecentActivity = {
   id: string;
   userId: string;
-  userName: string;
+  userName: string | null; // Full name from Clerk
+  email: string; // Email from Clerk
   action: string;
   courseTitle?: string;
   timestamp: Date;
@@ -2447,7 +2890,7 @@ const getLast12MonthsRevenue = (purchases: PurchaseWithCourseAndTransaction[]) =
       twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
       
       if (purchaseDate >= twelveMonthsAgo) {
-        revenueByMonth[monthKey] = (revenueByMonth[monthKey] || 0) + purchase.transaction.amount;
+        revenueByMonth[monthKey] += purchase.transaction.amount;
       }
     }
   });
@@ -2462,12 +2905,30 @@ export const getAnalytics = async (userId: string): Promise<AnalyticsData> => {
   try {
     console.log("[GET_ANALYTICS] Fetching analytics for userId:", userId);
 
-    // Fetch purchases
+    // Sync Clerk users with Prisma to ensure all users are present
+    await syncClerkUsers();
+
+    // Fetch valid user IDs to filter purchases
+    const validUsers = await db.user.findMany({
+      select: { id: true }
+    });
+    const validUserIds = new Set(validUsers.map(user => user.id));
+
+    // Debug: Check for purchase userIds that don't exist in validUserIds
+    const allPurchases = await db.purchase.findMany({
+      select: { userId: true },
+      where: { course: { userId: userId } }
+    });
+    const purchaseUserIds = new Set(allPurchases.map(p => p.userId));
+    console.log("[GET_ANALYTICS] Users in purchases but not in Prisma:", Array.from(purchaseUserIds).filter(id => !validUserIds.has(id)));
+
+    // Fetch purchases, only for valid users
     const purchases = await db.purchase.findMany({
       where: {
         course: {
           userId: userId
-        }
+        },
+        userId: { in: Array.from(validUserIds) } // Only include purchases with valid userIds
       },
       include: {
         course: {
@@ -2478,7 +2939,10 @@ export const getAnalytics = async (userId: string): Promise<AnalyticsData> => {
             }
           }
         },
-        transaction: true 
+        transaction: true,
+        user: {
+          select: { name: true, email: true }
+        }
       }
     });
 
@@ -2486,8 +2950,10 @@ export const getAnalytics = async (userId: string): Promise<AnalyticsData> => {
       id: p.id,
       courseId: p.courseId,
       userId: p.userId,
-      transactionId: p.transactionId,
+      transactionId: p.transaction?.id,
       transactionAmount: p.transaction?.amount,
+      userName: p.user?.name,
+      userEmail: p.user?.email
     })));
 
     // Fetch users with safe casting
@@ -2504,7 +2970,7 @@ export const getAnalytics = async (userId: string): Promise<AnalyticsData> => {
                 }
               }
             },
-            transaction: true,
+            transaction: true
           }
         },
         userProgress: true,
@@ -2516,6 +2982,25 @@ export const getAnalytics = async (userId: string): Promise<AnalyticsData> => {
     // Safely cast to UserWithRelations[]
     const users = rawUsers as unknown as UserWithRelations[];
     console.log("[GET_ANALYTICS] Fetched users:", users.length, users.map(u => ({ id: u.id, email: u.email })));
+
+    // Fetch Clerk user data for purchases
+    const uniqueUserIds = Array.from(new Set(purchases.map(p => p.userId)));
+    const clerkUsers = await Promise.all(
+      uniqueUserIds.map(async (id) => {
+        try {
+          const clerkUser = await clerkClient.users.getUser(id);
+          return {
+            id,
+            fullName: clerkUser.fullName || `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || null,
+            email: clerkUser.emailAddresses[0]?.emailAddress || ''
+          };
+        } catch (error) {
+          console.error(`[GET_ANALYTICS] Error fetching Clerk user ${id}:`, error);
+          return { id, fullName: null, email: '' };
+        }
+      })
+    );
+    const clerkUserMap = new Map(clerkUsers.map(u => [u.id, u]));
 
     // Group earnings by course
     const groupedEarnings = groupByCourse(purchases as PurchaseWithCourseAndTransaction[]);
@@ -2612,14 +3097,18 @@ export const getAnalytics = async (userId: string): Promise<AnalyticsData> => {
     const recentActivity: RecentActivity[] = purchases
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       .slice(0, 10)
-      .map((purchase: PurchaseWithCourseAndTransaction) => ({
-        id: purchase.id,
-        userId: purchase.userId,
-        userName: users.find((u: UserWithRelations) => u.id === purchase.userId)?.name || 'Unknown User',
-        action: 'Enrolled in course',
-        courseTitle: purchase.course.title,
-        timestamp: purchase.createdAt
-      }));
+      .map((purchase: PurchaseWithCourseAndTransaction) => {
+        const clerkUser = clerkUserMap.get(purchase.userId);
+        return {
+          id: purchase.id,
+          userId: purchase.userId,
+          userName: clerkUser?.fullName || purchase.user?.name || null,
+          email: clerkUser?.email || purchase.user?.email || '',
+          action: 'Enrolled in course',
+          courseTitle: purchase.course.title,
+          timestamp: purchase.createdAt
+        };
+      });
     console.log("[GET_ANALYTICS] Recent activity:", recentActivity);
 
     // Calculate user details
@@ -2741,16 +3230,6 @@ export const getAnalytics = async (userId: string): Promise<AnalyticsData> => {
     };
   }
 };
-
-
-
-
-
-
-
-
-
-
 
 
 
