@@ -90,6 +90,7 @@ export const CourseMobileSidebar = ({
           course={course}
           progressCount={progressCount}
           quizId={quizId} // Pass quizId to CourseSidebar
+          courseId={course.id} 
         />
       </SheetContent>
     </Sheet>
