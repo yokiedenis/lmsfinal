@@ -79,12 +79,66 @@
 // };
 
 
+// import { authMiddleware } from "@clerk/nextjs/server";
+// import { isTeacher } from "@/lib/teacher";
+// import { isSuperAdmin } from "@/lib/isSuperAdmin";
+
+// export default authMiddleware({
+//   //debug: true, // Enable debug mode for more detailed logs
+//   publicRoutes: [
+//     "/api/webhook",
+//     "/api/uploadthing",
+//     "/",
+//     "/api/purchases/check",
+//     "/search",
+//     "/api/posts(.*)",
+//     /^\/api\/courses\/[^/]+\/quizzes\/[^/]+\/get$/,
+//     /^\/api\/courses\/[^/]+\/chapterquizzes\/[^/]+\/get$/,
+//   ],
+//   ignoredRoutes: [/^\/api\/auth\/.*/], // Use regex to match all /api/auth/* routes
+//   afterAuth: async (auth, req) => {
+//     // console.log("Incoming Request:", req); // Log the incoming request
+
+//     const { userId } = auth;
+
+//     if (req.nextUrl.pathname.startsWith("/teacher/feedback")) {
+//       if (!userId || (!isTeacher(userId) && !isSuperAdmin(userId))) {
+//         return new Response(null, { status: 302, headers: { Location: "/" } });
+//       }
+//     }
+
+//     if (req.nextUrl.pathname.startsWith("/admin")) {
+//       if (!userId || !isSuperAdmin(userId)) {
+//         return new Response(null, { status: 302, headers: { Location: "/" } });
+//       }
+//     }
+//   },
+// });
+
+// export const config = {
+//   matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)",
+//     // Always run for API routes
+//     "/(api|trpc)(.*)",
+//     // Explicitly include the liveclasses route
+//     "/courses/:courseId/liveclasses",
+//   ],
+
+// };
+
+
+
+
+
+
+
+
 import { authMiddleware } from "@clerk/nextjs/server";
 import { isTeacher } from "@/lib/teacher";
 import { isSuperAdmin } from "@/lib/isSuperAdmin";
+import { NextResponse } from "next/server";
 
 export default authMiddleware({
-  //debug: true, // Enable debug mode for more detailed logs
+  // debug: true, // Uncomment for debugging
   publicRoutes: [
     "/api/webhook",
     "/api/uploadthing",
@@ -95,34 +149,45 @@ export default authMiddleware({
     /^\/api\/courses\/[^/]+\/quizzes\/[^/]+\/get$/,
     /^\/api\/courses\/[^/]+\/chapterquizzes\/[^/]+\/get$/,
   ],
-  ignoredRoutes: [/^\/api\/auth\/.*/], // Use regex to match all /api/auth/* routes
+  ignoredRoutes: [/^\/api\/auth\/.*/],
   afterAuth: async (auth, req) => {
-    // console.log("Incoming Request:", req); // Log the incoming request
-
     const { userId } = auth;
+    const { pathname } = req.nextUrl;
 
-    if (req.nextUrl.pathname.startsWith("/teacher/feedback")) {
+    // Prevent redirect loops by skipping if already on /
+    if (pathname === "/" && !userId) {
+      return NextResponse.next();
+    }
+
+    // Protect /teacher/feedback
+    if (pathname.startsWith("/teacher/feedback")) {
       if (!userId || (!isTeacher(userId) && !isSuperAdmin(userId))) {
-        return new Response(null, { status: 302, headers: { Location: "/" } });
+        console.log(`[MIDDLEWARE] Redirecting from ${pathname} to /: Unauthorized access`);
+        return NextResponse.redirect(new URL("/", req.url));
       }
     }
 
-    if (req.nextUrl.pathname.startsWith("/admin")) {
+    // Protect /admin
+    if (pathname.startsWith("/admin")) {
       if (!userId || !isSuperAdmin(userId)) {
-        return new Response(null, { status: 302, headers: { Location: "/" } });
+        console.log(`[MIDDLEWARE] Redirecting from ${pathname} to /: Unauthorized access`);
+        return NextResponse.redirect(new URL("/", req.url));
       }
     }
+
+    return NextResponse.next();
   },
 });
 
 export const config = {
-  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)",
-    // Always run for API routes
+  matcher: [
+    // Match all non-static routes except _next, static assets
+    "/((?!.*\\..*|_next|static).*)",
+    // Explicitly include API routes
     "/(api|trpc)(.*)",
-    // Explicitly include the liveclasses route
-    "/courses/:courseId/liveclasses",
+    // Include liveclasses route
+    "/courses/:courseId/liveclasses/:liveclassesId(.*)",
   ],
-
 };
 
 
