@@ -111,6 +111,8 @@ model Attachment{
 
   chapterId String?
   //Chapter Chapter @relation(fields: [chapterId], references: [id], onDelete:Cascade)
+  liveSessionId String? // linking attachments to a session
+  liveSession   LiveSession? @relation(fields: [liveSessionId], references: [id], onDelete: Cascade) //  relation
 
 
   createdAt DateTime @default(now())
@@ -624,19 +626,65 @@ model InstructorAssignment {
 
 
 model LiveSession {
-  id String @id @default(uuid()) @map("_id")
-  courseId String
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  title String
-  startTime DateTime
-  endTime DateTime
-  meetingUrl String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid()) @map("_id")
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  startTime   DateTime
+  endTime     DateTime
+  description String? 
+  meetingUrl  String?
+  position    Int      // For ordering the sessions (e.g., 0, 1, 2, 3...)
+  isPublished Boolean  @default(false) // To control visibility for students
+  attachments Attachment[]
+
+  liveclassquizzes    LiveClassQuiz[]   // One-to-many relation with Quiz
+  liveclassattempts    LiveClassAttempt[] // One-to-many relation with Attempt
+
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   
   @@index([courseId])
+  @@unique([courseId, position]) // Ensures no two sessions in the same course can have the same position
 }
 
+
+
+
+
+
+
+// New models for quizzes and attempts
+model LiveClassQuiz {
+  id            String      @id @default(uuid()) @map("_id")
+  liveSessionId String
+  liveSession   LiveSession @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
+  title         String
+  questions     Json        // Array of { question: string, options: string[], correctAnswer: string }
+  isPublished   Boolean     @default(false)
+
+  position      Int         @default(0) // Added for reordering (optional)
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([liveSessionId])
+}
+
+model LiveClassAttempt {
+  id            String      @id @default(uuid()) @map("_id")
+  liveSessionId String
+  liveSession   LiveSession @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
+  studentId     String      // Reference to a User or Student model
+  score         Int?
+  timeTaken     DateTime?
+  status        String      // e.g., "Completed", "In Progress"
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([liveSessionId, studentId])
+}
 
 
 
@@ -687,3 +735,7 @@ model File {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
+
+

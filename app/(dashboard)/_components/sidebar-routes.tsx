@@ -159,9 +159,206 @@
 
 
 
+// "use client";
+
+// import { Layout, Compass, List, BarChart, Users, CircleHelp, MessageCircle, Trophy, Video, User,FileText, TrendingUp, Brain,GraduationCap } from "lucide-react";
+// import SidebarItem from "./sidebar-item";
+// import { usePathname } from "next/navigation";
+// import { useUser } from "@clerk/nextjs";
+// import { isTeacher } from "@/lib/teacher";
+// import { isSuperAdmin } from "@/lib/isSuperAdmin";
+
+// // Define props interface for SidebarRoutes
+// interface SidebarRoutesProps {
+//   courseId?: string; // Optional courseId to match Sidebar
+// }
+
+// // Base routes for different roles
+// const studentRoutes = [
+//   { icon: Layout, label: "Dashboard", href: "/" },
+//   { icon: Compass, label: "Browse", href: "/search" },
+//   { icon: CircleHelp, label: "Student Helper", href: "/help" },
+//   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
+//   { icon: Video, label: "Live Classes", href: "/courses" }, // Placeholder, will be replaced dynamically
+//  // { icon: FileText, label: "Recordings & Materials", href: "/CourseMaterials" },
+//  // { icon: FileText, label: "Recordings", href: "/recordings" }, // New Recordings route
+//  // { icon: FileText, label: "Attachments", href: "/attachments" }, // New Attachments route
+//   { icon: TrendingUp, label: "Progress Tracker", href: "/progress" }, // New Progress Tracker item
+//   { icon: Brain , label: "ChatBot AI", href: "/chatbot" },
+//   { icon: User, label: "User Profile", href: "/profile" },
+//  // { icon: GraduationCap, label: "Certificate", href: "/Graduation" },
+// ];
+
+// const teacherRoutes = [
+//   { icon: List, label: "Courses", href: "/teacher/courses" },
+//   //{ icon: MessageCircle, label: "Student Feedback", href: "/teacher/feedback" },
+//   { icon: CircleHelp, label: "Student Helper", href: "/help" },
+//   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
+//  // { icon: FileText, label: "Recordings & Materials", href: "/CourseMaterials" },
+//   { icon: Brain , label: "ChatBot AI", href: "/chatbot" },
+//   //{ icon: Video, label: "Class Live Stream", href: "/livestream" }, // Base path, will be dynamic
+// ];
+
+
+
+// const superAdminRoutes = [
+//   { icon: BarChart, label: "Main Dashboard", href: "/teacher/analytics" },
+//  // { icon: List, label: "Course Management", href: "/courses/admin" }, 
+//   ...teacherRoutes,
+// ];
+
+// export const SidebarRoutes = ({ courseId }: SidebarRoutesProps) => {
+//   const pathname = usePathname();
+//   const { user } = useUser();
+
+//   console.log("SidebarRoutes courseId:", courseId); // Debug log
+
+
+//   // Determine user role
+//   const userId = user?.id;
+//   const isSuperAdminUser = userId && isSuperAdmin(userId);
+//   const isTeacherUser = userId && isTeacher(userId);
+
+//   // Determine base routes based on user role
+//   let baseRoutes = studentRoutes;
+//   if (isSuperAdminUser) {
+//     baseRoutes = superAdminRoutes;
+//   } else if (isTeacherUser) {
+//     baseRoutes = teacherRoutes;
+//   }
+
+//   // Dynamically adjust routes based on courseId
+//  const routes = baseRoutes.map((route) => {
+//     if (route.label === "Live Classes" && courseId) {
+//       return {
+//         ...route,
+//         href: `/courses/${courseId}/liveclasses`, // Replace :courseId with actual courseId
+//       };
+//     }
+//     return route;
+//   });
+
+//   return (
+//     <div className="flex flex-col w-full">
+//       {routes.map((route, index) => (
+//         <SidebarItem
+//           key={index}
+//           icon={route.icon}
+//           label={route.label}
+//          href={courseId ? `/courses/${courseId}/liveclasses` : "/courses"}
+//         />
+//       ))}
+//     </div>
+//   );
+// };
+
+
+
+
+
+
+
+// "use client";
+
+// import { Layout, Compass, List, BarChart, CircleHelp, MessageCircle, Trophy, Video, User, TrendingUp, Brain } from "lucide-react";
+// import SidebarItem from "./sidebar-item";
+// import { usePathname } from "next/navigation";
+// import { useUser } from "@clerk/nextjs";
+// import { isTeacher } from "@/lib/teacher";
+// import { isSuperAdmin } from "@/lib/isSuperAdmin";
+
+// // Define props interface for SidebarRoutes
+// interface SidebarRoutesProps {
+//   courseId?: string; // Optional courseId to match Sidebar
+// }
+
+// // Base routes for different roles
+// const studentRoutes = [
+//   { icon: Layout, label: "Dashboard", href: "/" },
+//   { icon: Compass, label: "Browse", href: "/search" },
+//   { icon: CircleHelp, label: "Student Helper", href: "/help" },
+//   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
+//   { icon: Video, label: "Live Classes", href: "/courses" }, // Default to /courses if no courseId
+//   { icon: TrendingUp, label: "Progress Tracker", href: "/progress" },
+//   { icon: Brain, label: "ChatBot AI", href: "/chatbot" },
+//   { icon: User, label: "User Profile", href: "/profile" },
+// ];
+
+// const teacherRoutes = [
+//   { icon: List, label: "Courses", href: "/teacher/courses" },
+//   { icon: CircleHelp, label: "Student Helper", href: "/help" },
+//   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
+//   { icon: Brain, label: "ChatBot AI", href: "/chatbot" },
+// ];
+
+// const superAdminRoutes = [
+//   { icon: BarChart, label: "Main Dashboard", href: "/teacher/analytics" },
+//   ...teacherRoutes,
+// ];
+
+// export const SidebarRoutes = ({ courseId }: SidebarRoutesProps) => {
+//   const pathname = usePathname();
+//   const { user } = useUser();
+
+//   console.log("SidebarRoutes courseId:", courseId); // Debug log
+
+//   // Determine user role
+//   const userId = user?.id;
+//   const isSuperAdminUser = userId && isSuperAdmin(userId);
+//   const isTeacherUser = userId && isTeacher(userId);
+
+//   // Determine base routes based on user role
+//   let baseRoutes = studentRoutes;
+//   if (isSuperAdminUser) {
+//     baseRoutes = superAdminRoutes;
+//   } else if (isTeacherUser) {
+//     baseRoutes = teacherRoutes;
+//   }
+
+//   // Dynamically adjust routes based on courseId
+//   const routes = baseRoutes.map((route) => {
+//     if (route.label === "Live Classes" && courseId) {
+//       return {
+//         ...route,
+//         href: `/courses/${courseId}/liveclasses`, // Correct path for live classes
+//       };
+//     }
+//     return route;
+//   });
+
+//   return (
+//     <div className="flex flex-col w-full">
+//       {routes.map((route, index) => (
+//         <SidebarItem
+//           key={index}
+//           icon={route.icon}
+//           label={route.label}
+//           href={route.href} // Use the href from the routes array
+//         />
+//       ))}
+//     </div>
+//   );
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 "use client";
 
-import { Layout, Compass, List, BarChart, Users, CircleHelp, MessageCircle, Trophy, Video, User,FileText, TrendingUp, Brain,GraduationCap } from "lucide-react";
+import { Layout, Compass, List, BarChart, CircleHelp, MessageCircle, Trophy, Video, User, TrendingUp, Brain } from "lucide-react";
 import SidebarItem from "./sidebar-item";
 import { usePathname } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
@@ -179,35 +376,29 @@ const studentRoutes = [
   { icon: Compass, label: "Browse", href: "/search" },
   { icon: CircleHelp, label: "Student Helper", href: "/help" },
   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
- // { icon: Video, label: "Class Live Stream", href: "/livestream" }, // Base path, will be dynamic
- // { icon: FileText, label: "Recordings & Materials", href: "/CourseMaterials" },
- // { icon: FileText, label: "Recordings", href: "/recordings" }, // New Recordings route
- // { icon: FileText, label: "Attachments", href: "/attachments" }, // New Attachments route
-  { icon: TrendingUp, label: "Progress Tracker", href: "/progress" }, // New Progress Tracker item
-  { icon: Brain , label: "ChatBot AI", href: "/chatbot" },
+  { icon: Video, label: "Live Classes", href: "/courses" }, // Default to /courses if no courseId
+  { icon: TrendingUp, label: "Progress Tracker", href: "/progress" },
+  { icon: Brain, label: "ChatBot AI", href: "/chatbot" },
   { icon: User, label: "User Profile", href: "/profile" },
- // { icon: GraduationCap, label: "Certificate", href: "/Graduation" },
 ];
 
 const teacherRoutes = [
   { icon: List, label: "Courses", href: "/teacher/courses" },
-  //{ icon: MessageCircle, label: "Student Feedback", href: "/teacher/feedback" },
   { icon: CircleHelp, label: "Student Helper", href: "/help" },
   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
- // { icon: FileText, label: "Recordings & Materials", href: "/CourseMaterials" },
-  { icon: Brain , label: "ChatBot AI", href: "/chatbot" },
-  //{ icon: Video, label: "Class Live Stream", href: "/livestream" }, // Base path, will be dynamic
+  { icon: Brain, label: "ChatBot AI", href: "/chatbot" },
 ];
 
 const superAdminRoutes = [
   { icon: BarChart, label: "Main Dashboard", href: "/teacher/analytics" },
- // { icon: List, label: "Course Management", href: "/courses/admin" }, 
   ...teacherRoutes,
 ];
 
 export const SidebarRoutes = ({ courseId }: SidebarRoutesProps) => {
   const pathname = usePathname();
   const { user } = useUser();
+
+  console.log("SidebarRoutes courseId:", courseId); // Debug log
 
   // Determine user role
   const userId = user?.id;
@@ -224,10 +415,10 @@ export const SidebarRoutes = ({ courseId }: SidebarRoutesProps) => {
 
   // Dynamically adjust routes based on courseId
   const routes = baseRoutes.map((route) => {
-    if (route.label === "Class Live Stream" && courseId) {
+    if (route.label === "Live Classes" && courseId) {
       return {
         ...route,
-        href: `/livestream/${courseId}`, // Matches app/(dashboard)/(routes)/livestream/[courseId]/page.tsx
+        href: `/courses/${courseId}/liveclasses`, // Correct path for live classes
       };
     }
     return route;
@@ -240,7 +431,7 @@ export const SidebarRoutes = ({ courseId }: SidebarRoutesProps) => {
           key={index}
           icon={route.icon}
           label={route.label}
-          href={route.href}
+          href={route.href} // Use the href from the routes array
         />
       ))}
     </div>
@@ -258,6 +449,108 @@ export const SidebarRoutes = ({ courseId }: SidebarRoutesProps) => {
 
 
 
+
+
+
+
+
+// File: app/(dashboard)/_components/sidebar-routes.tsx
+
+// "use client";
+
+// import { Layout, Compass, List, BarChart, CircleHelp, Trophy, Video, User, FileText, TrendingUp, Brain, GraduationCap } from "lucide-react";
+// import SidebarItem from "./sidebar-item";
+// import { usePathname } from "next/navigation";
+// import { useUser } from "@clerk/nextjs";
+// import { isTeacher } from "@/lib/teacher";
+// import { isSuperAdmin } from "@/lib/isSuperAdmin";
+
+// interface SidebarRoutesProps {
+//   courseId?: string;
+// }
+
+// const studentRoutes = [
+//   { icon: Layout, label: "Dashboard", href: "/" },
+//   { icon: Compass, label: "Browse", href: "/search" },
+//   { icon: CircleHelp, label: "Student Helper", href: "/help" },
+//   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
+//   { icon: Video,  label: "Live Classes", 
+//     href: (courseId?: string) => courseId ? `/courses/${courseId}/liveclasses` : "/courses/${courseId}/liveclasses" 
+     
+//   },
+//   { icon: TrendingUp, label: "Progress Tracker", href: "/progress" },
+//   { icon: Brain, label: "ChatBot AI", href: "/chatbot" },
+//   { icon: User, label: "User Profile", href: "/profile" },
+// ];
+
+// const teacherRoutes = [
+//   { icon: List, label: "Courses", href: "/teacher/courses" },
+//   { icon: CircleHelp, label: "Student Helper", href: "/help" },
+//   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
+//   { icon: Brain, label: "ChatBot AI", href: "/chatbot" },
+// ];
+
+// const superAdminRoutes = [
+//   { icon: BarChart, label: "Main Dashboard", href: "/teacher/analytics" },
+//   ...teacherRoutes,
+// ];
+
+// export const SidebarRoutes = ({ courseId }: SidebarRoutesProps) => {
+//   const pathname = usePathname();
+//   const { user } = useUser();
+
+//   console.log("SidebarRoutes courseId:", courseId); // Debug log
+
+//   const userId = user?.id;
+//   const isSuperAdminUser = userId && isSuperAdmin(userId);
+//   const isTeacherUser = userId && isTeacher(userId);
+
+//   let baseRoutes = studentRoutes;
+//   if (isSuperAdminUser) {
+//     baseRoutes = superAdminRoutes;
+//   } else if (isTeacherUser) {
+//     baseRoutes = teacherRoutes;
+//   }
+
+//   const routes = baseRoutes.map((route) => {
+//    // Handle dynamic href for Live Classes
+//     if (route.label === "Live Classes") {
+//       const href = typeof route.href === 'function' ? route.href(courseId) : route.href;
+//       return {
+//         ...route,
+//         href,
+//       };
+//     }
+//     return route;
+//   });
+
+//   return (
+//     <div className="flex flex-col w-full">
+//       {routes.map((route, index) => (
+//         <SidebarItem
+//           key={index}
+//           icon={route.icon}
+//           label={route.label}
+//           href={typeof route.href === 'function' ? route.href(courseId) : route.href}
+//         />
+//       ))}
+//     </div>
+//   );
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
 
 
 

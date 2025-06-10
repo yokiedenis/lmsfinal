@@ -1085,6 +1085,32 @@ table.dataTable tbody tr:hover {
 }
 
 
+
+
+
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+
+
+
   /* .clip-triangle-top-left {
   clip-path: polygon(0 0, 100% 0, 0 100%);
 }

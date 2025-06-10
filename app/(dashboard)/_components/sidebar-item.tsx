@@ -86,6 +86,8 @@ const SidebarItem = ({
   const pathname = usePathname();
   const router = useRouter();
 
+   console.log("SidebarItem href:", href); // Debug log
+
   // Determine if the current route is active
   const isActive =
     (pathname === "/" && href === "/") ||

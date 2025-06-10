@@ -89,6 +89,7 @@ export default authMiddleware({
     "/api/webhook",
     "/api/uploadthing",
     "/",
+    "/api/purchases/check",
     "/search",
     "/api/posts(.*)",
     /^\/api\/courses\/[^/]+\/quizzes\/[^/]+\/get$/,
@@ -115,7 +116,13 @@ export default authMiddleware({
 });
 
 export const config = {
-  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)",
+    // Always run for API routes
+    "/(api|trpc)(.*)",
+    // Explicitly include the liveclasses route
+    "/courses/:courseId/liveclasses",
+  ],
+
 };
 
 
