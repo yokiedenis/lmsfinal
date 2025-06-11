@@ -1417,7 +1417,7 @@ const LiveClassesPage = async ({ params }: { params: { courseId?: string } }) =>
     <div className="p-6 bg-slate-50 dark:bg-slate-950 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="mb-10 text-center">
-          <h1 className="text-5xl font-extrabold text-slate-900 dark:text-white leading-tight">Live Sessions</h1>
+          <h4 className="text-5xl font-extrabold text-slate-900 dark:text-white leading-tight">Live Sessions</h4>
           <p className="text-lg text-slate-600 dark:text-slate-400 mt-4">
             Join live sessions with instructors, ask questions, and learn with your peers.
           </p>
