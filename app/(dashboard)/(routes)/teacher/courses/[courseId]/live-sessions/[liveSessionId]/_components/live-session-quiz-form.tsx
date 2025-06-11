@@ -470,6 +470,369 @@
 
 
 
+// "use client";
+
+// import React, { useState, useEffect } from "react";
+// import { useForm, useFieldArray } from "react-hook-form";
+// import * as z from "zod";
+// import { zodResolver } from "@hookform/resolvers/zod";
+// import { Button } from "@/components/ui/button";
+// import { Input } from "@/components/ui/input";
+// import { Textarea } from "@/components/ui/textarea";
+// import {
+//   Form,
+//   FormField,
+//   FormItem,
+//   FormControl,
+//   FormMessage,
+// } from "@/components/ui/form";
+// import { Trash } from "lucide-react";
+// import axios from "axios";
+// import toast from "react-hot-toast";
+// import { QuizList } from "./live-session-quiz-list";
+// import { useRouter } from "next/navigation";
+
+// const formSchema = z.object({
+//   title: z.string().min(3, "Title must be at least 3 characters long"),
+//   questions: z
+//     .array(
+//       z.object({
+//         text: z.string().min(5, "Question must be at least 5 characters long"),
+//         options: z
+//           .array(z.string().min(1, "Option cannot be empty"))
+//           .min(4, "At least 4 options are required"),
+//         correctAnswer: z.string().min(1, "Correct answer is required"),
+//       })
+//     )
+//     .min(1, "At least one question is required"),
+// });
+
+// type Quiz = {
+//   id: string;
+//   title: string;
+//   courseId: string;
+//   liveSessionId: string;
+//   isPublished: boolean;
+//   createdAt: Date;
+//   updatedAt: Date;
+//   questions: { text: string; options: string[]; correctAnswer: string }[];
+//   _count?: {
+//     questions: number;
+//   } | null;
+// };
+
+// export const LiveSessionQuizForm = ({
+//   courseId,
+//   liveSessionId,
+//   initialQuizzes,
+// }: {
+//   courseId: string;
+//   liveSessionId: string;
+//   initialQuizzes: Quiz[];
+// }) => {
+//   const [isCreating, setIsCreating] = useState(false);
+//   const [isFormVisible, setIsFormVisible] = useState(false);
+//   const [quizzes, setQuizzes] = useState<Quiz[]>(initialQuizzes);
+//   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
+//   const [isUpdating, setIsUpdating] = useState(false);
+
+//   const router = useRouter();
+
+//   const form = useForm({
+//     resolver: zodResolver(formSchema),
+//     defaultValues: {
+//       title: "",
+//       questions: [
+//         {
+//           text: "",
+//           options: ["", "", "", ""],
+//           correctAnswer: "",
+//         },
+//       ],
+//     },
+//   });
+
+//   const { fields, append, remove } = useFieldArray({
+//     control: form.control,
+//     name: "questions",
+//   });
+
+//   // Autofill form when editing a quiz
+//   useEffect(() => {
+//     if (editingQuiz) {
+//       form.reset({
+//         title: editingQuiz.title,
+//         questions: editingQuiz.questions.map((q) => ({
+//           text: q.text,
+//           options: q.options,
+//           correctAnswer: q.correctAnswer,
+//         })),
+//       });
+//       setIsFormVisible(true);
+//     } else {
+//       form.reset({
+//         title: "",
+//         questions: [{ text: "", options: ["", "", "", ""], correctAnswer: "" }],
+//       });
+//     }
+//   }, [editingQuiz, form]);
+
+//   // Update quizzes when initialQuizzes changes
+//   useEffect(() => {
+//     setQuizzes(initialQuizzes);
+//   }, [initialQuizzes]);
+
+//   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+//     try {
+//       setIsCreating(true);
+//       let response;
+//       if (editingQuiz) {
+//         // Update existing quiz
+//         response = await axios.put(
+//           `/api/courses/${courseId}/livesessionquizzes/${editingQuiz.id}`,
+//           {
+//             ...values,
+//             liveSessionId,
+//           }
+//         );
+//         toast.success("Live session quiz updated successfully!");
+//       } else {
+//         // Create new quiz
+//         response = await axios.post(`/api/courses/${courseId}/livesessionquizzes`, {
+//           ...values,
+//           liveSessionId,
+
+//         });
+//         toast.success("Live session quiz created successfully!");
+//       }
+
+//       form.reset();
+//       setIsFormVisible(false);
+//       setEditingQuiz(null);
+
+//       // Refetch quizzes
+//       const fetchResponse = await axios.get(
+//         `/api/courses/${courseId}/livesessionquizzes`,
+//         {
+//           params: {
+//             liveSessionId,
+//           },
+//         }
+//       );
+//       // Transform response to match Quiz type
+//       const fetchedQuizzes = fetchResponse.data.map((quiz: any) => ({
+//         ...quiz,
+//         courseId,
+//         questions: quiz.questions as { text: string; options: string[]; correctAnswer: string }[],
+//         _count: {
+//           questions: Array.isArray(quiz.questions) ? quiz.questions.length : 0,
+//         },
+//       }));
+//       setQuizzes(fetchedQuizzes);
+//       router.refresh();
+//     } catch (error) {
+//       toast.error("Failed to save live session quiz. Please try again.");
+//     } finally {
+//       setIsCreating(false);
+//     }
+//   };
+
+//   const onReorder = async (updateData: { id: string; position: number }[]) => {
+//     try {
+//       setIsUpdating(true);
+//       await axios.put(`/api/courses/${courseId}/livesessionquizzes/reorder`, {
+//         list: updateData,
+//       });
+//       toast.success("Live session quizzes reordered successfully!");
+//       router.refresh();
+//     } catch {
+//       toast.error("Something went wrong while reordering the quizzes");
+//     } finally {
+//       setIsUpdating(false);
+//     }
+//   };
+
+//   return (
+//     <div className="space-y-8">
+//       <Button
+//         type="button"
+//         onClick={() => setIsFormVisible(!isFormVisible)}
+//         className="w-full"
+//       >
+//         {isFormVisible ? "Hide Quiz Form" : "Create a Quiz for the Live Session"}
+//       </Button>
+
+//       {isFormVisible && (
+//         <Form {...form}>
+//           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+//             <FormField
+//               control={form.control}
+//               name="title"
+//               render={({ field }) => (
+//                 <FormItem>
+//                   <FormControl>
+//                     <Input placeholder="Quiz Title" disabled={isCreating} {...field} />
+//                   </FormControl>
+//                   <FormMessage />
+//                 </FormItem>
+//               )}
+//             />
+//             <div className="space-y-6">
+//               {fields.map((field, index) => (
+//                 <QuestionForm
+//                   key={field.id}
+//                   questionIndex={index}
+//                   field={field}
+//                   remove={remove}
+//                   fields={fields}
+//                   form={form}
+//                   isSubmitting={isCreating}
+//                 />
+//               ))}
+//             </div>
+//             <Button
+//               type="button"
+//               onClick={() =>
+//                 append({
+//                   text: "",
+//                   options: ["", "", "", ""],
+//                   correctAnswer: "",
+//                 })
+//               }
+//               className="w-full"
+//               disabled={isCreating}
+//             >
+//               Add Question
+//             </Button>
+//             <Button type="submit" className="w-full" disabled={isCreating}>
+//               {isCreating
+//                 ? editingQuiz
+//                   ? "Updating..."
+//                   : "Creating..."
+//                 : editingQuiz
+//                 ? "Update Quiz"
+//                 : "Create Quiz"}
+//             </Button>
+//           </form>
+//         </Form>
+//       )}
+//       <div className="mt-8">
+//         <h3 className="text-lg font-semibold">Quizzes</h3>
+//         {!isCreating && (
+//           <div className="text-sm mt-2">
+//             <QuizList
+//               items={quizzes}
+//               onReorder={onReorder}
+//               onEdit={(quizId) => {
+//                 const quiz = quizzes.find((q) => q.id === quizId);
+//                 if (quiz) {
+//                   setEditingQuiz(quiz);
+//                   setIsFormVisible(true);
+//                 }
+//               }}
+//             />
+//           </div>
+//         )}
+//         {!isCreating && (
+//           <p className="text-xs text-muted-foreground mt-4">
+//             Drag and Drop to Reorder the Quizzes
+//           </p>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// const QuestionForm = ({
+//   questionIndex,
+//   field,
+//   remove,
+//   fields,
+//   form,
+//   isSubmitting,
+// }: {
+//   questionIndex: number;
+//   field: any;
+//   remove: (index: number) => void;
+//   fields: any[];
+//   form: any;
+//   isSubmitting: boolean;
+// }) => (
+//   <div className="space-y-4 border p-4 rounded-md">
+//     <div className="flex justify-between items-center">
+//       <h3 className="text-lg font-semibold">Question {questionIndex + 1}</h3>
+//       {fields.length > 1 && (
+//         <Button
+//           type="button"
+//           variant="destructive"
+//           onClick={() => remove(questionIndex)}
+//           disabled={isSubmitting}
+//         >
+//           <Trash className="h-4 w-4" />
+//         </Button>
+//       )}
+//     </div>
+//     <FormField
+//       control={form.control}
+//       name={`questions.${questionIndex}.text`}
+//       render={({ field }) => (
+//         <FormItem>
+//           <FormControl>
+//             <Textarea
+//               placeholder="Enter question text"
+//               disabled={isSubmitting}
+//               {...field}
+//             />
+//           </FormControl>
+//           <FormMessage />
+//         </FormItem>
+//       )}
+//     />
+//     {Array.from({ length: 4 }).map((_, optionIndex) => (
+//       <FormField
+//         key={optionIndex}
+//         control={form.control}
+//         name={`questions.${questionIndex}.options.${optionIndex}`}
+//         render={({ field }) => (
+//           <FormItem>
+//             <FormControl>
+//               <Input
+//                 placeholder={`Option ${optionIndex + 1}`}
+//                 disabled={isSubmitting}
+//                 {...field}
+//               />
+//             </FormControl>
+//             <FormMessage />
+//           </FormItem>
+//         )}
+//       />
+//     ))}
+//     <FormField
+//       control={form.control}
+//       name={`questions.${questionIndex}.correctAnswer`}
+//       render={({ field }) => (
+//         <FormItem>
+//           <FormControl>
+//             <Input
+//               placeholder="Correct Answer"
+//               disabled={isSubmitting}
+//               {...field}
+//             />
+//           </FormControl>
+//           <FormMessage />
+//         </FormItem>
+//       )}
+//     />
+//   </div>
+// );
+
+
+
+
+
+
+
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -512,7 +875,7 @@ type Quiz = {
   title: string;
   courseId: string;
   liveSessionId: string;
-  isPublished: boolean;
+  isPublished: boolean; // Keep isPublished in the type for consistency
   createdAt: Date;
   updatedAt: Date;
   questions: { text: string; options: string[]; correctAnswer: string }[];
@@ -593,6 +956,7 @@ export const LiveSessionQuizForm = ({
           {
             ...values,
             liveSessionId,
+            isPublished: editingQuiz.isPublished, // Preserve existing isPublished state
           }
         );
         toast.success("Live session quiz updated successfully!");
@@ -601,6 +965,7 @@ export const LiveSessionQuizForm = ({
         response = await axios.post(`/api/courses/${courseId}/livesessionquizzes`, {
           ...values,
           liveSessionId,
+          isPublished: true, // Explicitly set to true for new quizzes
         });
         toast.success("Live session quiz created successfully!");
       }
