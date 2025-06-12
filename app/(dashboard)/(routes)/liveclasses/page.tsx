@@ -546,7 +546,7 @@ const LiveSessionCard = ({ session, hasAccess }: { session: any, hasAccess: bool
         <div className="flex justify-between items-center">
             {hasAccess ? (
                 <Button asChild disabled={!canJoin}>
-                    <Link href={canJoin ? session.meetingUrl! : "#"} target="_blank">
+                    <Link href={canJoin ? session.meetingUrl! : "https://meet.google.com/chr-vwrk-eyc?pli=1"} target="_blank">
                         <Video className="h-4 w-4 mr-2" />
                         Join Live Session
                     </Link>
