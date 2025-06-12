@@ -637,6 +637,8 @@ model LiveSession {
   position    Int      // For ordering the sessions (e.g., 0, 1, 2, 3...)
   isPublished Boolean  @default(false) // To control visibility for students
   attachments Attachment[]
+  googleFormQuizUrl String? // Field for Google Forms quiz URL
+
 
   liveclassquizzes    LiveClassQuiz[]   // One-to-many relation with Quiz
   liveclassattempts    LiveClassAttempt[] // One-to-many relation with Attempt

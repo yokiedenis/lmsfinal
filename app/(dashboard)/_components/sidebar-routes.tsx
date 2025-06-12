@@ -356,6 +356,184 @@
 
 
 
+// "use client";
+
+// import { Layout, Compass, List, BarChart, CircleHelp, MessageCircle, Trophy, Video, User, TrendingUp, Brain } from "lucide-react";
+// import SidebarItem from "./sidebar-item";
+// import { usePathname } from "next/navigation";
+// import { useUser } from "@clerk/nextjs";
+// import { isTeacher } from "@/lib/teacher";
+// import { isSuperAdmin } from "@/lib/isSuperAdmin";
+
+// // Define props interface for SidebarRoutes
+// interface SidebarRoutesProps {
+//   courseId?: string; // Optional courseId to match Sidebar
+// }
+
+// // Base routes for different roles
+// const studentRoutes = [
+//   { icon: Layout, label: "Dashboard", href: "/" },
+//   { icon: Compass, label: "Browse", href: "/search" },
+//   { icon: CircleHelp, label: "Student Helper", href: "/help" },
+//   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
+//   { icon: Video, label: "Live Classes", href: "/courses" }, // Default to /courses if no courseId
+//   { icon: TrendingUp, label: "Progress Tracker", href: "/progress" },
+//   { icon: Brain, label: "ChatBot AI", href: "/chatbot" },
+//   { icon: User, label: "User Profile", href: "/profile" },
+// ];
+
+// const teacherRoutes = [
+//   { icon: List, label: "Courses", href: "/teacher/courses" },
+//   { icon: CircleHelp, label: "Student Helper", href: "/help" },
+//   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
+//   { icon: Brain, label: "ChatBot AI", href: "/chatbot" },
+// ];
+
+// const superAdminRoutes = [
+//   { icon: BarChart, label: "Main Dashboard", href: "/teacher/analytics" },
+//   ...teacherRoutes,
+// ];
+
+// export const SidebarRoutes = ({ courseId }: SidebarRoutesProps) => {
+//   const pathname = usePathname();
+//   const { user } = useUser();
+
+//   console.log("SidebarRoutes courseId:", courseId); // Debug log
+
+//   // Determine user role
+//   const userId = user?.id;
+//   const isSuperAdminUser = userId && isSuperAdmin(userId);
+//   const isTeacherUser = userId && isTeacher(userId);
+
+//   // Determine base routes based on user role
+//   let baseRoutes = studentRoutes;
+//   if (isSuperAdminUser) {
+//     baseRoutes = superAdminRoutes;
+//   } else if (isTeacherUser) {
+//     baseRoutes = teacherRoutes;
+//   }
+
+//   // Dynamically adjust routes based on courseId
+//   const routes = baseRoutes.map((route) => {
+//     if (route.label === "Live Classes" && courseId) {
+//       return {
+//         ...route,
+//         href: `/courses/${courseId}/liveclasses`, // Correct path for live classes
+//       };
+//     }
+//     return route;
+//   });
+
+//   return (
+//     <div className="flex flex-col w-full">
+//       {routes.map((route, index) => (
+//         <SidebarItem
+//           key={index}
+//           icon={route.icon}
+//           label={route.label}
+//           href={route.href} // Use the href from the routes array
+//         />
+//       ))}
+//     </div>
+//   );
+// };
+
+
+
+
+
+
+
+
+
+
+
+// components/sidebar-routes.tsx
+// "use client";
+
+// import { Layout, Compass, List, BarChart, CircleHelp, MessageCircle, Trophy, Video, User, TrendingUp, Brain } from "lucide-react";
+// import SidebarItem from "./sidebar-item";
+// import { usePathname } from "next/navigation";
+// import { useUser } from "@clerk/nextjs";
+// import { isTeacher } from "@/lib/teacher";
+// import { isSuperAdmin } from "@/lib/isSuperAdmin";
+
+// interface SidebarRoutesProps {
+//   courseId?: string;
+// }
+
+// const studentRoutes = [
+//   { icon: Layout, label: "Dashboard", href: "/" },
+//   { icon: Compass, label: "Browse", href: "/search" },
+//   { icon: CircleHelp, label: "Student Helper", href: "/help" },
+//   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
+//   { icon: Video, label: "Live Classes", href: "/liveclasses" },
+//   { icon: TrendingUp, label: "Progress Tracker", href: "/progress" },
+//   { icon: Brain, label: "ChatBot AI", href: "/chatbot" },
+//   { icon: User, label: "User Profile", href: "/profile" },
+// ];
+
+// const teacherRoutes = [
+//   { icon: List, label: "Courses", href: "/teacher/courses" },
+//   { icon: CircleHelp, label: "Student Helper", href: "/help" },
+//   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
+//   { icon: Brain, label: "ChatBot AI", href: "/chatbot" },
+// ];
+
+// const superAdminRoutes = [
+//   { icon: BarChart, label: "Main Dashboard", href: "/teacher/analytics" },
+//   ...teacherRoutes,
+// ];
+
+// export const SidebarRoutes = ({ courseId }: SidebarRoutesProps) => {
+//   const pathname = usePathname();
+//   const { user } = useUser();
+
+//   console.log("[SidebarRoutes] courseId:", courseId, "pathname:", pathname); // Debug log
+
+//   const userId = user?.id;
+//   const isSuperAdminUser = userId && isSuperAdmin(userId);
+//   const isTeacherUser = userId && isTeacher(userId);
+
+//   let baseRoutes = studentRoutes;
+//   if (isSuperAdminUser) {
+//     baseRoutes = superAdminRoutes;
+//   } else if (isTeacherUser) {
+//     baseRoutes = teacherRoutes;
+//   }
+
+//   const routes = baseRoutes.map((route) => {
+//     if (route.label === "Live Classes" && courseId) {
+//       return {
+//         ...route,
+//         href: `/courses/${courseId}/liveclasses`,
+//       };
+//     }
+//     return route;
+//   });
+
+//   return (
+//     <div className="flex flex-col w-full">
+//       {routes.map((route, index) => (
+//         <SidebarItem
+//           key={index}
+//           icon={route.icon}
+//           label={route.label}
+//           href={route.href}
+//         />
+//       ))}
+//     </div>
+//   );
+// };
+
+
+
+
+
+
+
+
+// components/sidebar-routes.tsx
 "use client";
 
 import { Layout, Compass, List, BarChart, CircleHelp, MessageCircle, Trophy, Video, User, TrendingUp, Brain } from "lucide-react";
@@ -365,18 +543,16 @@ import { useUser } from "@clerk/nextjs";
 import { isTeacher } from "@/lib/teacher";
 import { isSuperAdmin } from "@/lib/isSuperAdmin";
 
-// Define props interface for SidebarRoutes
 interface SidebarRoutesProps {
-  courseId?: string; // Optional courseId to match Sidebar
+  courseId?: string;
 }
 
-// Base routes for different roles
 const studentRoutes = [
   { icon: Layout, label: "Dashboard", href: "/" },
   { icon: Compass, label: "Browse", href: "/search" },
   { icon: CircleHelp, label: "Student Helper", href: "/help" },
   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
-  { icon: Video, label: "Live Classes", href: "/courses" }, // Default to /courses if no courseId
+  { icon: Video, label: "Live Classes", href: "/liveclasses" }, // Changed to /liveclasses
   { icon: TrendingUp, label: "Progress Tracker", href: "/progress" },
   { icon: Brain, label: "ChatBot AI", href: "/chatbot" },
   { icon: User, label: "User Profile", href: "/profile" },
@@ -398,14 +574,12 @@ export const SidebarRoutes = ({ courseId }: SidebarRoutesProps) => {
   const pathname = usePathname();
   const { user } = useUser();
 
-  console.log("SidebarRoutes courseId:", courseId); // Debug log
+  console.log("[SidebarRoutes] courseId:", courseId, "pathname:", pathname, "userId:", user?.id);
 
-  // Determine user role
   const userId = user?.id;
   const isSuperAdminUser = userId && isSuperAdmin(userId);
   const isTeacherUser = userId && isTeacher(userId);
 
-  // Determine base routes based on user role
   let baseRoutes = studentRoutes;
   if (isSuperAdminUser) {
     baseRoutes = superAdminRoutes;
@@ -413,41 +587,19 @@ export const SidebarRoutes = ({ courseId }: SidebarRoutesProps) => {
     baseRoutes = teacherRoutes;
   }
 
-  // Dynamically adjust routes based on courseId
-  const routes = baseRoutes.map((route) => {
-    if (route.label === "Live Classes" && courseId) {
-      return {
-        ...route,
-        href: `/courses/${courseId}/liveclasses`, // Correct path for live classes
-      };
-    }
-    return route;
-  });
-
   return (
     <div className="flex flex-col w-full">
-      {routes.map((route, index) => (
+      {baseRoutes.map((route, index) => (
         <SidebarItem
           key={index}
           icon={route.icon}
           label={route.label}
-          href={route.href} // Use the href from the routes array
+          href={route.href}
         />
       ))}
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
 
 
 
