@@ -493,15 +493,356 @@
 
 
 
+// import { auth } from "@clerk/nextjs/server";
+// import { redirect } from "next/navigation";
+// import { getLiveSessions } from "@/actions/get-live-sessions";
+// import { File, Clock, Video, Lock } from "lucide-react";
+// import { Badge } from "@/components/ui/badge";
+// import { Button } from "@/components/ui/button";
+// import Link from "next/link";
+
+// // Helper function to format dates
+// const formatDate = (date: Date) => {
+//   return new Intl.DateTimeFormat("en-US", {
+//     dateStyle: "full",
+//     timeStyle: "short",
+//   }).format(date);
+// };
+
+
+// // Component for a single Live Session Card
+// const LiveSessionCard = ({ session, hasAccess }: { session: any, hasAccess: boolean }) => {
+//   const now = new Date();
+//   const startTime = new Date(session.startTime);
+//   const endTime = new Date(session.endTime);
+
+//   let status: "UPCOMING" | "LIVE" | "FINISHED" = "UPCOMING";
+//   let statusColor: "default" | "destructive" | "secondary" = "default";
+
+//   if (now >= startTime && now <= endTime) {
+//     status = "LIVE";
+//     statusColor = "destructive";
+//   } else if (now > endTime) {
+//     status = "FINISHED";
+//     statusColor = "secondary";
+//   }
+
+//   const canJoin = hasAccess && status === "LIVE" && session.meetingUrl;
+
+//   return (
+//     <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105">
+//       <div className="p-6">
+//         <div className="flex items-center justify-between mb-3">
+//           <h3 className="text-2xl font-bold text-slate-800 dark:text-white">{session.title}</h3>
+//           <Badge variant={statusColor} className="text-sm">{status}</Badge>
+//         </div>
+//         <p className="text-slate-600 dark:text-slate-400 mb-4">{session.description}</p>
+        
+//         <div className="flex items-center text-sm text-slate-500 dark:text-slate-300 mb-4">
+//           <Clock className="h-4 w-4 mr-2" />
+//           <span>{formatDate(startTime)} - {new Intl.DateTimeFormat("en-US", { timeStyle: "short" }).format(endTime)}</span>
+//         </div>
+
+//         <div className="flex justify-between items-center">
+//             {hasAccess ? (
+//                 <Button asChild disabled={!canJoin}>
+//                     <Link href={canJoin ? session.meetingUrl! : "https://meet.google.com/chr-vwrk-eyc?pli=1"} target="_blank">
+//                         <Video className="h-4 w-4 mr-2" />
+//                         Join Live Session
+//                     </Link>
+//                 </Button>
+//             ) : (
+//                 <div className="flex items-center text-yellow-600">
+//                     <Lock className="h-4 w-4 mr-2" />
+//                     <span>Purchase course to join</span>
+//                 </div>
+//             )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+
+// // Main Page Component
+// const LiveClassesPage = async ({ params }: { params: { courseId: string } }) => {
+//   const { userId } = auth();
+
+//   if (!userId) {
+//     return redirect("/");
+//   }
+
+//   const sessions = await getLiveSessions({
+//     userId,
+//     courseId: params.courseId,
+//   });
+  
+//   // Check access from the first session (it's the same for all)
+//   const hasAccess = sessions.length > 0 ? sessions[0].hasAccess : false;
+
+//   return (
+//     <div className="p-6 bg-slate-50 dark:bg-slate-950 min-h-screen">
+//       <div className="max-w-7xl mx-auto">
+//         <div className="mb-8">
+//             <h4 className="text-4xl font-extrabold text-slate-900 dark:text-white">Live Classes</h4>
+//             <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">
+//                 Join live sessions with instructors, ask questions, and learn with your peers.
+//             </p>
+//         </div>
+
+//         {!hasAccess && (
+//             <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg shadow-md flex items-center">
+//                 <Lock className="h-8 w-8 mr-4 text-yellow-600" />
+//                 <div>
+//                     <h2 className="text-xl font-bold">Access Denied</h2>
+//                     <p>You must purchase this course to access the live classes. Please enroll in the course to join these exclusive sessions.</p>
+//                 </div>
+//             </div>
+//         )}
+
+//         {hasAccess && sessions.length === 0 && (
+//              <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-lg shadow-md">
+//                 <File className="mx-auto h-12 w-12 text-slate-400" />
+//                 <h3 className="mt-4 text-lg font-medium text-slate-800 dark:text-white">No Live Sessions Scheduled</h3>
+//                 <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+//                     There are currently no live sessions available for this course. Please check back later.
+//                 </p>
+//             </div>
+//         )}
+
+//         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mt-8">
+//           {sessions.map((session) => (
+//             <LiveSessionCard key={session.id} session={session} hasAccess={hasAccess} />
+//           ))}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default LiveClassesPage;
+
+
+
+
+
+// // app/liveclasses/page.tsx
+// import { auth } from "@clerk/nextjs/server";
+// import { redirect } from "next/navigation";
+// import { getLiveSessions } from "@/actions/get-live-sessions";
+// import { File, Clock, Video, Lock, Layers, Download, CalendarCheck, ExternalLink } from "lucide-react";
+// import { Badge } from "@/components/ui/badge";
+// import { Button } from "@/components/ui/button";
+// import Link from "next/link";
+// import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+// import { Separator } from "@/components/ui/separator";
+
+// const formatDate = (date: Date) => {
+//   return new Intl.DateTimeFormat("en-US", {
+//     dateStyle: "full",
+//     timeStyle: "short",
+//   }).format(date);
+// };
+
+// const LiveSessionCard = ({ session, hasAccess }: { session: any, hasAccess: boolean }) => {
+//   const now = new Date();
+//   const startTime = new Date(session.startTime);
+//   const endTime = new Date(session.endTime);
+
+//   let status: "UPCOMING" | "LIVE" | "FINISHED" = "UPCOMING";
+//   let statusColor: "default" | "destructive" | "secondary" | "success" = "default";
+
+//   if (now >= startTime && now <= endTime) {
+//     status = "LIVE";
+//     statusColor = "destructive";
+//   } else if (now > endTime) {
+//     status = "FINISHED";
+//     statusColor = "secondary";
+//   } else {
+//     statusColor = "success";
+//   }
+
+//   const canJoin = hasAccess && status === "LIVE" && session.meetingUrl;
+//   const numberOfQuizzes = session.liveclassquizzes ? session.liveclassquizzes.length : 0;
+//   const hasAttachments = session.attachments && session.attachments.length > 0;
+//   const hasGoogleFormQuiz = hasAccess && session.googleFormQuizUrl;
+
+//   console.log("[LIVE_SESSION_CARD] Session data:", {
+//     id: session.id,
+//     courseId: session.courseId,
+//     courseTitle: session.courseTitle,
+//     numberOfQuizzes,
+//     hasAccess,
+//     status,
+//     hasGoogleFormQuiz,
+//   });
+
+//   return (
+//     <Card className="flex flex-col h-full hover:shadow-lg transition-shadow duration-300 ease-in-out">
+//       <CardHeader className="pb-4">
+//         <div className="flex justify-between items-start mb-2">
+//           <CardTitle className="text-2xl font-extrabold text-slate-900 dark:text-white leading-tight">
+//             {session.title} ({session.courseTitle})
+//           </CardTitle>
+//           <Badge variant={statusColor} className="text-sm px-3 py-1 rounded-full animate-pulse-on-live">
+//             {status}
+//           </Badge>
+//         </div>
+//         <CardDescription className="text-slate-600 dark:text-slate-400 text-base">
+//           {session.description}
+//         </CardDescription>
+//       </CardHeader>
+//       <CardContent className="flex-grow pt-4">
+//         <div className="space-y-3 mb-4">
+//           <div className="flex items-center text-sm text-slate-700 dark:text-slate-300">
+//             <CalendarCheck className="h-4 w-4 mr-2 text-blue-500" />
+//             <span>Date: {formatDate(startTime).split(',')[0]}</span>
+//           </div>
+//           <div className="flex items-center text-sm text-slate-700 dark:text-slate-300">
+//             <Clock className="h-4 w-4 mr-2 text-purple-500" />
+//             <span>
+//               Time: {new Intl.DateTimeFormat("en-US", { timeStyle: "short" }).format(startTime)} -{" "}
+//               {new Intl.DateTimeFormat("en-US", { timeStyle: "short" }).format(endTime)}
+//             </span>
+//           </div>
+//           {numberOfQuizzes > 0 && (
+//             <div className="flex items-center text-sm text-slate-700 dark:text-slate-300">
+//               <Layers className="h-4 w-4 mr-2 text-green-500" />
+//               <span>Quizzes: {numberOfQuizzes}</span>
+//             </div>
+//           )}
+//         </div>
+//         {hasAttachments && (
+//           <>
+//             <Separator className="my-4" />
+//             <div className="mt-4">
+//               <h4 className="text-lg font-semibold text-slate-800 dark:text-white mb-3">Resources</h4>
+//               <ul className="space-y-2">
+//                 {session.attachments.map((attachment: any) => (
+//                   <li key={attachment.id} className="flex items-center text-blue-600 dark:text-blue-400 hover:underline">
+//                     <Download className="h-4 w-4 mr-2" />
+//                     <a href={attachment.url} target="_blank" rel="noopener noreferrer" className="truncate">
+//                       {attachment.name}
+//                     </a>
+//                   </li>
+//                 ))}
+//               </ul>
+//             </div>
+//           </>
+//         )}
+//       </CardContent>
+//       <CardFooter className="pt-4 border-t border-slate-200 dark:border-slate-700">
+//         <div className="flex flex-col sm:flex-row justify-between items-center w-full gap-4">
+//           {hasAccess ? (
+//             <Button asChild disabled={!canJoin} className="w-full sm:w-auto">
+//               <Link href={canJoin ? session.meetingUrl! : "#"} target="_blank">
+//                 <Video className="h-4 w-4 mr-2" />
+//                 {status === "LIVE" ? "Join Now" : "View Details"}
+//               </Link>
+//             </Button>
+//           ) : (
+//             <div className="flex items-center text-amber-600 dark:text-amber-400 text-sm font-medium">
+//               <Lock className="h-4 w-4 mr-2" />
+//               <span>Purchase course to join</span>
+//             </div>
+//           )}
+//           {hasAccess && numberOfQuizzes > 0 && (
+//             <Button asChild className="w-full sm:w-auto bg-green-600 hover:bg-green-700">
+//               <Link href={`/courses/${session.courseId}/liveclasses/${session.id}/quiz`}>
+//                 <Layers className="h-4 w-4 mr-2" />
+//                 Attempt Quiz
+//               </Link>
+//             </Button>
+//           )}
+//           {hasGoogleFormQuiz && (
+//             <Button asChild className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700">
+//               <Link href={session.googleFormQuizUrl} target="_blank" rel="noopener noreferrer">
+//                 <ExternalLink className="h-4 w-4 mr-2" />
+//                 Take Google Forms Quiz
+//               </Link>
+//             </Button>
+//           )}
+//         </div>
+//       </CardFooter>
+//     </Card>
+//   );
+// };
+
+// const LiveClassesPage = async () => {
+//   const { userId } = auth();
+
+//   if (!userId) {
+//     console.log("[LIVECLASSES_PAGE] Redirecting to /: No userId");
+//     return redirect("/");
+//   }
+
+//   console.log(`[LIVECLASSES_PAGE] Rendering for userId: ${userId}`);
+
+//   const sessions = await getLiveSessions({ userId });
+
+//   const hasAccess = sessions.length > 0 ? sessions[0].hasAccess : false;
+
+//   return (
+//     <div className="p-6 bg-slate-50 dark:bg-slate-950 min-h-screen">
+//       <div className="max-w-7xl mx-auto">
+//         <div className="mb-10 text-center">
+//    <p className="text-5xl font-extrabold text-slate-900 dark:text-white leading-tight" style={{ backgroundColor: 'white' }}>Live Sessions</p>          <p className="text-lg text-slate-600 dark:text-slate-400 mt-4">
+//             Join live sessions with instructors, ask questions, and learn with your peers.
+//           </p>
+//         </div>
+
+//         {!hasAccess && (
+//           <div className="bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-950 dark:to-rose-900 border-l-4 border-red-600 text-red-700 dark:text-red-200 p-8 rounded-lg shadow-xl flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8 mb-10">
+//             <Lock className="h-12 w-12 text-red-500 dark:text-red-400 flex-shrink-0" />
+//             <div className="text-center md:text-left flex-grow">
+//               <h2 className="text-3xl font-bold mb-3">Access Restricted</h2>
+//               <p className="text-lg">
+//                 You haven't purchased any courses with live sessions. Enroll now to join the community!
+//               </p>
+//               <Button asChild className="mt-4 px-8 py-3 text-lg font-semibold bg-blue-600 hover:bg-blue-700 dark:text-white">
+//                 <Link href="/courses">Browse Courses</Link>
+//               </Button>
+//             </div>
+//           </div>
+//         )}
+
+//         {hasAccess && sessions.length === 0 && (
+//           <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-200 dark:border-gray-900">
+//             <File className="mx-auto h-16 w-16 text-gray-400 dark:text-gray-200 mb-6" />
+//             <h3 className="mt-4 text-3xl font-bold text-gray-700 dark:text-white">No Live Sessions Available</h3>
+//             <p className="mt-2 text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
+//               We're excited to bring you more live content soon! No live sessions are available for your purchased courses.
+//             </p>
+//           </div>
+//         )}
+
+//         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mt-8">
+//           {hasAccess &&
+//             sessions.map((session) => (
+//               <LiveSessionCard key={session.id} session={session} hasAccess={true} />
+//             ))}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default LiveClassesPage;
+
+
+
+
+
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getLiveSessions } from "@/actions/get-live-sessions";
-import { File, Clock, Video, Lock } from "lucide-react";
+import { File, Clock, Video, Lock, Layers, Download, CalendarCheck, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
-// Helper function to format dates
 const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat("en-US", {
     dateStyle: "full",
@@ -509,110 +850,184 @@ const formatDate = (date: Date) => {
   }).format(date);
 };
 
-
-// Component for a single Live Session Card
 const LiveSessionCard = ({ session, hasAccess }: { session: any, hasAccess: boolean }) => {
-  const now = new Date();
-  const startTime = new Date(session.startTime);
-  const endTime = new Date(session.endTime);
+  const now = new Date(); // Current time in UTC
+  const startTime = new Date(session.startTime); // Assuming UTC from database
+  const endTime = new Date(session.endTime); // Assuming UTC from database
+
+  // Convert to user's local time zone (e.g., CEST) for comparison and display
+  const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  console.log("[LIVE_SESSION_CARD] User Time Zone:", userTimeZone);
+
+  const options = { timeZone: userTimeZone, hour12: false };
+  const nowLocal = new Date(now.toLocaleString("en-US", options));
+  const startTimeLocal = new Date(startTime.toLocaleString("en-US", options));
+  const endTimeLocal = new Date(endTime.toLocaleString("en-US", options));
+
+  console.log("[LIVE_SESSION_CARD] Time Data:", {
+    nowUTC: now.toISOString(),
+    nowLocal: nowLocal.toISOString(),
+    startTimeUTC: startTime.toISOString(),
+    startTimeLocal: startTimeLocal.toISOString(),
+    endTimeUTC: endTime.toISOString(),
+    endTimeLocal: endTimeLocal.toISOString(),
+  });
 
   let status: "UPCOMING" | "LIVE" | "FINISHED" = "UPCOMING";
-  let statusColor: "default" | "destructive" | "secondary" = "default";
+  let statusColor: "default" | "destructive" | "secondary" | "success" = "default";
 
-  if (now >= startTime && now <= endTime) {
+  if (nowLocal >= startTimeLocal && nowLocal <= endTimeLocal) {
     status = "LIVE";
     statusColor = "destructive";
-  } else if (now > endTime) {
+  } else if (nowLocal > endTimeLocal) {
     status = "FINISHED";
     statusColor = "secondary";
+  } else {
+    statusColor = "success";
   }
 
   const canJoin = hasAccess && status === "LIVE" && session.meetingUrl;
+  const numberOfQuizzes = session.liveclassquizzes ? session.liveclassquizzes.length : 0;
+  const hasAttachments = session.attachments && session.attachments.length > 0;
+  const hasGoogleFormQuiz = hasAccess && session.googleFormQuizUrl;
+
+  console.log("[LIVE_SESSION_CARD] Session Data:", {
+    id: session.id,
+    courseId: session.courseId,
+    courseTitle: session.courseTitle,
+    numberOfQuizzes,
+    hasAccess,
+    status,
+    hasGoogleFormQuiz,
+    meetingUrl: session.meetingUrl,
+  });
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105">
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-2xl font-bold text-slate-800 dark:text-white">{session.title}</h3>
-          <Badge variant={statusColor} className="text-sm">{status}</Badge>
+    <Card className="flex flex-col h-full hover:shadow-lg transition-shadow duration-300 ease-in-out">
+      <CardHeader className="pb-4">
+        <div className="flex justify-between items-start mb-2">
+          <CardTitle className="text-2xl font-extrabold text-slate-900 dark:text-white leading-tight">
+            {session.title} ({session.courseTitle})
+          </CardTitle>
+          <Badge variant={statusColor} className="text-sm px-3 py-1 rounded-full animate-pulse-on-live">
+            {status}
+          </Badge>
         </div>
-        <p className="text-slate-600 dark:text-slate-400 mb-4">{session.description}</p>
-        
-        <div className="flex items-center text-sm text-slate-500 dark:text-slate-300 mb-4">
-          <Clock className="h-4 w-4 mr-2" />
-          <span>{formatDate(startTime)} - {new Intl.DateTimeFormat("en-US", { timeStyle: "short" }).format(endTime)}</span>
+        <CardDescription className="text-slate-600 dark:text-slate-400 text-base">
+          {session.description}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex-grow pt-4">
+        <div className="space-y-3 mb-4">
+          <div className="flex items-center text-sm text-slate-700 dark:text-slate-300">
+            <CalendarCheck className="h-4 w-4 mr-2 text-blue-500" />
+            <span>Date: {formatDate(startTime).split(',')[0]}</span>
+          </div>
+          <div className="flex items-center text-sm text-slate-700 dark:text-slate-300">
+            <Clock className="h-4 w-4 mr-2 text-purple-500" />
+            <span>
+              Time: {new Intl.DateTimeFormat("en-US", { timeStyle: "short", timeZone: userTimeZone }).format(startTimeLocal)} -{" "}
+              {new Intl.DateTimeFormat("en-US", { timeStyle: "short", timeZone: userTimeZone }).format(endTimeLocal)}
+            </span>
+          </div>
+          {numberOfQuizzes > 0 && (
+            <div className="flex items-center text-sm text-slate-700 dark:text-slate-300">
+              <Layers className="h-4 w-4 mr-2 text-green-500" />
+              <span>Quizzes: {numberOfQuizzes}</span>
+            </div>
+          )}
         </div>
-
-        <div className="flex justify-between items-center">
-            {hasAccess ? (
-                <Button asChild disabled={!canJoin}>
-                    <Link href={canJoin ? session.meetingUrl! : "https://meet.google.com/chr-vwrk-eyc?pli=1"} target="_blank">
-                        <Video className="h-4 w-4 mr-2" />
-                        Join Live Session
-                    </Link>
-                </Button>
-            ) : (
-                <div className="flex items-center text-yellow-600">
-                    <Lock className="h-4 w-4 mr-2" />
-                    <span>Purchase course to join</span>
-                </div>
-            )}
+        {hasAttachments && (
+          <>
+            <Separator className="my-4" />
+            <div className="mt-4">
+              <h4 className="text-lg font-semibold text-slate-800 dark:text-white mb-3">Resources</h4>
+              <ul className="space-y-2">
+                {session.attachments.map((attachment: any) => (
+                  <li key={attachment.id} className="flex items-center text-blue-600 dark:text-blue-400 hover:underline">
+                    <Download className="h-4 w-4 mr-2" />
+                    <a href={attachment.url} target="_blank" rel="noopener noreferrer" className="truncate">
+                      {attachment.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </>
+        )}
+      </CardContent>
+      <CardFooter className="pt-4 border-t border-slate-200 dark:border-slate-700">
+        <div className="flex flex-col sm:flex-row justify-between items-center w-full gap-4">
+          {hasAccess ? (
+            <Button asChild disabled={!session.meetingUrl} className="w-full sm:w-auto">
+              <Link href={session.meetingUrl || "#"} target="_blank">
+                <Video className="h-4 w-4 mr-2" />
+                {status === "LIVE" ? "Join Now" : "View Details"}
+              </Link>
+            </Button>
+          ) : (
+            <div className="flex items-center text-amber-600 dark:text-amber-400 text-sm font-medium">
+              <Lock className="h-4 w-4 mr-2" />
+              <span>Purchase course to join</span>
+            </div>
+          )}
+          {hasAccess && numberOfQuizzes > 0 && (
+            <Button asChild className="w-full sm:w-auto bg-green-600 hover:bg-green-700">
+              <Link href={`/courses/${session.courseId}/liveclasses/${session.id}/quiz`}>
+                <Layers className="h-4 w-4 mr-2" />
+                Attempt Quiz
+              </Link>
+            </Button>
+          )}
+          {hasGoogleFormQuiz && (
+            <Button asChild className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700">
+              <Link href={session.googleFormQuizUrl} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Take Google Forms Quiz
+              </Link>
+            </Button>
+          )}
         </div>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 };
 
-
-// Main Page Component
-const LiveClassesPage = async ({ params }: { params: { courseId: string } }) => {
+const LiveClassesPage = async () => {
   const { userId } = auth();
 
   if (!userId) {
+    console.log("[LIVECLASSES_PAGE] Redirecting to /: No userId");
     return redirect("/");
   }
 
-  const sessions = await getLiveSessions({
-    userId,
-    courseId: params.courseId,
-  });
-  
-  // Check access from the first session (it's the same for all)
-  const hasAccess = sessions.length > 0 ? sessions[0].hasAccess : false;
+  console.log(`[LIVECLASSES_PAGE] Rendering for userId: ${userId}`);
+
+  const sessions = await getLiveSessions({ userId });
 
   return (
     <div className="p-6 bg-slate-50 dark:bg-slate-950 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-            <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white">Live Classes</h1>
-            <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">
-                Join live sessions with instructors, ask questions, and learn with your peers.
-            </p>
+        <div className="mb-10 text-center">
+          <p className="text-5xl font-extrabold text-slate-900 dark:text-white leading-tight" style={{ backgroundColor: 'white' }}>Live Sessions</p>
+          <p className="text-lg text-slate-600 dark:text-slate-400 mt-4">
+            Join live sessions with instructors, ask questions, and learn with your peers.
+          </p>
         </div>
 
-        {!hasAccess && (
-            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg shadow-md flex items-center">
-                <Lock className="h-8 w-8 mr-4 text-yellow-600" />
-                <div>
-                    <h2 className="text-xl font-bold">Access Denied</h2>
-                    <p>You must purchase this course to access the live classes. Please enroll in the course to join these exclusive sessions.</p>
-                </div>
-            </div>
-        )}
-
-        {hasAccess && sessions.length === 0 && (
-             <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-lg shadow-md">
-                <File className="mx-auto h-12 w-12 text-slate-400" />
-                <h3 className="mt-4 text-lg font-medium text-slate-800 dark:text-white">No Live Sessions Scheduled</h3>
-                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                    There are currently no live sessions available for this course. Please check back later.
-                </p>
-            </div>
+        {sessions.length === 0 && (
+          <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-200 dark:border-gray-900">
+            <File className="mx-auto h-16 w-16 text-gray-400 dark:text-gray-200 mb-6" />
+            <h3 className="mt-4 text-3xl font-bold text-gray-700 dark:text-white">No Live Sessions Available</h3>
+            <p className="mt-2 text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
+              We're excited to bring you more live content soon! No live sessions are available for your purchased courses.
+            </p>
+          </div>
         )}
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mt-8">
           {sessions.map((session) => (
-            <LiveSessionCard key={session.id} session={session} hasAccess={hasAccess} />
+            <LiveSessionCard key={session.id} session={session} hasAccess={session.hasAccess} />
           ))}
         </div>
       </div>
